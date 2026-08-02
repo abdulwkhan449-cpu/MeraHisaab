@@ -21,6 +21,7 @@
 
     <!-- Budgets-specific styles -->
     <link rel="stylesheet" href="budgets.css" />
+
 </head>
 <body>
 
@@ -42,7 +43,7 @@
                 <a href="index.html" class="nav-item"><i class="fas fa-home"></i> Dashboard</a>
                 <a href="report.html" class="nav-item"><i class="fas fa-chart-line"></i> Reports</a>
                 <a href="budget.html" class="nav-item active"><i class="fas fa-wallet"></i> Budgets</a>
-                <a href="setting.html" class="nav-item" id="settingsNavTrigger"><i class="fas fa-cog"></i> Settings</a>
+                <a href="#" class="nav-item" id="settingsNavTrigger"><i class="fas fa-cog"></i> Settings</a>
             </nav>
             <div class="sidebar-user">
                 <div class="avatar" id="userAvatar">JD</div>
@@ -54,7 +55,7 @@
         <!-- Overlay -->
         <div class="overlay" id="sidebarOverlay"></div>
 
-        <!-- Main Content (same as Dashboard – no extra container) -->
+        <!-- Main Content -->
         <main class="main-content" id="mainContent">
 
             <header class="top-header">
@@ -62,7 +63,7 @@
                     <button class="hamburger" id="menuToggle"><i class="fas fa-bars"></i></button>
                     <div>
                         <h1 class="text-3xl font-bold">Budgets</h1>
-                        <p id="currentMonthDisplay" class="subtitle">Manage your monthly spending limits</p>
+                        <p id="currentPeriodDisplay" class="subtitle">Full Year 2026 Overview</p>
                     </div>
                 </div>
                 <div class="header-actions">
@@ -74,7 +75,7 @@
                 </div>
             </header>
 
-            <!-- Summary Cards (same as Dashboard) -->
+            <!-- Summary Cards -->
             <section class="summary-grid">
                 <div class="card card-balance">
                     <div class="card-header"><i class="fas fa-wallet"></i> Total Budget</div>
@@ -93,11 +94,29 @@
                 </div>
             </section>
 
-            <!-- Filter Bar (same as Dashboard) -->
+            <!-- Filter Bar (Year + Month) -->
             <div class="filter-bar">
                 <div class="filter-left">
-                    <label for="budgetMonthFilter"><i class="fas fa-calendar-alt"></i> Month:</label>
-                    <input type="month" id="budgetMonthFilter" />
+                    <label for="yearFilter"><i class="fas fa-calendar-alt"></i> Year:</label>
+                    <select id="yearFilter" class="px-4 py-2 rounded-lg border dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white font-semibold">
+                        <!-- populated by JS -->
+                    </select>
+                    <label for="monthFilter">Month:</label>
+                    <select id="monthFilter" class="px-4 py-2 rounded-lg border dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white font-semibold">
+                        <option value="all">All</option>
+                        <option value="01">January</option>
+                        <option value="02">February</option>
+                        <option value="03">March</option>
+                        <option value="04">April</option>
+                        <option value="05">May</option>
+                        <option value="06">June</option>
+                        <option value="07">July</option>
+                        <option value="08">August</option>
+                        <option value="09">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
                 </div>
                 <div class="filter-right">
                     <span class="stat-badge" id="budgetCountBadge"><i class="fas fa-list"></i> 0 Budgets</span>
@@ -105,11 +124,11 @@
                 </div>
             </div>
 
-            <!-- Budgets List (same as Dashboard's transaction list) -->
+            <!-- Budgets List -->
             <div class="list-box">
                 <div class="list-header">
                     <h2 class="text-xl font-semibold"><i class="fas fa-wallet text-purple-600"></i> Your Budgets</h2>
-                    <span id="listMonthLabel" class="text-sm text-gray-500 dark:text-gray-400">For July 2026</span>
+                    <span id="listPeriodLabel" class="text-sm text-gray-500 dark:text-gray-400">For Full Year 2026</span>
                 </div>
                 <div id="budgetList">
                     <!-- Rendered by JS -->
@@ -136,6 +155,11 @@
                     <option value="Rent">Rent</option>
                     <option value="Other">Other</option>
                 </select>
+            </div>
+            <div class="form-group">
+                <label for="budgetMonth">Month (YYYY-MM)</label>
+                <input type="month" id="budgetMonth" required />
+                <small class="text-gray-500 dark:text-gray-400 block mt-1">Select the month this budget applies to.</small>
             </div>
             <div class="form-group">
                 <label for="budgetAmount">Monthly Limit</label>
