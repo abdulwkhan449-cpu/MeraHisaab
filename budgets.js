@@ -180,6 +180,15 @@ function saveBudgets(budgets) {
 // ============================================================
 // 6. FILTER LOGIC (Year + Month, with "All" options)
 // ============================================================
+function getFilteredTransactions(transactions, year, month) {
+    return transactions.filter(tx => {
+        if (!tx.date) return false;
+        if (year !== 'all' && tx.date.slice(0, 4) !== year) return false;
+        if (month !== 'all' && tx.date.slice(5, 7) !== month) return false;
+        return true;
+    });
+}
+
 function getFilteredBudgets(budgets, year, month) {
     return budgets.filter(b => {
         if (year !== 'all' && b.month.slice(0, 4) !== year) return false;
@@ -221,7 +230,7 @@ function populateYearFilter(years) {
 }
 
 // ============================================================
-// 7. RENDER ALL
+// 7. RENDER ALL (UPDATED – shows dashboard data even without budgets)
 // ============================================================
 function renderAll() {
     const transactions = loadTransactions();
@@ -231,12 +240,15 @@ function renderAll() {
 
     const selectedYear = document.getElementById('yearFilter').value;
     const selectedMonth = document.getElementById('monthFilter').value;
-    const filtered = getFilteredBudgets(budgets, selectedYear, selectedMonth);
+    
+    // Get filtered transactions for summary cards
+    const filteredTxs = getFilteredTransactions(transactions, selectedYear, selectedMonth);
+    const filteredBudgets = getFilteredBudgets(budgets, selectedYear, selectedMonth);
 
     updatePeriodLabel(selectedYear, selectedMonth);
-    updateSummaryCards(filtered, transactions);
-    renderBudgetList(filtered, transactions);
-    updateBadges(filtered);
+    updateSummaryCards(filteredTxs, filteredBudgets);
+    renderBudgetList(filteredBudgets, filteredTxs);
+    updateBadges(filteredBudgets);
 }
 
 function updatePeriodLabel(year, month) {
@@ -254,21 +266,40 @@ function updatePeriodLabel(year, month) {
     document.getElementById('listPeriodLabel').textContent = 'For ' + label;
 }
 
-function updateSummaryCards(filteredBudgets, allTransactions) {
-    let totalBudget = 0;
-    let totalSpent = 0;
-    filteredBudgets.forEach(b => {
-        totalBudget += b.amount;
-        const spent = allTransactions
-            .filter(tx => tx.type === 'expense' && tx.category === b.category && tx.date && tx.date.startsWith(b.month))
-            .reduce((sum, tx) => sum + tx.amount, 0);
-        totalSpent += spent;
+// 🔥 UPDATED: Shows dashboard data even without budgets
+function updateSummaryCards(filteredTransactions, filteredBudgets) {
+    // Calculate income and expenses from transactions
+    let totalIncome = 0, totalExpense = 0;
+    filteredTransactions.forEach(tx => {
+        if (tx.type === 'income') totalIncome += tx.amount;
+        else totalExpense += tx.amount;
     });
-    const usage = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
+    const balance = totalIncome - totalExpense;
+    const savingsRate = totalIncome > 0 ? ((balance / totalIncome) * 100) : 0;
 
-    document.getElementById('totalBudgetDisplay').textContent = formatCurrency(totalBudget);
-    document.getElementById('totalSpentDisplay').textContent = formatCurrency(totalSpent);
-    document.getElementById('overallUsageDisplay').textContent = usage.toFixed(0) + '%';
+    // If budgets exist, show budget data; otherwise show transaction data
+    if (filteredBudgets.length > 0) {
+        // Show budget-specific data
+        let totalBudget = 0;
+        let totalSpent = 0;
+        filteredBudgets.forEach(b => {
+            totalBudget += b.amount;
+            const spent = filteredTransactions
+                .filter(tx => tx.type === 'expense' && tx.category === b.category && tx.date && tx.date.startsWith(b.month))
+                .reduce((sum, tx) => sum + tx.amount, 0);
+            totalSpent += spent;
+        });
+        const usage = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
+
+        document.getElementById('totalBudgetDisplay').textContent = formatCurrency(totalBudget);
+        document.getElementById('totalSpentDisplay').textContent = formatCurrency(totalSpent);
+        document.getElementById('overallUsageDisplay').textContent = usage.toFixed(0) + '%';
+    } else {
+        // 🔥 NO BUDGETS SET – show dashboard data instead
+        document.getElementById('totalBudgetDisplay').textContent = formatCurrency(totalIncome);
+        document.getElementById('totalSpentDisplay').textContent = formatCurrency(totalExpense);
+        document.getElementById('overallUsageDisplay').textContent = savingsRate.toFixed(0) + '%';
+    }
 }
 
 function updateBadges(filteredBudgets) {
@@ -287,7 +318,7 @@ function updateBadges(filteredBudgets) {
 // ============================================================
 // 8. RENDER BUDGET LIST
 // ============================================================
-function renderBudgetList(filteredBudgets, allTransactions) {
+function renderBudgetList(filteredBudgets, filteredTransactions) {
     const container = document.getElementById('budgetList');
     if (filteredBudgets.length === 0) {
         container.innerHTML = `
@@ -304,7 +335,7 @@ function renderBudgetList(filteredBudgets, allTransactions) {
 
     let html = '';
     filteredBudgets.forEach(b => {
-        const spent = allTransactions
+        const spent = filteredTransactions
             .filter(tx => tx.type === 'expense' && tx.category === b.category && tx.date && tx.date.startsWith(b.month))
             .reduce((sum, tx) => sum + tx.amount, 0);
         const remaining = b.amount - spent;
@@ -463,7 +494,7 @@ document.getElementById('saveBudgetBtn').addEventListener('click', () => {
 });
 
 // ============================================================
-// 10. AUTO-REFRESH WHEN DATA CHANGES (Integration with Dashboard)
+// 10. AUTO-REFRESH WHEN DATA CHANGES
 // ============================================================
 window.addEventListener('storage', (e) => {
     if (e.key === 'financeData' || e.key === 'budgets' || e.key === 'userProfile' || e.key === 'darkMode') {
