@@ -297,7 +297,7 @@ body {
     margin-top: 4px;
 }
 
-/* ========== OVERLAY (Mobile only, NO BLUR) ========== */
+/* ========== OVERLAY (Mobile only) ========== */
 .overlay {
     position: fixed;
     inset: 0;
@@ -312,9 +312,9 @@ body {
     opacity: 1;
 }
 
-/* ========== MAIN CONTENT (FULL WIDTH FIX) ========== */
+/* ========== MAIN CONTENT ========== */
 .main-content {
-    padding: 20px 24px;  /* Reduced padding */
+    padding: 20px 24px;
     transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     width: 100%;
     max-width: 100%;
@@ -328,7 +328,7 @@ body {
 }
 @media (max-width: 900px) {
     .main-content {
-        padding: 16px 16px; /* Even less padding on mobile for full width */
+        padding: 16px 16px;
     }
 }
 
@@ -459,14 +459,16 @@ body {
     gap: 12px;
     font-weight: 500;
     color: var(--text-secondary);
+    flex-wrap: wrap;
 }
-.filter-left input[type="month"] {
+.filter-left select {
     padding: 8px 12px;
     border-radius: 8px;
     border: 1px solid var(--border-color);
     background: var(--bg-input);
     color: var(--text-primary);
     font-weight: 600;
+    font-size: 0.9rem;
 }
 .filter-right {
     display: flex;
