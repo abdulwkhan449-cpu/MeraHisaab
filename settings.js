@@ -139,7 +139,53 @@ function showToast(message, type = 'info') {
 }
 
 // ============================================================
-// 5. SAVE PROFILE
+// 5. CONFIRMATION MODAL (Reusable)
+// ============================================================
+const confirmationModal = document.getElementById('confirmationModal');
+const confirmTitle = document.getElementById('confirmationTitle');
+const confirmMessage = document.getElementById('confirmationMessage');
+const confirmYesBtn = document.getElementById('confirmYesBtn');
+const confirmNoBtn = document.getElementById('confirmNoBtn');
+
+let confirmCallback = null; // stores the function to run on "Yes"
+
+function showConfirmation(title, message, onYes) {
+    confirmTitle.textContent = title;
+    confirmMessage.textContent = message;
+    confirmCallback = onYes || null;
+    confirmationModal.classList.add('active');
+}
+
+function closeConfirmation() {
+    confirmationModal.classList.remove('active');
+    confirmCallback = null;
+}
+
+// Yes button
+confirmYesBtn.addEventListener('click', () => {
+    if (typeof confirmCallback === 'function') {
+        confirmCallback();
+    }
+    closeConfirmation();
+});
+
+// No button
+confirmNoBtn.addEventListener('click', closeConfirmation);
+
+// Click outside to close
+confirmationModal.addEventListener('click', (e) => {
+    if (e.target === confirmationModal) closeConfirmation();
+});
+
+// Escape key to close
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && confirmationModal.classList.contains('active')) {
+        closeConfirmation();
+    }
+});
+
+// ============================================================
+// 6. SAVE PROFILE
 // ============================================================
 document.getElementById('saveProfileBtn').addEventListener('click', () => {
     const name = document.getElementById('settingsProfileName').value.trim();
@@ -162,7 +208,7 @@ document.getElementById('saveProfileBtn').addEventListener('click', () => {
 });
 
 // ============================================================
-// 6. EXPORT DATA
+// 7. EXPORT DATA
 // ============================================================
 document.getElementById('exportDataBtn').addEventListener('click', () => {
     const stored = localStorage.getItem('financeData');
@@ -201,7 +247,7 @@ document.getElementById('exportDataBtn').addEventListener('click', () => {
 });
 
 // ============================================================
-// 7. IMPORT DATA
+// 8. IMPORT DATA
 // ============================================================
 document.getElementById('importDataBtn').addEventListener('click', () => {
     document.getElementById('fileInput').click();
@@ -277,7 +323,7 @@ document.getElementById('fileInput').addEventListener('change', (e) => {
 });
 
 // ============================================================
-// 8. CLEAR ALL DATA
+// 9. CLEAR ALL DATA (with custom confirmation)
 // ============================================================
 document.getElementById('clearDataBtn').addEventListener('click', () => {
     const stored = localStorage.getItem('financeData');
@@ -286,27 +332,33 @@ document.getElementById('clearDataBtn').addEventListener('click', () => {
         return;
     }
 
-    if (!confirm('⚠️ Are you sure you want to permanently delete ALL your transactions? This cannot be undone!')) {
-        return;
-    }
-
-    localStorage.removeItem('financeData');
-    window.dispatchEvent(new Event('storage'));
-    showToast('🗑️ All data has been cleared.', 'info');
+    showConfirmation(
+        'Clear All Data?',
+        'Do you want to clear all of your data? This action cannot be undone.',
+        () => {
+            localStorage.removeItem('financeData');
+            window.dispatchEvent(new Event('storage'));
+            showToast('🗑️ All data has been cleared.', 'info');
+        }
+    );
 });
 
 // ============================================================
-// 9. LOGOUT
+// 10. LOGOUT (with custom confirmation)
 // ============================================================
 document.getElementById('settingsLogoutBtn').addEventListener('click', () => {
-    if (confirm('Are you sure you want to logout?')) {
-        localStorage.removeItem('userProfile');
-        window.location.href = 'index.html';
-    }
+    showConfirmation(
+        'Logout?',
+        'Do you want to log out?',
+        () => {
+            localStorage.removeItem('userProfile');
+            window.location.href = 'index.html';
+        }
+    );
 });
 
 // ============================================================
-// 10. QUICK ADD MONEY (NEW)
+// 11. QUICK ADD MONEY
 // ============================================================
 const quickForm = document.getElementById('quickAddForm');
 const quickDescription = document.getElementById('quickDescription');
@@ -333,14 +385,10 @@ quickForm.addEventListener('submit', (e) => {
         return;
     }
 
-    // Get today's date
     const today = new Date().toISOString().slice(0, 10);
-
-    // Load existing transactions
     const stored = localStorage.getItem('financeData');
     let transactions = stored ? JSON.parse(stored) : [];
 
-    // Create new transaction
     const newTx = {
         id: Date.now(),
         description: description,
@@ -353,17 +401,14 @@ quickForm.addEventListener('submit', (e) => {
     transactions.push(newTx);
     localStorage.setItem('financeData', JSON.stringify(transactions));
 
-    // Reset form
     quickForm.reset();
     document.querySelector('input[name="quickType"][value="income"]').checked = true;
 
-    // Show success message
     quickAddSuccess.style.display = 'block';
     setTimeout(() => {
         quickAddSuccess.style.display = 'none';
     }, 3000);
 
-    // Dispatch event for other pages
     document.dispatchEvent(new Event('transactionsUpdated'));
     window.dispatchEvent(new Event('storage'));
 
@@ -371,7 +416,7 @@ quickForm.addEventListener('submit', (e) => {
 });
 
 // ============================================================
-// 11. LISTEN FOR STORAGE CHANGES
+// 12. LISTEN FOR STORAGE CHANGES
 // ============================================================
 window.addEventListener('storage', (e) => {
     if (e.key === 'userProfile') {
@@ -402,7 +447,7 @@ window.addEventListener('storage', (e) => {
 });
 
 // ============================================================
-// 12. INITIALIZATION
+// 13. INITIALIZATION
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
     const hasUser = loadUserProfile();
