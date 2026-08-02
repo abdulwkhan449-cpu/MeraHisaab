@@ -158,7 +158,6 @@ function toggleDarkMode() {
     const isDark = document.body.classList.contains('dark');
     darkToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i> Light' : '<i class="fas fa-moon"></i> Dark';
     localStorage.setItem('darkMode', isDark);
-    // No chart to re-render, but keep for consistency
 }
 
 // ============================================================
@@ -183,7 +182,6 @@ function saveBudgets(budgets) {
 // ============================================================
 function getFilteredBudgets(budgets, year, month) {
     return budgets.filter(b => {
-        // b.month format: "YYYY-MM"
         if (year !== 'all' && b.month.slice(0, 4) !== year) return false;
         if (month !== 'all' && b.month.slice(5, 7) !== month) return false;
         return true;
@@ -206,7 +204,6 @@ function populateYearFilter(years) {
     const currentYear = new Date().getFullYear().toString();
     select.innerHTML = '';
     
-    // "All Years" option
     const allOpt = document.createElement('option');
     allOpt.value = 'all';
     allOpt.textContent = 'All Years';
@@ -262,7 +259,6 @@ function updateSummaryCards(filteredBudgets, allTransactions) {
     let totalSpent = 0;
     filteredBudgets.forEach(b => {
         totalBudget += b.amount;
-        // Calculate spent for that category and month (exact month)
         const spent = allTransactions
             .filter(tx => tx.type === 'expense' && tx.category === b.category && tx.date && tx.date.startsWith(b.month))
             .reduce((sum, tx) => sum + tx.amount, 0);
@@ -277,12 +273,9 @@ function updateSummaryCards(filteredBudgets, allTransactions) {
 
 function updateBadges(filteredBudgets) {
     document.getElementById('budgetCountBadge').innerHTML = `<i class="fas fa-list"></i> ${filteredBudgets.length} Budgets`;
+    const transactions = loadTransactions();
     let overCount = 0;
     filteredBudgets.forEach(b => {
-        // We'll compute over-budget count here, but we already have spent data from the summary
-        // We'll compute in renderBudgetList and store in a data attribute? For simplicity,
-        // we can compute again.
-        const transactions = loadTransactions();
         const spent = transactions
             .filter(tx => tx.type === 'expense' && tx.category === b.category && tx.date && tx.date.startsWith(b.month))
             .reduce((sum, tx) => sum + tx.amount, 0);
@@ -327,7 +320,7 @@ function renderBudgetList(filteredBudgets, allTransactions) {
         } else if (spent === b.amount) {
             statusClass = 'exact';
             progressClass = 'warning';
-            remainingText = `Exactly at limit`;
+            remainingText = 'Exactly at limit';
         } else {
             statusClass = 'under';
             progressClass = 'safe';
@@ -363,7 +356,6 @@ function renderBudgetList(filteredBudgets, allTransactions) {
     });
     container.innerHTML = html;
 
-    // Attach event listeners to edit/delete buttons
     container.querySelectorAll('.edit-budget-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const category = btn.dataset.category;
@@ -410,14 +402,13 @@ function openBudgetModal(budget = null) {
     } else {
         editingBudget = null;
         title.innerHTML = '<i class="fas fa-plus-circle text-purple-600"></i> Set Budget';
-        // Default to selected month from filter, or current month
         const year = document.getElementById('yearFilter').value;
         const month = document.getElementById('monthFilter').value;
-        let defaultMonth = new Date().toISOString().slice(0, 7); // current YYYY-MM
+        let defaultMonth = new Date().toISOString().slice(0, 7);
         if (year !== 'all' && month !== 'all') {
             defaultMonth = year + '-' + month;
         } else if (year !== 'all') {
-            defaultMonth = year + '-01'; // fallback to January
+            defaultMonth = year + '-01';
         }
         monthInput.value = defaultMonth;
         categoryInput.value = 'Food & Dining';
@@ -455,11 +446,9 @@ document.getElementById('saveBudgetBtn').addEventListener('click', () => {
     let budgets = loadBudgets();
 
     if (editingBudget) {
-        // Remove old entry
         budgets = budgets.filter(b => !(b.category === editingBudget.category && b.month === editingBudget.month));
     }
 
-    // Check for duplicate (same category + month)
     const exists = budgets.some(b => b.category === category && b.month === month);
     if (exists) {
         showToast(`A budget for "${category}" in ${month} already exists.`, 'error');
@@ -474,7 +463,23 @@ document.getElementById('saveBudgetBtn').addEventListener('click', () => {
 });
 
 // ============================================================
-// 10. INITIALIZATION
+// 10. AUTO-REFRESH WHEN DATA CHANGES (Integration with Dashboard)
+// ============================================================
+window.addEventListener('storage', (e) => {
+    if (e.key === 'financeData' || e.key === 'budgets' || e.key === 'userProfile' || e.key === 'darkMode') {
+        console.log('🔄 Data changed in another tab – refreshing Budgets...');
+        renderAll();
+        updateUIWithUser();
+    }
+});
+
+document.addEventListener('transactionsUpdated', () => {
+    console.log('🔄 Transactions updated – refreshing Budgets...');
+    renderAll();
+});
+
+// ============================================================
+// 11. INITIALIZATION
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
     const hasUser = loadUserProfile();
@@ -489,17 +494,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     darkToggle.addEventListener('click', toggleDarkMode);
 
-    // Set default month to "All"
     document.getElementById('monthFilter').value = 'all';
-
-    // Initial render
     renderAll();
 
-    // Event listeners for filter changes
     document.getElementById('yearFilter').addEventListener('change', renderAll);
     document.getElementById('monthFilter').addEventListener('change', renderAll);
 
-    // Restore sidebar state
     const savedSidebarState = localStorage.getItem('sidebarOpen');
     const isDesktop = window.innerWidth >= 901;
     let defaultOpen = isDesktop;
