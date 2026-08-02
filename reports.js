@@ -171,8 +171,25 @@ function loadTransactions() {
 }
 
 // ============================================================
-// 7. YEAR FILTER LOGIC
+// 7. FILTER LOGIC (Year + Month, with "All" options)
 // ============================================================
+function getFilteredTransactions(transactions, year, month) {
+    return transactions.filter(tx => {
+        if (!tx.date) return false;
+        // Year filter
+        if (year !== 'all') {
+            const txYear = tx.date.slice(0, 4);
+            if (txYear !== year) return false;
+        }
+        // Month filter
+        if (month !== 'all') {
+            const txMonth = tx.date.slice(5, 7);
+            if (txMonth !== month) return false;
+        }
+        return true;
+    });
+}
+
 function getAvailableYears(transactions) {
     const years = new Set();
     transactions.forEach(tx => {
@@ -189,12 +206,17 @@ function populateYearFilter(years) {
     const currentYear = new Date().getFullYear().toString();
     select.innerHTML = '';
     
+    // Add "All Years" option
+    const allOpt = document.createElement('option');
+    allOpt.value = 'all';
+    allOpt.textContent = 'All Years';
+    select.appendChild(allOpt);
+    
     if (years.length === 0) {
         years = [currentYear];
     }
     
-    // Show most recent year first
-    years.sort((a, b) => b - a);
+    years.sort((a, b) => b - a); // newest first
     
     years.forEach(year => {
         const option = document.createElement('option');
@@ -207,32 +229,39 @@ function populateYearFilter(years) {
     });
 }
 
-function getTransactionsForYear(transactions, year) {
-    return transactions.filter(tx => tx.date && tx.date.startsWith(year));
-}
-
 // ============================================================
 // 8. RENDER ALL (Main function)
 // ============================================================
 function renderAll() {
-    const transactions = loadTransactions(); // Same data as Dashboard
+    const transactions = loadTransactions();
     const years = getAvailableYears(transactions);
     populateYearFilter(years);
     
     const selectedYear = document.getElementById('yearFilter').value;
-    const yearData = getTransactionsForYear(transactions, selectedYear);
+    const selectedMonth = document.getElementById('monthFilter').value;
+    const filtered = getFilteredTransactions(transactions, selectedYear, selectedMonth);
     
-    updateSummaryCards(yearData);
-    renderMonthlyChart(yearData);
-    renderCategoryChart(yearData);
-    renderTopSpending(yearData);
+    updateSummaryCards(filtered);
+    renderMonthlyChart(filtered);
+    renderCategoryChart(filtered);
+    renderTopSpending(filtered);
     updateUIWithUser();
-    updateCountBadge(yearData.length);
-    updateYearDisplay(selectedYear);
+    updateCountBadge(filtered.length);
+    updatePeriodDisplay(selectedYear, selectedMonth);
 }
 
-function updateYearDisplay(year) {
-    document.getElementById('currentYearDisplay').textContent = `Overview for ${year}`;
+function updatePeriodDisplay(year, month) {
+    const monthNames = ['January','February','March','April','May','June',
+                        'July','August','September','October','November','December'];
+    let label = '';
+    if (year === 'all') {
+        label = 'All Time';
+    } else if (month !== 'all') {
+        label = monthNames[parseInt(month)-1] + ' ' + year;
+    } else {
+        label = 'Full Year ' + year;
+    }
+    document.getElementById('currentPeriodDisplay').textContent = label + ' Overview';
 }
 
 function updateCountBadge(count) {
@@ -240,7 +269,7 @@ function updateCountBadge(count) {
 }
 
 // ============================================================
-// 9. SUMMARY CARDS (shows real data from transactions)
+// 9. SUMMARY CARDS
 // ============================================================
 function updateSummaryCards(transactions) {
     let totalIncome = 0, totalExpense = 0;
@@ -449,7 +478,7 @@ function renderTopSpending(transactions) {
         container.innerHTML = `
             <div class="text-center text-gray-500 dark:text-gray-400 py-8">
                 <i class="fas fa-coffee text-4xl mb-2 block"></i>
-                No expenses this year. Enjoy your savings!
+                No expenses this period. Enjoy your savings!
             </div>
         `;
         return;
@@ -487,7 +516,6 @@ function renderTopSpending(transactions) {
 // ============================================================
 // 13. AUTO-REFRESH WHEN DATA CHANGES (Integration with Dashboard)
 // ============================================================
-// Listen for storage changes from other tabs/pages
 window.addEventListener('storage', (e) => {
     if (e.key === 'financeData' || e.key === 'userProfile' || e.key === 'darkMode') {
         console.log('🔄 Data changed in another tab – refreshing Reports...');
@@ -496,7 +524,6 @@ window.addEventListener('storage', (e) => {
     }
 });
 
-// Also listen for custom events (in case of same-tab updates)
 document.addEventListener('transactionsUpdated', () => {
     console.log('🔄 Transactions updated – refreshing Reports...');
     renderAll();
@@ -518,11 +545,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     darkToggle.addEventListener('click', toggleDarkMode);
     
+    // Set default month to "All"
+    document.getElementById('monthFilter').value = 'all';
+    
     // Initial render
     renderAll();
     
-    // Event listener for year filter change
+    // Event listeners for filter changes
     document.getElementById('yearFilter').addEventListener('change', renderAll);
+    document.getElementById('monthFilter').addEventListener('change', renderAll);
     
     // Restore sidebar state
     const savedSidebarState = localStorage.getItem('sidebarOpen');
