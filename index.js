@@ -1,9 +1,8 @@
 // ============================================================
-// 0. USER PROFILE MANAGEMENT (CURRENCY FIXED)
+// 0. USER PROFILE MANAGEMENT
 // ============================================================
 let userProfile = { name: 'Guest', currency: 'PKR', symbol: 'Rs' };
 
-// ✅ Currency Symbol Map
 const CURRENCY_SYMBOLS = {
     PKR: 'Rs',
     USD: '$',
@@ -65,7 +64,7 @@ function updateUIWithUser() {
 }
 
 // ============================================================
-// ⭐ UPDATED: Login Page Display with Force-Clear
+// LOGIN PAGE (with force-clear)
 // ============================================================
 function showLoginPage(show) {
     const loginPage = document.getElementById('loginPage');
@@ -74,19 +73,12 @@ function showLoginPage(show) {
         loginPage.classList.remove('hidden');
         appContainer.style.display = 'none';
 
-        // 🔥 FORCE CLEAR input fields (defeats pre-filled values & autofill)
         const nameInput = document.getElementById('loginName');
         const balanceInput = document.getElementById('loginBalance');
-        
-        // Clear immediately
         nameInput.value = '';
         balanceInput.value = '';
-        
-        // Disable autofill (browser might override)
         nameInput.setAttribute('autocomplete', 'off');
         balanceInput.setAttribute('autocomplete', 'off');
-        
-        // Extra: clear again after a tiny delay (catches browser auto-fill)
         setTimeout(() => {
             nameInput.value = '';
             balanceInput.value = '';
@@ -207,14 +199,13 @@ logoutBtn.addEventListener('click', () => {
 });
 
 // ============================================================
-// 3. LOGIN HANDLER (UPDATED - No pre-filled values)
+// 3. LOGIN HANDLER
 // ============================================================
 const loginBtn = document.getElementById('loginBtn');
 const loginName = document.getElementById('loginName');
 const loginBalance = document.getElementById('loginBalance');
 const loginCurrency = document.getElementById('loginCurrency');
 
-// Ensure they are empty on page load (extra safety)
 loginName.value = '';
 loginBalance.value = '';
 
@@ -230,7 +221,6 @@ loginBtn.addEventListener('click', () => {
     saveUserProfile(name, currency, balance);
 });
 
-// Allow Enter key on both fields
 loginBalance.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') loginBtn.click();
 });
@@ -261,6 +251,7 @@ const incomeDisplay = document.getElementById('incomeDisplay');
 const expenseDisplay = document.getElementById('expenseDisplay');
 const savingsDisplay = document.getElementById('savingsDisplay');
 const transactionList = document.getElementById('transactionList');
+const yearFilter = document.getElementById('yearFilter');
 const monthFilter = document.getElementById('monthFilter');
 const darkToggle = document.getElementById('darkModeToggle');
 const chartCanvas = document.getElementById('expenseChart');
@@ -272,20 +263,26 @@ const topCategoryBadge = document.getElementById('topCategoryBadge');
 const toastContainer = document.getElementById('toastContainer');
 
 // ============================================================
-// 6. INIT
+// 6. INIT (FIXED: load data FIRST, then populate year dropdown)
 // ============================================================
 function initApp() {
+    loadFromLocalStorage();          // 🔥 Load transactions first
+    populateYearFilter();            // Now populate years from loaded data
     const now = new Date();
-    const monthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-    monthFilter.value = monthStr;
-    updateMonthLabel(monthStr);
-
-    loadFromLocalStorage();
+    const currentYear = now.getFullYear();
+    const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
+    yearFilter.value = currentYear;
+    monthFilter.value = currentMonth;
+    updatePeriodLabel();
     renderAll();
 
     form.addEventListener('submit', handleFormSubmit);
+    yearFilter.addEventListener('change', () => {
+        updatePeriodLabel();
+        renderAll();
+    });
     monthFilter.addEventListener('change', () => {
-        updateMonthLabel(monthFilter.value);
+        updatePeriodLabel();
         renderAll();
     });
     darkToggle.addEventListener('click', toggleDarkMode);
@@ -313,7 +310,6 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleSidebar(defaultOpen);
     } else {
         showLoginPage(true);
-        // Additional clear (just in case)
         document.getElementById('loginName').value = '';
         document.getElementById('loginBalance').value = '';
         if (localStorage.getItem('darkMode') === 'true') {
@@ -358,13 +354,38 @@ function loadFromLocalStorage() {
 // ============================================================
 // 9. HELPERS
 // ============================================================
-function updateMonthLabel(monthVal) {
-    if (!monthVal) return;
-    const [year, month] = monthVal.split('-');
-    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    const label = `${months[parseInt(month) - 1]} ${year}`;
-    currentMonthDisplay.textContent = `${label} Overview`;
-    listMonthLabel.textContent = `Showing ${label}`;
+function populateYearFilter() {
+    const currentYear = new Date().getFullYear();
+    let earliestYear = currentYear;
+    transactions.forEach(tx => {
+        if (!tx.date) return;
+        const y = parseInt(tx.date.slice(0, 4));
+        if (y < earliestYear) earliestYear = y;
+    });
+    if (earliestYear > currentYear) earliestYear = currentYear; // fallback
+
+    yearFilter.innerHTML = '';
+    for (let y = currentYear; y >= earliestYear; y--) {
+        const opt = document.createElement('option');
+        opt.value = y;
+        opt.textContent = y;
+        yearFilter.appendChild(opt);
+    }
+}
+
+function updatePeriodLabel() {
+    const year = yearFilter.value;
+    const month = monthFilter.value;
+    const monthNames = ['January','February','March','April','May','June',
+                        'July','August','September','October','November','December'];
+    let label = year;
+    if (month !== 'all') {
+        label = monthNames[parseInt(month)-1] + ' ' + year;
+    } else {
+        label = 'Full Year ' + year;
+    }
+    currentMonthDisplay.textContent = label + ' Overview';
+    listMonthLabel.textContent = 'Showing ' + label;
 }
 
 function formatCurrency(amount) {
@@ -373,9 +394,19 @@ function formatCurrency(amount) {
 }
 
 function getFilteredTransactions() {
+    const year = yearFilter.value;
     const month = monthFilter.value;
-    if (!month) return transactions;
-    return transactions.filter(tx => tx.date && tx.date.startsWith(month));
+    if (!year) return transactions;
+    return transactions.filter(tx => {
+        if (!tx.date) return false;
+        const txYear = tx.date.slice(0, 4);
+        if (txYear !== year) return false;
+        if (month !== 'all') {
+            const txMonth = tx.date.slice(5, 7);
+            return txMonth === month;
+        }
+        return true;
+    });
 }
 
 // ============================================================
@@ -472,7 +503,7 @@ function renderChart(filtered) {
 // ============================================================
 function renderTransactionList(filtered) {
     if (filtered.length === 0) {
-        transactionList.innerHTML = `<p class="empty-msg">No transactions for this month. Add one above!</p>`;
+        transactionList.innerHTML = `<p class="empty-msg">No transactions for this period. Add one above!</p>`;
         return;
     }
 
@@ -512,7 +543,7 @@ function escapeHTML(text) {
 }
 
 // ============================================================
-// 13. CRUD (FIXED: Uses current date for new transactions)
+// 13. CRUD
 // ============================================================
 function handleFormSubmit(e) {
     e.preventDefault();
@@ -559,6 +590,7 @@ function handleFormSubmit(e) {
     saveToLocalStorage();
     form.reset();
     document.querySelector('input[name="type"][value="income"]').checked = true;
+    populateYearFilter();  // 🔥 Refresh year dropdown (new year might appear)
     renderAll();
 }
 
@@ -566,6 +598,7 @@ function deleteTransaction(id) {
     if (!confirm('Permanently delete this transaction?')) return;
     transactions = transactions.filter(tx => tx.id !== id);
     saveToLocalStorage();
+    populateYearFilter();  // 🔥 Refresh year dropdown
     renderAll();
     showToast('🗑️ Transaction deleted.', 'info');
 }
