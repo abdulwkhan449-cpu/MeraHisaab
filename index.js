@@ -263,16 +263,15 @@ const topCategoryBadge = document.getElementById('topCategoryBadge');
 const toastContainer = document.getElementById('toastContainer');
 
 // ============================================================
-// 6. INIT (FIXED: load data FIRST, then populate year dropdown)
+// 6. INIT (load data first, populate year dropdown, default to current year + "All" months)
 // ============================================================
 function initApp() {
-    loadFromLocalStorage();          // 🔥 Load transactions first
-    populateYearFilter();            // Now populate years from loaded data
+    loadFromLocalStorage();          // Load transactions first
+    populateYearFilter();            // Now populate years (includes "All Years")
     const now = new Date();
     const currentYear = now.getFullYear();
-    const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
-    yearFilter.value = currentYear;
-    monthFilter.value = currentMonth;
+    yearFilter.value = currentYear;  // Default to current year
+    monthFilter.value = 'all';       // 🔥 Show full year by default
     updatePeriodLabel();
     renderAll();
 
@@ -365,6 +364,13 @@ function populateYearFilter() {
     if (earliestYear > currentYear) earliestYear = currentYear; // fallback
 
     yearFilter.innerHTML = '';
+    // Add "All Years" option first
+    const allOpt = document.createElement('option');
+    allOpt.value = 'all';
+    allOpt.textContent = 'All Years';
+    yearFilter.appendChild(allOpt);
+
+    // Then add years from current down to earliest
     for (let y = currentYear; y >= earliestYear; y--) {
         const opt = document.createElement('option');
         opt.value = y;
@@ -378,8 +384,10 @@ function updatePeriodLabel() {
     const month = monthFilter.value;
     const monthNames = ['January','February','March','April','May','June',
                         'July','August','September','October','November','December'];
-    let label = year;
-    if (month !== 'all') {
+    let label = '';
+    if (year === 'all') {
+        label = 'All Time';
+    } else if (month !== 'all') {
         label = monthNames[parseInt(month)-1] + ' ' + year;
     } else {
         label = 'Full Year ' + year;
@@ -396,11 +404,13 @@ function formatCurrency(amount) {
 function getFilteredTransactions() {
     const year = yearFilter.value;
     const month = monthFilter.value;
-    if (!year) return transactions;
     return transactions.filter(tx => {
         if (!tx.date) return false;
-        const txYear = tx.date.slice(0, 4);
-        if (txYear !== year) return false;
+        // If year is 'all', skip year filter
+        if (year !== 'all') {
+            const txYear = tx.date.slice(0, 4);
+            if (txYear !== year) return false;
+        }
         if (month !== 'all') {
             const txMonth = tx.date.slice(5, 7);
             return txMonth === month;
@@ -590,7 +600,7 @@ function handleFormSubmit(e) {
     saveToLocalStorage();
     form.reset();
     document.querySelector('input[name="type"][value="income"]').checked = true;
-    populateYearFilter();  // 🔥 Refresh year dropdown (new year might appear)
+    populateYearFilter();  // Refresh year dropdown (new year might appear)
     renderAll();
 }
 
@@ -598,7 +608,7 @@ function deleteTransaction(id) {
     if (!confirm('Permanently delete this transaction?')) return;
     transactions = transactions.filter(tx => tx.id !== id);
     saveToLocalStorage();
-    populateYearFilter();  // 🔥 Refresh year dropdown
+    populateYearFilter();  // Refresh year dropdown
     renderAll();
     showToast('🗑️ Transaction deleted.', 'info');
 }
