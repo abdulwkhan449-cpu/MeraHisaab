@@ -256,6 +256,40 @@
     }
 }
 
+/* ===== CONFIRMATION MODAL (Reusable) ===== */
+.confirmation-modal {
+    max-width: 420px;
+    text-align: center;
+    padding: 36px 32px 32px;
+}
+
+.confirmation-icon {
+    font-size: 3rem;
+    color: var(--accent-red);
+    margin-bottom: 12px;
+}
+
+.confirmation-modal h3 {
+    color: var(--text-primary);
+}
+
+.confirmation-modal p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.confirmation-modal .btn {
+    min-width: 100px;
+}
+
+.confirmation-modal .btn-primary {
+    background: var(--accent-red);
+}
+.confirmation-modal .btn-primary:hover {
+    background: #dc2626;
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+}
+
 /* ----- Responsive ----- */
 @media (max-width: 600px) {
     .settings-card {
@@ -278,6 +312,10 @@
 
     .settings-card .radio-group {
         gap: 15px;
+    }
+
+    .confirmation-modal {
+        padding: 28px 20px 24px;
     }
 }
 
@@ -314,7 +352,11 @@ body.dark #quickAddSuccess {
     color: #34d399;
 }
 
-/* ----- Button Styles (reused from index.css, but here for completeness) ----- */
+body.dark .confirmation-modal p {
+    color: var(--text-secondary);
+}
+
+/* ----- Button Styles (reused from index.css) ----- */
 .btn {
     padding: 12px 24px;
     border: none;
@@ -341,7 +383,7 @@ body.dark #quickAddSuccess {
     box-shadow: 0 8px 20px rgba(124, 58, 237, 0.3);
 }
 
-/* ----- Toast notification (in case it's needed in settings) ----- */
+/* ----- Toast notification ----- */
 .toast-container {
     position: fixed;
     bottom: 30px;
