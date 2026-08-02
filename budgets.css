@@ -177,7 +177,7 @@
     background: linear-gradient(90deg, #ef4444, #f87171);
 }
 
-/* ----- Empty State (beautiful) ----- */
+/* ----- Empty State ----- */
 .empty-budgets {
     text-align: center;
     color: var(--text-secondary);
