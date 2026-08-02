@@ -1,25 +1,17 @@
 // ============================================================
-// 0. USER PROFILE & GLOBAL Scope
+// 0. USER PROFILE MANAGEMENT
 // ============================================================
 let userProfile = { name: 'Guest', currency: 'PKR', symbol: 'Rs' };
-let budgets = [];
-let editingBudgetId = null;
 
-const CURRENCY_SYMBOLS = { PKR: 'Rs', USD: '$', EUR: '€', GBP: '£', INR: '₹', JPY: '¥' };
-const CATEGORY_ICONS = {
-    'Food & Dining': 'fa-utensils',
-    'Transport': 'fa-car',
-    'Shopping': 'fa-shopping-bag',
-    'Bills & Utilities': 'fa-file-invoice',
-    'Entertainment': 'fa-film',
-    'Salary': 'fa-money-bill-wave',
-    'Rent': 'fa-home',
-    'Other': 'fa-box'
+const CURRENCY_SYMBOLS = {
+    PKR: 'Rs',
+    USD: '$',
+    EUR: '€',
+    GBP: '£',
+    INR: '₹',
+    JPY: '¥'
 };
 
-// ============================================================
-// 1. LOAD USER PROFILE
-// ============================================================
 function loadUserProfile() {
     const stored = localStorage.getItem('userProfile');
     if (stored) {
@@ -27,9 +19,40 @@ function loadUserProfile() {
         if (!userProfile.symbol || !CURRENCY_SYMBOLS[userProfile.currency]) {
             userProfile.symbol = CURRENCY_SYMBOLS[userProfile.currency] || 'Rs';
         }
+        console.log('✅ Profile loaded:', userProfile);
         return true;
     }
     return false;
+}
+
+function saveUserProfile(name, currency, initialBalance = 0) {
+    userProfile = {
+        name: name,
+        currency: currency,
+        symbol: CURRENCY_SYMBOLS[currency] || 'Rs'
+    };
+    localStorage.setItem('userProfile', JSON.stringify(userProfile));
+    console.log('✅ Profile saved:', userProfile);
+    
+    if (initialBalance > 0) {
+        const today = new Date().toISOString().slice(0, 10);
+        const newTx = {
+            id: Date.now(),
+            description: '💰 Initial Deposit (Sign-up)',
+            amount: parseFloat(initialBalance),
+            category: 'Salary',
+            type: 'income',
+            date: today
+        };
+        let txs = JSON.parse(localStorage.getItem('financeData') || '[]');
+        txs.push(newTx);
+        localStorage.setItem('financeData', JSON.stringify(txs));
+    }
+    
+    showLoginPage(false);
+    initApp();
+    renderAll();
+    updateUIWithUser();
 }
 
 function updateUIWithUser() {
@@ -37,15 +60,44 @@ function updateUIWithUser() {
     const initials = userProfile.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
     document.getElementById('userAvatar').textContent = initials;
     document.getElementById('headerCurrencyDisplay').textContent = userProfile.currency;
-}
-
-function formatCurrency(amount) {
-    const symbol = userProfile.symbol || 'Rs';
-    return symbol + amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    console.log('🔄 UI updated with currency:', userProfile.currency, 'symbol:', userProfile.symbol);
 }
 
 // ============================================================
-// 2. SIDEBAR LOGIC
+// LOGIN PAGE (with force-clear)
+// ============================================================
+function showLoginPage(show) {
+    const loginPage = document.getElementById('loginPage');
+    const appContainer = document.getElementById('appContainer');
+    if (show) {
+        loginPage.classList.remove('hidden');
+        appContainer.style.display = 'none';
+
+        const nameInput = document.getElementById('loginName');
+        const balanceInput = document.getElementById('loginBalance');
+        nameInput.value = '';
+        balanceInput.value = '';
+        nameInput.setAttribute('autocomplete', 'off');
+        balanceInput.setAttribute('autocomplete', 'off');
+        setTimeout(() => {
+            nameInput.value = '';
+            balanceInput.value = '';
+        }, 50);
+    } else {
+        loginPage.classList.add('hidden');
+        appContainer.style.display = 'flex';
+    }
+}
+
+function logoutUser() {
+    if (confirm('Are you sure you want to logout? Your data will remain saved.')) {
+        localStorage.removeItem('userProfile');
+        location.reload();
+    }
+}
+
+// ============================================================
+// 1. SIDEBAR LOGIC
 // ============================================================
 const sidebar = document.getElementById('sidebar');
 const overlay = document.getElementById('sidebarOverlay');
@@ -98,12 +150,13 @@ window.addEventListener('resize', () => {
 });
 
 // ============================================================
-// 3. SETTINGS MODAL
+// 2. SETTINGS MODAL
 // ============================================================
 const settingsModal = document.getElementById('settingsModal');
 const settingsNavTrigger = document.getElementById('settingsNavTrigger');
 const closeSettingsBtn = document.getElementById('closeSettingsBtn');
 const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+const logoutBtn = document.getElementById('logoutBtn');
 const settingsName = document.getElementById('settingsName');
 const settingsCurrency = document.getElementById('settingsCurrency');
 
@@ -140,99 +193,140 @@ saveSettingsBtn.addEventListener('click', () => {
     showToast('✅ Settings updated successfully!', 'success');
 });
 
-// ============================================================
-// 4. BUDGET MODAL LOGIC
-// ============================================================
-const budgetModal = document.getElementById('budgetModal');
-const budgetCategory = document.getElementById('budgetCategory');
-const budgetAmount = document.getElementById('budgetAmount');
-const saveBudgetBtn = document.getElementById('saveBudgetBtn');
-const closeBudgetBtn = document.getElementById('closeBudgetBtn');
-const budgetModalTitle = document.getElementById('budgetModalTitle');
+logoutBtn.addEventListener('click', () => {
+    closeSettings();
+    logoutUser();
+});
 
-function openBudgetModal(category = null, amount = null, id = null) {
-    budgetModal.classList.add('active');
-    if (id !== null) {
-        editingBudgetId = id;
-        budgetModalTitle.innerHTML = '<i class="fas fa-pen text-purple-600"></i> Edit Budget';
-        saveBudgetBtn.innerHTML = '<i class="fas fa-save"></i> Update Budget';
-        if (category) budgetCategory.value = category;
-        if (amount) budgetAmount.value = amount;
-    } else {
-        editingBudgetId = null;
-        budgetModalTitle.innerHTML = '<i class="fas fa-plus-circle text-purple-600"></i> Set Budget';
-        saveBudgetBtn.innerHTML = '<i class="fas fa-save"></i> Save Budget';
-        budgetCategory.value = 'Food & Dining';
-        budgetAmount.value = '';
+// ============================================================
+// 3. LOGIN HANDLER
+// ============================================================
+const loginBtn = document.getElementById('loginBtn');
+const loginName = document.getElementById('loginName');
+const loginBalance = document.getElementById('loginBalance');
+const loginCurrency = document.getElementById('loginCurrency');
+
+loginName.value = '';
+loginBalance.value = '';
+
+loginBtn.addEventListener('click', () => {
+    const name = loginName.value.trim();
+    const currency = loginCurrency.value;
+    const balance = parseFloat(loginBalance.value) || 0;
+    
+    if (!name) {
+        showToast('Please enter your name.', 'error');
+        return;
+    }
+    saveUserProfile(name, currency, balance);
+});
+
+loginBalance.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') loginBtn.click();
+});
+loginName.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') loginBtn.click();
+});
+
+// ============================================================
+// 4. MAIN APP STATE
+// ============================================================
+let transactions = [];
+let editingId = null;
+let myChart = null;
+
+// ============================================================
+// 5. DOM REFS
+// ============================================================
+const form = document.getElementById('transactionForm');
+const descInput = document.getElementById('description');
+const amountInput = document.getElementById('amount');
+const categorySelect = document.getElementById('category');
+const typeRadios = document.querySelectorAll('input[name="type"]');
+const submitBtn = document.getElementById('submitBtn');
+const formTitle = document.getElementById('formTitle');
+
+const balanceDisplay = document.getElementById('balanceDisplay');
+const incomeDisplay = document.getElementById('incomeDisplay');
+const expenseDisplay = document.getElementById('expenseDisplay');
+const savingsDisplay = document.getElementById('savingsDisplay');
+const transactionList = document.getElementById('transactionList');
+const yearFilter = document.getElementById('yearFilter');
+const monthFilter = document.getElementById('monthFilter');
+const darkToggle = document.getElementById('darkModeToggle');
+const chartCanvas = document.getElementById('expenseChart');
+const chartEmptyMsg = document.getElementById('chartEmptyMsg');
+const currentMonthDisplay = document.getElementById('currentMonthDisplay');
+const listMonthLabel = document.getElementById('listMonthLabel');
+const txCountBadge = document.getElementById('txCountBadge');
+const topCategoryBadge = document.getElementById('topCategoryBadge');
+const toastContainer = document.getElementById('toastContainer');
+
+// ============================================================
+// 6. INIT
+// ============================================================
+function initApp() {
+    populateYearFilter();
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
+    yearFilter.value = currentYear;
+    monthFilter.value = currentMonth;   // default: current month
+    updatePeriodLabel();
+
+    loadFromLocalStorage();
+    renderAll();
+
+    form.addEventListener('submit', handleFormSubmit);
+    yearFilter.addEventListener('change', () => {
+        updatePeriodLabel();
+        renderAll();
+    });
+    monthFilter.addEventListener('change', () => {
+        updatePeriodLabel();
+        renderAll();
+    });
+    darkToggle.addEventListener('click', toggleDarkMode);
+    document.getElementById('addQuickBtn').addEventListener('click', () => {
+        document.querySelector('.form-box').scrollIntoView({ behavior: 'smooth' });
+        descInput.focus();
+    });
+
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark');
+        darkToggle.innerHTML = '<i class="fas fa-sun"></i> Light';
     }
 }
 
-function closeBudgetModal() {
-    budgetModal.classList.remove('active');
-    editingBudgetId = null;
-}
-
-closeBudgetBtn.addEventListener('click', closeBudgetModal);
-budgetModal.addEventListener('click', (e) => {
-    if (e.target === budgetModal) closeBudgetModal();
-});
-
-document.getElementById('addBudgetBtn').addEventListener('click', () => {
-    openBudgetModal();
-});
-
-saveBudgetBtn.addEventListener('click', () => {
-    const category = budgetCategory.value;
-    const amount = parseFloat(budgetAmount.value);
-    if (!category) return showToast('Select a category.', 'error');
-    if (isNaN(amount) || amount <= 0) return showToast('Enter a valid positive amount.', 'error');
-
-    if (editingBudgetId === null) {
-        const existing = budgets.find(b => b.category === category);
-        if (existing) {
-            return showToast(`A budget for "${category}" already exists.`, 'error');
-        }
-        budgets.push({ id: Date.now().toString(), category, amount });
-        showToast(`✅ Budget set for "${category}"`, 'success');
+document.addEventListener('DOMContentLoaded', () => {
+    const hasUser = loadUserProfile();
+    if (hasUser) {
+        showLoginPage(false);
+        initApp();
+        updateUIWithUser();
+        const savedSidebarState = localStorage.getItem('sidebarOpen');
+        const isDesktop = window.innerWidth >= 901;
+        let defaultOpen = isDesktop;
+        if (savedSidebarState !== null) defaultOpen = savedSidebarState === 'true';
+        toggleSidebar(defaultOpen);
     } else {
-        const index = budgets.findIndex(b => b.id === editingBudgetId);
-        if (index !== -1) {
-            budgets[index].category = category;
-            budgets[index].amount = amount;
-            showToast(`✅ Budget updated for "${category}"`, 'success');
+        showLoginPage(true);
+        document.getElementById('loginName').value = '';
+        document.getElementById('loginBalance').value = '';
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark');
         }
-        editingBudgetId = null;
     }
-    saveBudgets();
-    closeBudgetModal();
-    renderAll();
 });
-
-function editBudget(id) {
-    const budget = budgets.find(b => b.id === id);
-    if (!budget) return;
-    openBudgetModal(budget.category, budget.amount, budget.id);
-}
-
-function deleteBudget(id) {
-    const budget = budgets.find(b => b.id === id);
-    if (!budget) return;
-    if (!confirm(`Delete budget for "${budget.category}"?`)) return;
-    budgets = budgets.filter(b => b.id !== id);
-    saveBudgets();
-    renderAll();
-    showToast(`🗑️ Budget deleted for "${budget.category}"`, 'info');
-}
 
 // ============================================================
-// 5. TOAST SYSTEM
+// 7. TOAST
 // ============================================================
 function showToast(message, type = 'info') {
-    const container = document.getElementById('toastContainer');
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
     toast.textContent = message;
-    container.appendChild(toast);
+    toastContainer.appendChild(toast);
     setTimeout(() => {
         toast.style.opacity = '0';
         toast.style.transform = 'translateX(40px)';
@@ -242,9 +336,294 @@ function showToast(message, type = 'info') {
 }
 
 // ============================================================
-// 6. DARK MODE
+// 8. LOCAL STORAGE (Data)
 // ============================================================
-const darkToggle = document.getElementById('darkModeToggle');
+function saveToLocalStorage() {
+    localStorage.setItem('financeData', JSON.stringify(transactions));
+}
+
+function loadFromLocalStorage() {
+    const stored = localStorage.getItem('financeData');
+    if (stored) {
+        transactions = JSON.parse(stored);
+        return;
+    }
+    transactions = [];
+    saveToLocalStorage();
+}
+
+// ============================================================
+// 9. HELPERS
+// ============================================================
+function populateYearFilter() {
+    const currentYear = new Date().getFullYear();
+    let earliestYear = currentYear;
+    transactions.forEach(tx => {
+        if (!tx.date) return;
+        const y = parseInt(tx.date.slice(0, 4));
+        if (y < earliestYear) earliestYear = y;
+    });
+    if (earliestYear > currentYear) earliestYear = currentYear; // fallback
+
+    yearFilter.innerHTML = '';
+    for (let y = currentYear; y >= earliestYear; y--) {
+        const opt = document.createElement('option');
+        opt.value = y;
+        opt.textContent = y;
+        yearFilter.appendChild(opt);
+    }
+}
+
+function updatePeriodLabel() {
+    const year = yearFilter.value;
+    const month = monthFilter.value;
+    const monthNames = ['January','February','March','April','May','June',
+                        'July','August','September','October','November','December'];
+    let label = year;
+    if (month !== 'all') {
+        label = monthNames[parseInt(month)-1] + ' ' + year;
+    } else {
+        label = 'Full Year ' + year;
+    }
+    currentMonthDisplay.textContent = label + ' Overview';
+    listMonthLabel.textContent = 'Showing ' + label;
+}
+
+function formatCurrency(amount) {
+    const symbol = userProfile.symbol || 'Rs';
+    return symbol + amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+function getFilteredTransactions() {
+    const year = yearFilter.value;
+    const month = monthFilter.value;
+    if (!year) return transactions;
+    return transactions.filter(tx => {
+        if (!tx.date) return false;
+        const txYear = tx.date.slice(0, 4);
+        if (txYear !== year) return false;
+        if (month !== 'all') {
+            const txMonth = tx.date.slice(5, 7);
+            return txMonth === month;
+        }
+        return true;
+    });
+}
+
+// ============================================================
+// 10. RENDER ALL
+// ============================================================
+function renderAll() {
+    const filtered = getFilteredTransactions();
+
+    let totalIncome = 0, totalExpense = 0;
+    filtered.forEach(tx => {
+        if (tx.type === 'income') totalIncome += tx.amount;
+        else totalExpense += tx.amount;
+    });
+    const balance = totalIncome - totalExpense;
+    const savingsRate = totalIncome > 0 ? ((balance / totalIncome) * 100) : 0;
+
+    incomeDisplay.textContent = formatCurrency(totalIncome);
+    expenseDisplay.textContent = formatCurrency(totalExpense);
+    balanceDisplay.textContent = formatCurrency(balance);
+    savingsDisplay.textContent = savingsRate.toFixed(0) + '%';
+
+    txCountBadge.innerHTML = `<i class="fas fa-list"></i> ${filtered.length} Transactions`;
+    const expenses = filtered.filter(tx => tx.type === 'expense');
+    const catMap = {};
+    expenses.forEach(tx => { catMap[tx.category] = (catMap[tx.category] || 0) + tx.amount; });
+    let topCat = 'None';
+    let topVal = 0;
+    for (const [cat, val] of Object.entries(catMap)) {
+        if (val > topVal) { topVal = val; topCat = cat; }
+    }
+    topCategoryBadge.innerHTML = topCat !== 'None' ? `<i class="fas fa-tag"></i> Top: ${topCat}` : '<i class="fas fa-tag"></i> Top: None';
+
+    renderChart(filtered);
+    renderTransactionList(filtered);
+}
+
+// ============================================================
+// 11. CHART
+// ============================================================
+function renderChart(filtered) {
+    const expenses = filtered.filter(tx => tx.type === 'expense');
+    const catMap = {};
+    expenses.forEach(tx => { catMap[tx.category] = (catMap[tx.category] || 0) + tx.amount; });
+
+    const labels = Object.keys(catMap);
+    const dataValues = Object.values(catMap);
+
+    if (labels.length === 0) {
+        chartEmptyMsg.style.display = 'block';
+        if (myChart) { myChart.destroy(); myChart = null; }
+        return;
+    }
+    chartEmptyMsg.style.display = 'none';
+
+    const palette = ['#7c3aed', '#3b82f6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#8b5cf6'];
+    const colors = labels.map((_, i) => palette[i % palette.length]);
+
+    if (myChart) { myChart.destroy(); myChart = null; }
+
+    const ctx = chartCanvas.getContext('2d');
+    myChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: dataValues,
+                backgroundColor: colors,
+                borderColor: getComputedStyle(document.body).getPropertyValue('--bg-card').trim() || '#ffffff',
+                borderWidth: 3,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            cutout: '60%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: getComputedStyle(document.body).getPropertyValue('--text-secondary').trim() || '#64748b',
+                        font: { size: 11, weight: '500' },
+                        padding: 12,
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                    }
+                }
+            }
+        }
+    });
+}
+
+// ============================================================
+// 12. TRANSACTION LIST
+// ============================================================
+function renderTransactionList(filtered) {
+    if (filtered.length === 0) {
+        transactionList.innerHTML = `<p class="empty-msg">No transactions for this period. Add one above!</p>`;
+        return;
+    }
+
+    const sorted = [...filtered].sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
+
+    let html = '';
+    sorted.forEach(tx => {
+        const sign = tx.type === 'income' ? '+' : '-';
+        const colorClass = tx.type === 'income' ? 'income-text' : 'expense-text';
+        const dateObj = new Date(tx.date + 'T00:00:00');
+        const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+        html += `
+            <div class="transaction-item" data-id="${tx.id}">
+                <div class="tx-info">
+                    <span class="tx-desc">${escapeHTML(tx.description)}</span>
+                    <span class="tx-meta">
+                        <span>${dateStr}</span>
+                        <span class="tx-category">${escapeHTML(tx.category)}</span>
+                    </span>
+                </div>
+                <span class="tx-amount ${colorClass}">${sign} ${formatCurrency(tx.amount)}</span>
+                <div class="tx-actions">
+                    <button class="edit-btn" onclick="editTransaction(${tx.id})"><i class="fas fa-pen"></i></button>
+                    <button class="delete-btn" onclick="deleteTransaction(${tx.id})"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+        `;
+    });
+    transactionList.innerHTML = html;
+}
+
+function escapeHTML(text) {
+    const d = document.createElement('div');
+    d.textContent = text;
+    return d.innerHTML;
+}
+
+// ============================================================
+// 13. CRUD
+// ============================================================
+function handleFormSubmit(e) {
+    e.preventDefault();
+
+    const description = descInput.value.trim();
+    const amount = parseFloat(amountInput.value);
+    const category = categorySelect.value;
+    let type = 'expense';
+    typeRadios.forEach(r => { if (r.checked) type = r.value; });
+
+    if (!description) return showToast('Please enter a description.', 'error');
+    if (isNaN(amount) || amount <= 0) return showToast('Please enter a valid positive amount.', 'error');
+
+    const today = new Date().toISOString().slice(0, 10);
+
+    if (editingId !== null) {
+        const index = transactions.findIndex(tx => tx.id === editingId);
+        if (index !== -1) {
+            transactions[index] = { 
+                ...transactions[index], 
+                description, 
+                amount, 
+                category, 
+                type
+            };
+            showToast('✅ Transaction updated!', 'success');
+        }
+        editingId = null;
+        submitBtn.innerHTML = '<i class="fas fa-plus"></i> Add Transaction';
+        formTitle.innerHTML = '<i class="fas fa-plus-circle"></i> Add Transaction';
+    } else {
+        const newTx = { 
+            id: Date.now(), 
+            description, 
+            amount, 
+            category, 
+            type, 
+            date: today
+        };
+        transactions.push(newTx);
+        showToast('🎉 Transaction added!', 'success');
+    }
+
+    saveToLocalStorage();
+    form.reset();
+    document.querySelector('input[name="type"][value="income"]').checked = true;
+    // Re-populate year dropdown because a new transaction might have a new year
+    populateYearFilter();
+    renderAll();
+}
+
+function deleteTransaction(id) {
+    if (!confirm('Permanently delete this transaction?')) return;
+    transactions = transactions.filter(tx => tx.id !== id);
+    saveToLocalStorage();
+    populateYearFilter();  // update years in dropdown
+    renderAll();
+    showToast('🗑️ Transaction deleted.', 'info');
+}
+
+function editTransaction(id) {
+    const tx = transactions.find(t => t.id === id);
+    if (!tx) return;
+
+    descInput.value = tx.description;
+    amountInput.value = tx.amount;
+    categorySelect.value = tx.category;
+    typeRadios.forEach(r => { r.checked = (r.value === tx.type); });
+
+    editingId = tx.id;
+    submitBtn.innerHTML = '<i class="fas fa-pen"></i> Update Transaction';
+    formTitle.innerHTML = '<i class="fas fa-pen"></i> Edit Transaction';
+    document.querySelector('.form-box').scrollIntoView({ behavior: 'smooth' });
+    descInput.focus();
+}
+
+// ============================================================
+// 14. DARK MODE
+// ============================================================
 function toggleDarkMode() {
     document.body.classList.toggle('dark');
     const isDark = document.body.classList.contains('dark');
@@ -252,245 +631,3 @@ function toggleDarkMode() {
     localStorage.setItem('darkMode', isDark);
     renderAll();
 }
-
-// ============================================================
-// 7. BUDGET DATA MANAGEMENT
-// ============================================================
-function loadBudgets() {
-    const stored = localStorage.getItem('budgets');
-    if (stored) {
-        budgets = JSON.parse(stored);
-    } else {
-        // SEED WITH DEFAULT BUDGETS
-        budgets = [
-            { id: Date.now() + 1, category: 'Food & Dining', amount: 500 },
-            { id: Date.now() + 2, category: 'Transport', amount: 200 },
-            { id: Date.now() + 3, category: 'Shopping', amount: 300 },
-            { id: Date.now() + 4, category: 'Bills & Utilities', amount: 400 },
-            { id: Date.now() + 5, category: 'Entertainment', amount: 150 }
-        ];
-        saveBudgets();
-    }
-}
-
-function saveBudgets() {
-    localStorage.setItem('budgets', JSON.stringify(budgets));
-}
-
-// ============================================================
-// 8. LOAD TRANSACTIONS (SHARED WITH DASHBOARD)
-// ============================================================
-function loadTransactions() {
-    const stored = localStorage.getItem('financeData');
-    if (stored) {
-        return JSON.parse(stored);
-    }
-    return [];
-}
-
-function getCategorySpending(transactions, category, month) {
-    const filtered = transactions.filter(tx => {
-        if (tx.type !== 'expense') return false;
-        if (tx.category !== category) return false;
-        if (month && tx.date) {
-            return tx.date.startsWith(month);
-        }
-        return true;
-    });
-    return filtered.reduce((sum, tx) => sum + tx.amount, 0);
-}
-
-// ============================================================
-// 9. RENDER ALL
-// ============================================================
-function renderAll() {
-    const month = document.getElementById('budgetMonthFilter').value;
-    if (!month) {
-        const now = new Date();
-        const monthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-        document.getElementById('budgetMonthFilter').value = monthStr;
-        updateMonthLabel(monthStr);
-    } else {
-        updateMonthLabel(month);
-    }
-
-    loadBudgets();
-    const transactions = loadTransactions();
-    const selectedMonth = document.getElementById('budgetMonthFilter').value;
-
-    renderBudgetList(transactions, selectedMonth);
-    renderBudgetSummary(transactions, selectedMonth);
-}
-
-function updateMonthLabel(month) {
-    if (!month) return;
-    const [year, m] = month.split('-');
-    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    const label = `${months[parseInt(m) - 1]} ${year}`;
-    document.getElementById('listMonthLabel').textContent = `For ${label}`;
-    document.getElementById('currentMonthDisplay').textContent = `Managing budgets for ${label}`;
-}
-
-// ============================================================
-// 10. RENDER BUDGET LIST
-// ============================================================
-function renderBudgetList(transactions, month) {
-    const container = document.getElementById('budgetList');
-    const badge = document.getElementById('budgetCountBadge');
-    const overBadge = document.getElementById('overBudgetBadge');
-
-    if (budgets.length === 0) {
-        container.innerHTML = `
-            <div class="empty-budgets">
-                <i class="fas fa-wallet"></i>
-                <h3>No budgets set yet</h3>
-                <p>Click the <strong>"New Budget"</strong> button to set spending limits for your categories.</p>
-            </div>
-        `;
-        badge.innerHTML = `<i class="fas fa-list"></i> 0 Budgets`;
-        overBadge.innerHTML = `<i class="fas fa-exclamation-triangle"></i> 0 Over Budget`;
-        return;
-    }
-
-    let overCount = 0;
-    let html = '';
-
-    budgets.forEach(budget => {
-        const spent = getCategorySpending(transactions, budget.category, month);
-        const percentage = budget.amount > 0 ? (spent / budget.amount) * 100 : 0;
-        const remaining = budget.amount - spent;
-        const icon = CATEGORY_ICONS[budget.category] || 'fa-tag';
-
-        let statusClass = 'under';
-        let statusText = `${formatCurrency(remaining)} remaining`;
-        let progressClass = 'safe';
-        let progressWidth = Math.min(percentage, 100);
-
-        if (percentage >= 100) {
-            statusClass = 'over';
-            statusText = `⚠️ ${formatCurrency(Math.abs(remaining))} over`;
-            progressClass = 'danger';
-            overCount++;
-        } else if (percentage >= 80) {
-            statusClass = 'over';
-            statusText = `⚠️ ${formatCurrency(remaining)} remaining`;
-            progressClass = 'warning';
-        }
-
-        if (percentage === 0 && spent === 0) {
-            statusClass = 'under';
-            statusText = 'No spending yet 🎯';
-            progressClass = 'safe';
-            progressWidth = 0;
-        }
-
-        html += `
-            <div class="budget-item" data-id="${budget.id}">
-                <div class="budget-header">
-                    <div>
-                        <span class="budget-category"><i class="fas ${icon}"></i> ${budget.category}</span>
-                    </div>
-                    <div class="budget-numbers">
-                        <span class="budget-limit"><i class="fas fa-bullseye"></i> ${formatCurrency(budget.amount)}</span>
-                        <span class="budget-spent ${statusClass}"><i class="fas fa-arrow-right"></i> ${formatCurrency(spent)}</span>
-                        <span class="budget-remaining ${statusClass}">${statusText}</span>
-                        <div class="budget-actions">
-                            <button class="edit-budget-btn" onclick="editBudget('${budget.id}')"><i class="fas fa-pen"></i></button>
-                            <button class="delete-budget-btn" onclick="deleteBudget('${budget.id}')"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>
-                </div>
-                <div class="budget-progress">
-                    <div class="progress-fill ${progressClass}" style="width: ${Math.min(progressWidth, 100)}%;"></div>
-                </div>
-            </div>
-        `;
-    });
-
-    container.innerHTML = html;
-    badge.innerHTML = `<i class="fas fa-list"></i> ${budgets.length} Budgets`;
-    overBadge.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${overCount} Over Budget`;
-}
-
-// ============================================================
-// 11. RENDER BUDGET SUMMARY (FIXED: Total Budget = Total Income from Dashboard)
-// ============================================================
-function renderBudgetSummary(transactions, month) {
-    // ✅ Calculate Total Income from Dashboard (same data)
-    const allIncome = transactions.filter(tx => {
-        return tx.type === 'income' && tx.date && tx.date.startsWith(month);
-    });
-    const totalIncome = allIncome.reduce((sum, tx) => sum + tx.amount, 0);
-
-    // ✅ Total Budget = Total Income (matches Dashboard)
-    const totalBudget = totalIncome;
-
-    // ✅ Total Spent = ALL expenses for the month
-    const allExpenses = transactions.filter(tx => {
-        return tx.type === 'expense' && tx.date && tx.date.startsWith(month);
-    });
-    const totalSpent = allExpenses.reduce((sum, tx) => sum + tx.amount, 0);
-
-    document.getElementById('totalBudgetDisplay').textContent = formatCurrency(totalBudget);
-    document.getElementById('totalSpentDisplay').textContent = formatCurrency(totalSpent);
-
-    const usage = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
-    document.getElementById('overallUsageDisplay').textContent = usage.toFixed(0) + '%';
-}
-
-// ============================================================
-// 12. INTEGRATION: AUTO-REFRESH ON DATA CHANGES
-// ============================================================
-
-// Listen for changes from other tabs
-window.addEventListener('storage', (e) => {
-    if (e.key === 'financeData' || e.key === 'userProfile' || e.key === 'darkMode' || e.key === 'budgets') {
-        renderAll();
-        updateUIWithUser();
-    }
-});
-
-// Custom event for same-tab updates (dispatched from Dashboard)
-document.addEventListener('transactionsUpdated', () => {
-    renderAll();
-});
-
-// Refresh when the tab gains focus (user switches back to Budgets)
-window.addEventListener('focus', () => {
-    renderAll();
-    updateUIWithUser();
-});
-
-// ============================================================
-// 13. INITIALIZATION
-// ============================================================
-document.addEventListener('DOMContentLoaded', () => {
-    const hasUser = loadUserProfile();
-    if (!hasUser) {
-        window.location.href = 'index.html';
-        return;
-    }
-
-    const now = new Date();
-    const monthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-    document.getElementById('budgetMonthFilter').value = monthStr;
-
-    if (localStorage.getItem('darkMode') === 'true') {
-        document.body.classList.add('dark');
-        darkToggle.innerHTML = '<i class="fas fa-sun"></i> Light';
-    }
-    darkToggle.addEventListener('click', toggleDarkMode);
-
-    loadBudgets();
-    renderAll();
-
-    document.getElementById('budgetMonthFilter').addEventListener('change', renderAll);
-
-    const savedSidebarState = localStorage.getItem('sidebarOpen');
-    const isDesktop = window.innerWidth >= 901;
-    let defaultOpen = isDesktop;
-    if (savedSidebarState !== null) defaultOpen = savedSidebarState === 'true';
-    toggleSidebar(defaultOpen);
-
-    updateUIWithUser();
-});
