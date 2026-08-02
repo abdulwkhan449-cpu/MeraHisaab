@@ -10,6 +10,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
 
+        <!-- Favicon (same as other pages) -->
+    <link rel="icon" href="./logo.png" type="image/x-icon" />
+    
+    
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
@@ -21,6 +25,7 @@
 
     <!-- Settings-specific styles -->
     <link rel="stylesheet" href="settings.css" />
+
 </head>
 <body>
 
@@ -42,7 +47,7 @@
                 <a href="index.html" class="nav-item"><i class="fas fa-home"></i> Dashboard</a>
                 <a href="report.html" class="nav-item"><i class="fas fa-chart-line"></i> Reports</a>
                 <a href="budget.html" class="nav-item"><i class="fas fa-wallet"></i> Budgets</a>
-                <a href="#" class="nav-item active"><i class="fas fa-cog"></i> Settings</a>
+                <a href="setting.html" class="nav-item active"><i class="fas fa-cog"></i> Settings</a>
             </nav>
             <div class="sidebar-user">
                 <div class="avatar" id="userAvatar">JD</div>
@@ -103,7 +108,7 @@
                     </div>
                 </div>
 
-                <!-- ===== QUICK ADD MONEY SECTION (NEW) ===== -->
+                <!-- ===== QUICK ADD MONEY SECTION ===== -->
                 <div class="settings-section">
                     <div class="section-header">
                         <i class="fas fa-plus-circle text-purple-600"></i>
@@ -263,7 +268,28 @@
     </div>
 
     <!-- ========================================================== -->
-    <!-- SETTINGS MODAL                                             -->
+    <!-- CONFIRMATION MODAL (Reusable)                               -->
+    <!-- ========================================================== -->
+    <div id="confirmationModal" class="modal-overlay">
+        <div class="modal-content confirmation-modal">
+            <div class="confirmation-icon">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <h3 id="confirmationTitle" class="text-xl font-bold mb-2">Confirm Action</h3>
+            <p id="confirmationMessage" class="text-gray-600 dark:text-gray-300 mb-6">Are you sure?</p>
+            <div class="flex flex-wrap gap-3 justify-center">
+                <button id="confirmYesBtn" class="btn btn-primary px-6" style="background: var(--accent-red);">
+                    <i class="fas fa-check"></i> Yes
+                </button>
+                <button id="confirmNoBtn" class="btn" style="background: var(--bg-body); color: var(--text-primary); border: 1px solid var(--border-color);">
+                    <i class="fas fa-times"></i> No
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- SETTINGS MODAL (reused from index)                         -->
     <!-- ========================================================== -->
     <div id="settingsModal" class="modal-overlay">
         <div class="modal-content">
