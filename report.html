@@ -24,6 +24,7 @@
 
     <!-- Reports-specific styles -->
     <link rel="stylesheet" href="reports.css" />
+
 </head>
 <body>
 
@@ -45,7 +46,7 @@
                 <a href="index.html" class="nav-item"><i class="fas fa-home"></i> Dashboard</a>
                 <a href="report" class="nav-item active"><i class="fas fa-chart-line"></i> Reports</a>
                 <a href="budget.html" class="nav-item"><i class="fas fa-wallet"></i> Budgets</a>
-                <a href="setting.html" class="nav-item" id="settingsNavTrigger"><i class="fas fa-cog"></i> Settings</a>
+                <a href="#" class="nav-item" id="settingsNavTrigger"><i class="fas fa-cog"></i> Settings</a>
             </nav>
             <div class="sidebar-user">
                 <div class="avatar" id="userAvatar">JD</div>
@@ -57,7 +58,7 @@
         <!-- Overlay -->
         <div class="overlay" id="sidebarOverlay"></div>
 
-        <!-- Main Content (full width, padding comes from index.css) -->
+        <!-- Main Content -->
         <main class="main-content" id="mainContent">
 
             <header class="top-header">
@@ -65,7 +66,7 @@
                     <button class="hamburger" id="menuToggle"><i class="fas fa-bars"></i></button>
                     <div>
                         <h1 class="text-3xl font-bold">Reports & Analytics</h1>
-                        <p id="currentYearDisplay" class="subtitle">Overview for 2026</p>
+                        <p id="currentPeriodDisplay" class="subtitle">Full Year 2026 Overview</p>
                     </div>
                 </div>
                 <div class="header-actions">
@@ -74,12 +75,28 @@
                 </div>
             </header>
 
-            <!-- Filter Bar -->
+            <!-- Filter Bar (Year + Month) -->
             <div class="filter-bar">
                 <div class="filter-left">
                     <label for="yearFilter"><i class="fas fa-calendar-alt"></i> Year:</label>
                     <select id="yearFilter" class="px-4 py-2 rounded-lg border dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white font-semibold">
                         <!-- Options populated by JS -->
+                    </select>
+                    <label for="monthFilter">Month:</label>
+                    <select id="monthFilter" class="px-4 py-2 rounded-lg border dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white font-semibold">
+                        <option value="all">All</option>
+                        <option value="01">January</option>
+                        <option value="02">February</option>
+                        <option value="03">March</option>
+                        <option value="04">April</option>
+                        <option value="05">May</option>
+                        <option value="06">June</option>
+                        <option value="07">July</option>
+                        <option value="08">August</option>
+                        <option value="09">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
                     </select>
                 </div>
                 <div class="filter-right">
@@ -87,17 +104,17 @@
                 </div>
             </div>
 
-            <!-- Summary Cards (identical to Dashboard) -->
+            <!-- Summary Cards -->
             <section class="summary-grid">
                 <div class="card card-income">
                     <div class="card-header"><i class="fas fa-arrow-up"></i> Total Income</div>
                     <div class="card-value" id="totalIncomeDisplay">Rs0.00</div>
-                    <div class="card-footer">For selected year</div>
+                    <div class="card-footer">For selected period</div>
                 </div>
                 <div class="card card-expense">
                     <div class="card-header"><i class="fas fa-arrow-down"></i> Total Expenses</div>
                     <div class="card-value" id="totalExpenseDisplay">Rs0.00</div>
-                    <div class="card-footer">For selected year</div>
+                    <div class="card-footer">For selected period</div>
                 </div>
                 <div class="card card-balance">
                     <div class="card-header"><i class="fas fa-wallet"></i> Net Savings</div>
@@ -123,7 +140,7 @@
                     <div class="chart-wrapper">
                         <canvas id="categoryChart"></canvas>
                     </div>
-                    <p id="chartEmptyMsg" class="chart-empty-msg">No expenses this year.</p>
+                    <p id="chartEmptyMsg" class="chart-empty-msg">No expenses this period.</p>
                 </div>
 
                 <div class="chart-box">
