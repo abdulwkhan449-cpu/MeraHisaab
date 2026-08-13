@@ -1,16 +1,15 @@
 // ============================================================
-// SUPABASE CLIENT (only once)
+// SUPABASE – initialised only once
 // ============================================================
 const SUPABASE_URL = 'https://yrlfdjxotruhgjxykxvi.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yVhkAwx7LXgJg8klHwCm4w_L5SUoGmk';
 
-// Check if Supabase is loaded
 if (typeof window.supabase === 'undefined') {
-    alert('Supabase library failed to load. Please check your internet connection.');
+    alert('Supabase library failed to load. Check your internet connection.');
     throw new Error('Supabase not loaded');
 }
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-console.log('✅ Supabase initialized');
+console.log('✅ Supabase initialised');
 
 // ============================================================
 // STATE
@@ -22,12 +21,7 @@ let editingId = null;
 let myChart = null;
 
 const CURRENCY_SYMBOLS = {
-    PKR: 'Rs',
-    USD: '$',
-    EUR: '€',
-    GBP: '£',
-    INR: '₹',
-    JPY: '¥'
+    PKR: 'Rs', USD: '$', EUR: '€', GBP: '£', INR: '₹', JPY: '¥'
 };
 
 // ============================================================
@@ -37,13 +31,11 @@ function formatCurrency(amount) {
     const symbol = userProfile.symbol || 'Rs';
     return symbol + amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
-
 function escapeHTML(text) {
     const d = document.createElement('div');
     d.textContent = text;
     return d.innerHTML;
 }
-
 function showToast(message, type = 'info') {
     const container = document.getElementById('toastContainer');
     const toast = document.createElement('div');
@@ -56,14 +48,12 @@ function showToast(message, type = 'info') {
         setTimeout(() => toast.remove(), 300);
     }, 3000);
 }
-
 function updateUIWithUser() {
     document.getElementById('sidebarUserName').textContent = userProfile.name;
     const initials = userProfile.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
     document.getElementById('userAvatar').textContent = initials;
     document.getElementById('headerCurrencyDisplay').textContent = userProfile.currency;
 }
-
 function showLoginPage(show) {
     document.getElementById('loginPage').classList.toggle('hidden', !show);
     document.getElementById('appContainer').style.display = show ? 'none' : 'flex';
@@ -81,7 +71,6 @@ async function loadProfile(userId) {
     if (error && error.code !== 'PGRST116') throw error;
     return data;
 }
-
 async function ensureProfile(userId, name, currency) {
     let profile = await loadProfile(userId);
     if (!profile) {
@@ -107,82 +96,100 @@ async function loadTransactions() {
     if (error) throw error;
     transactions = data || [];
 }
-
 async function addTransaction(description, amount, category, type, date) {
     const { error } = await supabase
         .from('transactions')
-        .insert([{
-            user_id: currentUser.id,
-            description,
-            amount,
-            category,
-            type,
-            date
-        }]);
+        .insert([{ user_id: currentUser.id, description, amount, category, type, date }]);
     if (error) throw error;
 }
-
 async function updateTransaction(id, description, amount, category, type, date) {
     const { error } = await supabase
         .from('transactions')
         .update({ description, amount, category, type, date })
-        .eq('id', id)
-        .eq('user_id', currentUser.id);
+        .eq('id', id).eq('user_id', currentUser.id);
     if (error) throw error;
 }
-
 async function deleteTransaction(id) {
     const { error } = await supabase
         .from('transactions')
         .delete()
-        .eq('id', id)
-        .eq('user_id', currentUser.id);
+        .eq('id', id).eq('user_id', currentUser.id);
     if (error) throw error;
 }
 
 // ============================================================
-// LOGIN / SIGNUP HANDLER
+// LOGIN HANDLER
 // ============================================================
 async function handleLogin() {
     const email = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value;
-    const name = document.getElementById('loginName').value.trim();
-    const currency = document.getElementById('loginCurrency').value;
-    const balance = parseFloat(document.getElementById('loginBalance').value) || 0;
 
-    if (!email || !password || !name) {
-        showToast('Please fill in all required fields.', 'error');
+    if (!email || !password) {
+        showToast('Please enter email and password.', 'error');
         return;
     }
 
     try {
-        // Try sign in first
-        let { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email, password });
-        if (authError && authError.message.includes('Invalid login credentials')) {
-            // User doesn't exist – sign up
-            const { data: signUpData, error: signUpError } = await supabase.auth.signUp({ email, password });
-            if (signUpError) throw signUpError;
-            authData = signUpData;
-        } else if (authError) {
-            throw authError;
-        }
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        currentUser = data.user;
 
-        currentUser = authData.user;
-
-        // Ensure profile exists
-        const profile = await ensureProfile(currentUser.id, name, currency);
+        const profile = await loadProfile(currentUser.id);
         userProfile = {
             name: profile.name,
             currency: profile.currency,
             symbol: CURRENCY_SYMBOLS[profile.currency] || 'Rs'
         };
 
-        // Add initial balance if this is a new user (no transactions yet)
-        const { count } = await supabase
-            .from('transactions')
-            .select('*', { count: 'exact', head: true })
-            .eq('user_id', currentUser.id);
-        if (count === 0 && balance > 0) {
+        showLoginPage(false);
+        updateUIWithUser();
+        await loadTransactions();
+        renderAll();
+        showToast(`Welcome back, ${userProfile.name}!`, 'success');
+    } catch (error) {
+        console.error('Login error:', error);
+        showToast('Login failed: ' + error.message, 'error');
+    }
+}
+
+// ============================================================
+// SIGNUP HANDLER
+// ============================================================
+async function handleSignup() {
+    const name = document.getElementById('signupName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value;
+    const confirm = document.getElementById('signupConfirm').value;
+    const currency = document.getElementById('signupCurrency').value;
+    const balance = parseFloat(document.getElementById('signupBalance').value) || 0;
+    const termsChecked = document.getElementById('termsCheck').checked;
+
+    if (!name || !email || !password || !confirm) {
+        showToast('Please fill in all required fields.', 'error');
+        return;
+    }
+    if (password !== confirm) {
+        showToast('Passwords do not match.', 'error');
+        return;
+    }
+    if (!termsChecked) {
+        showToast('Please accept the terms & conditions.', 'error');
+        return;
+    }
+    if (password.length < 6) {
+        showToast('Password must be at least 6 characters.', 'error');
+        return;
+    }
+
+    try {
+        const { data, error } = await supabase.auth.signUp({ email, password });
+        if (error) throw error;
+        currentUser = data.user;
+
+        await ensureProfile(currentUser.id, name, currency);
+        userProfile = { name, currency, symbol: CURRENCY_SYMBOLS[currency] || 'Rs' };
+
+        if (balance > 0) {
             const today = new Date().toISOString().slice(0, 10);
             await addTransaction('💰 Initial Deposit (Sign-up)', balance, 'Salary', 'income', today);
         }
@@ -193,16 +200,9 @@ async function handleLogin() {
         renderAll();
         showToast(`Welcome, ${userProfile.name}!`, 'success');
     } catch (error) {
-        console.error('Login error:', error);
-        showToast('Login failed: ' + error.message, 'error');
+        console.error('Signup error:', error);
+        showToast('Signup failed: ' + error.message, 'error');
     }
-}
-
-// ============================================================
-// GOOGLE LOGIN (placeholder)
-// ============================================================
-function handleGoogleLogin() {
-    showToast('Google login coming soon!', 'info');
 }
 
 // ============================================================
@@ -216,6 +216,14 @@ async function logoutUser() {
         userProfile = { name: 'Guest', currency: 'PKR', symbol: 'Rs' };
         location.reload();
     }
+}
+
+// ============================================================
+// TOGGLE FORMS
+// ============================================================
+function toggleForms(showLogin) {
+    document.getElementById('loginFormContainer').style.display = showLogin ? 'block' : 'none';
+    document.getElementById('signupFormContainer').style.display = showLogin ? 'none' : 'block';
 }
 
 // ============================================================
@@ -307,7 +315,6 @@ function initTransactionForm() {
         }
     });
 
-    // Edit and Delete (global functions for onclick)
     window.editTransaction = async function(id) {
         const tx = transactions.find(t => t.id === id);
         if (!tx) return;
@@ -336,7 +343,7 @@ function initTransactionForm() {
 }
 
 // ============================================================
-// FILTERS & RENDER
+// RENDER FUNCTIONS (dashboard, chart, list)
 // ============================================================
 function getFilteredTransactions() {
     const year = document.getElementById('yearFilter').value;
@@ -371,7 +378,6 @@ function renderAll() {
     document.getElementById('savingsDisplay').textContent = savingsRate.toFixed(0) + '%';
     document.getElementById('txCountBadge').innerHTML = `<i class="fas fa-list"></i> ${filtered.length} Transactions`;
 
-    // Top category
     const expenses = filtered.filter(tx => tx.type === 'expense');
     const catMap = {};
     expenses.forEach(tx => { catMap[tx.category] = (catMap[tx.category] || 0) + tx.amount; });
@@ -406,10 +412,7 @@ function renderChart(expenses) {
     const ctx = document.getElementById('expenseChart').getContext('2d');
     myChart = new Chart(ctx, {
         type: 'doughnut',
-        data: {
-            labels,
-            datasets: [{ data: dataValues, backgroundColor: colors, borderColor: '#fff', borderWidth: 3 }]
-        },
+        data: { labels, datasets: [{ data: dataValues, backgroundColor: colors, borderColor: '#fff', borderWidth: 3 }] },
         options: {
             responsive: true,
             maintainAspectRatio: true,
@@ -564,9 +567,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Init transaction form
     initTransactionForm();
 
-    // Set up login and Google buttons
+    // Login / Signup buttons
     document.getElementById('loginBtn').addEventListener('click', handleLogin);
-    document.getElementById('googleLoginBtn').addEventListener('click', handleGoogleLogin);
+    document.getElementById('signupBtn').addEventListener('click', handleSignup);
+
+    // Toggle links
+    document.getElementById('switchToSignup').addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleForms(false);
+    });
+    document.getElementById('switchToLogin').addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleForms(true);
+    });
 
     // Quick add button
     document.getElementById('addQuickBtn').addEventListener('click', () => {
@@ -574,7 +587,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('description').focus();
     });
 
-    // Check session
+    // Check existing session
     const { data: { session } } = await supabase.auth.getSession();
     if (session) {
         currentUser = session.user;
@@ -595,7 +608,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('monthFilter').value = 'all';
         updatePeriodLabel();
         renderAll();
-        // Sidebar state
         const saved = localStorage.getItem('sidebarOpen');
         const isDesktop = window.innerWidth >= 901;
         let defaultOpen = isDesktop;
@@ -603,10 +615,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         toggleSidebar(defaultOpen);
     } else {
         showLoginPage(true);
-        document.getElementById('loginName').value = '';
-        document.getElementById('loginBalance').value = '';
+        toggleForms(true); // show login by default
+        // Clear fields
         document.getElementById('loginEmail').value = '';
         document.getElementById('loginPassword').value = '';
+        document.getElementById('signupName').value = '';
+        document.getElementById('signupEmail').value = '';
+        document.getElementById('signupPassword').value = '';
+        document.getElementById('signupConfirm').value = '';
+        document.getElementById('signupBalance').value = '';
+        document.getElementById('termsCheck').checked = false;
     }
 
     // Event listeners for filters
