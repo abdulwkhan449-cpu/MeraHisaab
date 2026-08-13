@@ -1,17 +1,7 @@
 // ============================================================
-// SUPABASE – declared only ONCE
+// LOCAL STORAGE – no Supabase
 // ============================================================
-const SUPABASE_URL = 'https://yrlfdjxotruhgjxykxvi.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_yVhkAwx7LXgJg8klHwCm4w_L5SUoGmk';
-
-if (typeof window.supabase === 'undefined') {
-    alert('Supabase library failed to load. Check your internet connection.');
-    throw new Error('Supabase not loaded');
-}
-
-// ✅ Only one declaration
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-console.log('✅ Supabase initialised');
+console.log('📦 Using localStorage for data');
 
 // ============================================================
 // STATE
@@ -23,12 +13,7 @@ let editingId = null;
 let myChart = null;
 
 const CURRENCY_SYMBOLS = {
-    PKR: 'Rs',
-    USD: '$',
-    EUR: '€',
-    GBP: '£',
-    INR: '₹',
-    JPY: '¥'
+    PKR: 'Rs', USD: '$', EUR: '€', GBP: '£', INR: '₹', JPY: '¥'
 };
 
 // ============================================================
@@ -38,13 +23,11 @@ function formatCurrency(amount) {
     const symbol = userProfile.symbol || 'Rs';
     return symbol + amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
-
 function escapeHTML(text) {
     const d = document.createElement('div');
     d.textContent = text;
     return d.innerHTML;
 }
-
 function showToast(message, type = 'info') {
     const container = document.getElementById('toastContainer');
     const toast = document.createElement('div');
@@ -57,17 +40,44 @@ function showToast(message, type = 'info') {
         setTimeout(() => toast.remove(), 300);
     }, 3000);
 }
-
 function updateUIWithUser() {
     document.getElementById('sidebarUserName').textContent = userProfile.name;
     const initials = userProfile.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
     document.getElementById('userAvatar').textContent = initials;
     document.getElementById('headerCurrencyDisplay').textContent = userProfile.currency;
 }
-
 function showLoginPage(show) {
     document.getElementById('loginPage').classList.toggle('hidden', !show);
     document.getElementById('appContainer').style.display = show ? 'none' : 'flex';
+}
+
+// ============================================================
+// LOCAL STORAGE HELPERS
+// ============================================================
+function loadUsers() {
+    const data = localStorage.getItem('myhisab_users');
+    return data ? JSON.parse(data) : {};
+}
+function saveUsers(users) {
+    localStorage.setItem('myhisab_users', JSON.stringify(users));
+}
+function loadUserProfile(email) {
+    const users = loadUsers();
+    return users[email] || null;
+}
+function saveUserProfile(email, profile) {
+    const users = loadUsers();
+    users[email] = profile;
+    saveUsers(users);
+}
+function loadTransactionsForUser(email) {
+    const key = `myhisab_transactions_${email}`;
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : [];
+}
+function saveTransactionsForUser(email, txs) {
+    const key = `myhisab_transactions_${email}`;
+    localStorage.setItem(key, JSON.stringify(txs));
 }
 
 // ============================================================
@@ -76,87 +86,13 @@ function showLoginPage(show) {
 function toggleForms(showLogin) {
     const loginContainer = document.getElementById('loginFormContainer');
     const signupContainer = document.getElementById('signupFormContainer');
-    
     if (showLogin) {
         loginContainer.style.display = 'block';
         signupContainer.style.display = 'none';
-        console.log('🔄 Switched to Login form');
     } else {
         loginContainer.style.display = 'none';
         signupContainer.style.display = 'block';
-        console.log('🔄 Switched to Signup form');
     }
-}
-
-// ============================================================
-// AUTH & PROFILE
-// ============================================================
-async function loadProfile(userId) {
-    const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-    if (error && error.code !== 'PGRST116') throw error;
-    return data;
-}
-
-async function ensureProfile(userId, name, currency) {
-    let profile = await loadProfile(userId);
-    if (!profile) {
-        const { error } = await supabase
-            .from('profiles')
-            .insert([{ id: userId, name, currency }]);
-        if (error) throw error;
-        profile = { name, currency };
-    }
-    return profile;
-}
-
-// ============================================================
-// TRANSACTIONS CRUD
-// ============================================================
-async function loadTransactions() {
-    if (!currentUser) return;
-    const { data, error } = await supabase
-        .from('transactions')
-        .select('*')
-        .eq('user_id', currentUser.id)
-        .order('date', { ascending: false });
-    if (error) throw error;
-    transactions = data || [];
-}
-
-async function addTransaction(description, amount, category, type, date) {
-    const { error } = await supabase
-        .from('transactions')
-        .insert([{
-            user_id: currentUser.id,
-            description,
-            amount,
-            category,
-            type,
-            date
-        }]);
-    if (error) throw error;
-}
-
-async function updateTransaction(id, description, amount, category, type, date) {
-    const { error } = await supabase
-        .from('transactions')
-        .update({ description, amount, category, type, date })
-        .eq('id', id)
-        .eq('user_id', currentUser.id);
-    if (error) throw error;
-}
-
-async function deleteTransaction(id) {
-    const { error } = await supabase
-        .from('transactions')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', currentUser.id);
-    if (error) throw error;
 }
 
 // ============================================================
@@ -171,32 +107,29 @@ async function handleLogin() {
         return;
     }
 
-    try {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        currentUser = data.user;
-
-        const profile = await loadProfile(currentUser.id);
-        if (!profile) {
-            showToast('Profile not found. Please sign up.', 'error');
-            return;
-        }
-        
-        userProfile = {
-            name: profile.name,
-            currency: profile.currency,
-            symbol: CURRENCY_SYMBOLS[profile.currency] || 'Rs'
-        };
-
-        showLoginPage(false);
-        updateUIWithUser();
-        await loadTransactions();
-        renderAll();
-        showToast(`Welcome back, ${userProfile.name}!`, 'success');
-    } catch (error) {
-        console.error('Login error:', error);
-        showToast('Login failed: ' + error.message, 'error');
+    const profile = loadUserProfile(email);
+    if (!profile) {
+        showToast('No account found with this email.', 'error');
+        return;
     }
+    if (profile.password !== password) {
+        showToast('Incorrect password.', 'error');
+        return;
+    }
+
+    // Login success
+    currentUser = email;
+    userProfile = {
+        name: profile.name,
+        currency: profile.currency,
+        symbol: CURRENCY_SYMBOLS[profile.currency] || 'Rs'
+    };
+    transactions = loadTransactionsForUser(email);
+
+    showLoginPage(false);
+    updateUIWithUser();
+    renderAll();
+    showToast(`Welcome back, ${userProfile.name}!`, 'success');
 }
 
 // ============================================================
@@ -228,100 +161,94 @@ async function handleSignup() {
         return;
     }
 
-    try {
-        // 1. Sign up with Supabase Auth
-        const { data, error } = await supabase.auth.signUp({ 
-            email, 
-            password,
-            options: {
-                data: { name: name }
-            }
-        });
-        if (error) throw error;
-        currentUser = data.user;
-
-        // 2. Create profile in database
-        await ensureProfile(currentUser.id, name, currency);
-        userProfile = { name, currency, symbol: CURRENCY_SYMBOLS[currency] || 'Rs' };
-
-        // 3. Add initial balance if provided
-        if (balance > 0) {
-            const today = new Date().toISOString().slice(0, 10);
-            await addTransaction('💰 Initial Deposit (Sign-up)', balance, 'Salary', 'income', today);
-        }
-
-        // 4. Show dashboard
-        showLoginPage(false);
-        updateUIWithUser();
-        await loadTransactions();
-        renderAll();
-        showToast(`Welcome, ${userProfile.name}! Your account is ready.`, 'success');
-        
-        console.log('✅ User signed up successfully:', email);
-        console.log('✅ Profile saved to Supabase:', userProfile);
-    } catch (error) {
-        console.error('Signup error:', error);
-        showToast('Signup failed: ' + error.message, 'error');
+    // Check if user already exists
+    if (loadUserProfile(email)) {
+        showToast('An account with this email already exists.', 'error');
+        return;
     }
+
+    // Create profile
+    const profile = { name, password, currency };
+    saveUserProfile(email, profile);
+
+    // Add initial balance if any
+    let txs = [];
+    if (balance > 0) {
+        const today = new Date().toISOString().slice(0, 10);
+        txs.push({
+            id: Date.now(),
+            description: '💰 Initial Deposit (Sign-up)',
+            amount: balance,
+            category: 'Salary',
+            type: 'income',
+            date: today
+        });
+    }
+    saveTransactionsForUser(email, txs);
+
+    // Login automatically
+    currentUser = email;
+    userProfile = { name, currency, symbol: CURRENCY_SYMBOLS[currency] || 'Rs' };
+    transactions = txs;
+
+    showLoginPage(false);
+    updateUIWithUser();
+    renderAll();
+    showToast(`Welcome, ${userProfile.name}! Your account is ready.`, 'success');
 }
 
 // ============================================================
 // LOGOUT
 // ============================================================
-async function logoutUser() {
+function logoutUser() {
     if (confirm('Are you sure you want to logout?')) {
-        await supabase.auth.signOut();
         currentUser = null;
-        transactions = [];
         userProfile = { name: 'Guest', currency: 'PKR', symbol: 'Rs' };
-        location.reload();
+        transactions = [];
+        showLoginPage(true);
+        toggleForms(false); // show signup by default
+        document.getElementById('loginEmail').value = '';
+        document.getElementById('loginPassword').value = '';
     }
 }
 
 // ============================================================
-// SETTINGS MODAL
+// TRANSACTIONS CRUD (localStorage)
 // ============================================================
-function initSettingsModal() {
-    const settingsModal = document.getElementById('settingsModal');
-    document.getElementById('settingsNavTrigger').addEventListener('click', () => {
-        document.getElementById('settingsName').value = userProfile.name;
-        document.getElementById('settingsCurrency').value = userProfile.currency;
-        settingsModal.classList.add('active');
-    });
-    document.getElementById('closeSettingsBtn').addEventListener('click', () => settingsModal.classList.remove('active'));
-    settingsModal.addEventListener('click', (e) => { if (e.target === settingsModal) settingsModal.classList.remove('active'); });
-
-    document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
-        const name = document.getElementById('settingsName').value.trim();
-        const currency = document.getElementById('settingsCurrency').value;
-        if (!name) return showToast('Please enter a name.', 'error');
-
-        try {
-            await supabase
-                .from('profiles')
-                .update({ name, currency })
-                .eq('id', currentUser.id);
-
-            userProfile.name = name;
-            userProfile.currency = currency;
-            userProfile.symbol = CURRENCY_SYMBOLS[currency] || 'Rs';
-            updateUIWithUser();
-            renderAll();
-            settingsModal.classList.remove('active');
-            showToast('✅ Settings updated!', 'success');
-        } catch (error) {
-            showToast('Update failed: ' + error.message, 'error');
-        }
-    });
-
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-        settingsModal.classList.remove('active');
-        logoutUser();
-    });
+function loadTransactions() {
+    if (!currentUser) return;
+    transactions = loadTransactionsForUser(currentUser);
+}
+function saveTransactions() {
+    if (!currentUser) return;
+    saveTransactionsForUser(currentUser, transactions);
+}
+function addTransaction(description, amount, category, type, date) {
+    const newTx = {
+        id: Date.now(),
+        description,
+        amount,
+        category,
+        type,
+        date
+    };
+    transactions.push(newTx);
+    saveTransactions();
+}
+function updateTransaction(id, description, amount, category, type, date) {
+    const index = transactions.findIndex(tx => tx.id === id);
+    if (index !== -1) {
+        transactions[index] = { ...transactions[index], description, amount, category, type, date };
+        saveTransactions();
+    }
+}
+function deleteTransaction(id) {
+    transactions = transactions.filter(tx => tx.id !== id);
+    saveTransactions();
 }
 
 // ============================================================
-// TRANSACTION FORM
+// TRANSACTION FORM HANDLING
 // ============================================================
 function initTransactionForm() {
     const form = document.getElementById('transactionForm');
@@ -332,7 +259,7 @@ function initTransactionForm() {
     const submitBtn = document.getElementById('submitBtn');
     const formTitle = document.getElementById('formTitle');
 
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener('submit', (e) => {
         e.preventDefault();
 
         const description = descInput.value.trim();
@@ -346,28 +273,24 @@ function initTransactionForm() {
 
         const today = new Date().toISOString().slice(0, 10);
 
-        try {
-            if (editingId !== null) {
-                await updateTransaction(editingId, description, amount, category, type, today);
-                showToast('✅ Transaction updated!', 'success');
-                editingId = null;
-                submitBtn.innerHTML = '<i class="fas fa-plus"></i> Add Transaction';
-                formTitle.innerHTML = '<i class="fas fa-plus-circle"></i> Add Transaction';
-            } else {
-                await addTransaction(description, amount, category, type, today);
-                showToast('🎉 Transaction added!', 'success');
-            }
-
-            await loadTransactions();
-            renderAll();
-            form.reset();
-            document.querySelector('input[name="type"][value="income"]').checked = true;
-        } catch (error) {
-            showToast('Error saving: ' + error.message, 'error');
+        if (editingId !== null) {
+            updateTransaction(editingId, description, amount, category, type, today);
+            showToast('✅ Transaction updated!', 'success');
+            editingId = null;
+            submitBtn.innerHTML = '<i class="fas fa-plus"></i> Add Transaction';
+            formTitle.innerHTML = '<i class="fas fa-plus-circle"></i> Add Transaction';
+        } else {
+            addTransaction(description, amount, category, type, today);
+            showToast('🎉 Transaction added!', 'success');
         }
+
+        loadTransactions();
+        renderAll();
+        form.reset();
+        document.querySelector('input[name="type"][value="income"]').checked = true;
     });
 
-    window.editTransaction = async function(id) {
+    window.editTransaction = function(id) {
         const tx = transactions.find(t => t.id === id);
         if (!tx) return;
         descInput.value = tx.description;
@@ -381,21 +304,17 @@ function initTransactionForm() {
         descInput.focus();
     };
 
-    window.deleteTransaction = async function(id) {
+    window.deleteTransaction = function(id) {
         if (!confirm('Permanently delete this transaction?')) return;
-        try {
-            await deleteTransaction(id);
-            await loadTransactions();
-            renderAll();
-            showToast('🗑️ Transaction deleted.', 'info');
-        } catch (error) {
-            showToast('Delete failed: ' + error.message, 'error');
-        }
+        deleteTransaction(id);
+        loadTransactions();
+        renderAll();
+        showToast('🗑️ Transaction deleted.', 'info');
     };
 }
 
 // ============================================================
-// RENDER FUNCTIONS
+// RENDER FUNCTIONS (same as before)
 // ============================================================
 function getFilteredTransactions() {
     const year = document.getElementById('yearFilter').value;
@@ -413,7 +332,6 @@ function getFilteredTransactions() {
         return true;
     });
 }
-
 function renderAll() {
     const filtered = getFilteredTransactions();
     let totalIncome = 0, totalExpense = 0;
@@ -442,7 +360,6 @@ function renderAll() {
     renderChart(expenses);
     renderTransactionList(filtered);
 }
-
 function renderChart(expenses) {
     const catMap = {};
     expenses.forEach(tx => { catMap[tx.category] = (catMap[tx.category] || 0) + tx.amount; });
@@ -481,7 +398,6 @@ function renderChart(expenses) {
         }
     });
 }
-
 function renderTransactionList(filtered) {
     const container = document.getElementById('transactionList');
     if (filtered.length === 0) {
@@ -529,7 +445,6 @@ function updatePeriodLabel() {
     document.getElementById('currentMonthDisplay').textContent = label + ' Overview';
     document.getElementById('listMonthLabel').textContent = 'Showing ' + label;
 }
-
 function populateYearFilter() {
     const currentYear = new Date().getFullYear();
     let earliestYear = currentYear;
@@ -589,7 +504,6 @@ function initSidebar() {
 
     return toggleSidebar;
 }
-
 function initDarkMode() {
     document.getElementById('darkModeToggle').addEventListener('click', () => {
         document.body.classList.toggle('dark');
@@ -601,10 +515,51 @@ function initDarkMode() {
 }
 
 // ============================================================
-// INIT – runs when DOM is ready
+// SETTINGS MODAL
 // ============================================================
-document.addEventListener('DOMContentLoaded', async () => {
-    console.log('🚀 App initialising...');
+function initSettingsModal() {
+    const settingsModal = document.getElementById('settingsModal');
+    document.getElementById('settingsNavTrigger').addEventListener('click', () => {
+        document.getElementById('settingsName').value = userProfile.name;
+        document.getElementById('settingsCurrency').value = userProfile.currency;
+        settingsModal.classList.add('active');
+    });
+    document.getElementById('closeSettingsBtn').addEventListener('click', () => settingsModal.classList.remove('active'));
+    settingsModal.addEventListener('click', (e) => { if (e.target === settingsModal) settingsModal.classList.remove('active'); });
+
+    document.getElementById('saveSettingsBtn').addEventListener('click', () => {
+        const name = document.getElementById('settingsName').value.trim();
+        const currency = document.getElementById('settingsCurrency').value;
+        if (!name) return showToast('Please enter a name.', 'error');
+
+        // Update profile in localStorage
+        const profile = loadUserProfile(currentUser);
+        if (profile) {
+            profile.name = name;
+            profile.currency = currency;
+            saveUserProfile(currentUser, profile);
+        }
+
+        userProfile.name = name;
+        userProfile.currency = currency;
+        userProfile.symbol = CURRENCY_SYMBOLS[currency] || 'Rs';
+        updateUIWithUser();
+        renderAll();
+        settingsModal.classList.remove('active');
+        showToast('✅ Settings updated!', 'success');
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        settingsModal.classList.remove('active');
+        logoutUser();
+    });
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🚀 App initialising (localStorage mode)...');
 
     // Dark mode
     if (localStorage.getItem('darkMode') === 'true') {
@@ -614,14 +569,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Init sidebar
     const toggleSidebar = initSidebar();
-
-    // Init dark mode
     initDarkMode();
-
-    // Init settings modal
     initSettingsModal();
-
-    // Init transaction form
     initTransactionForm();
 
     // Login / Signup buttons
@@ -631,15 +580,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Toggle links
     document.getElementById('switchToSignup').addEventListener('click', (e) => {
         e.preventDefault();
-        console.log('🔄 Switching to Signup');
         toggleForms(false);
         document.getElementById('loginEmail').value = '';
         document.getElementById('loginPassword').value = '';
     });
-
     document.getElementById('switchToLogin').addEventListener('click', (e) => {
         e.preventDefault();
-        console.log('🔄 Switching to Login');
         toggleForms(true);
         document.getElementById('signupName').value = '';
         document.getElementById('signupEmail').value = '';
@@ -655,42 +601,42 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('description').focus();
     });
 
-    // Check existing session
-    const { data: { session } } = await supabase.auth.getSession();
-    console.log('📋 Session check:', session ? 'User logged in' : 'No session');
-
-    if (session) {
-        currentUser = session.user;
-        const profile = await loadProfile(currentUser.id);
+    // Check if a user is already logged in (by checking localStorage for last session)
+    const lastUser = localStorage.getItem('myhisab_last_user');
+    if (lastUser) {
+        const profile = loadUserProfile(lastUser);
         if (profile) {
+            currentUser = lastUser;
             userProfile = {
                 name: profile.name,
                 currency: profile.currency,
                 symbol: CURRENCY_SYMBOLS[profile.currency] || 'Rs'
             };
+            transactions = loadTransactionsForUser(lastUser);
+            showLoginPage(false);
+            updateUIWithUser();
+            populateYearFilter();
+            const now = new Date();
+            document.getElementById('yearFilter').value = now.getFullYear();
+            document.getElementById('monthFilter').value = 'all';
+            updatePeriodLabel();
+            renderAll();
+            const saved = localStorage.getItem('sidebarOpen');
+            const isDesktop = window.innerWidth >= 901;
+            let defaultOpen = isDesktop;
+            if (saved !== null) defaultOpen = saved === 'true';
+            toggleSidebar(defaultOpen);
+            console.log('✅ Restored session for:', userProfile.name);
+            return;
         }
-        showLoginPage(false);
-        updateUIWithUser();
-        await loadTransactions();
-        populateYearFilter();
-        const now = new Date();
-        document.getElementById('yearFilter').value = now.getFullYear();
-        document.getElementById('monthFilter').value = 'all';
-        updatePeriodLabel();
-        renderAll();
-        const saved = localStorage.getItem('sidebarOpen');
-        const isDesktop = window.innerWidth >= 901;
-        let defaultOpen = isDesktop;
-        if (saved !== null) defaultOpen = saved === 'true';
-        toggleSidebar(defaultOpen);
-        console.log('✅ User logged in:', userProfile.name);
-    } else {
-        showLoginPage(true);
-        toggleForms(false); // Show signup by default
-        console.log('📝 Showing signup page (default)');
     }
 
-    // Event listeners for filters
+    // No session: show login page (signup by default)
+    showLoginPage(true);
+    toggleForms(false); // signup default
+    console.log('📝 Showing signup page (default)');
+
+    // Filter listeners
     document.getElementById('yearFilter').addEventListener('change', () => {
         updatePeriodLabel();
         renderAll();
@@ -700,5 +646,5 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderAll();
     });
 
-    console.log('✅ App initialised successfully');
+    console.log('✅ App initialised (localStorage)');
 });
