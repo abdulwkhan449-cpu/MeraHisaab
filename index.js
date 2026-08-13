@@ -192,6 +192,13 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
 });
 
 // ============================================================
+// GOOGLE LOGIN (placeholder)
+// ============================================================
+document.getElementById('googleLoginBtn')?.addEventListener('click', () => {
+    showToast('Google login coming soon!', 'info');
+});
+
+// ============================================================
 // LOGOUT
 // ============================================================
 async function logoutUser() {
@@ -577,4 +584,4 @@ document.addEventListener('DOMContentLoaded', async () => {
         updatePeriodLabel();
         renderAll();
     });
-});s
+});
