@@ -66,150 +66,8 @@ body.dark {
 }
 .dark .login-container { background: #1e293b; }
 
-/* Left side – form */
-.login-left {
-    flex: 1 1 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-    background: white;
-    overflow-y: auto;
-}
-.dark .login-left { background: #1e293b; }
-
-.login-card {
-    width: 100%;
-    max-width: 420px;
-    padding: 0;
-    background: transparent;
-    box-shadow: none;
-}
-.login-header { text-align: center; margin-bottom: 2rem; }
-.login-logo {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #7c3aed;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-}
-.login-logo i { font-size: 1.8rem; }
-.login-sub {
-    color: #64748b;
-    font-size: 0.95rem;
-    margin-top: 0.25rem;
-}
-.dark .login-sub { color: #94a3b8; }
-
-/* Form fields */
-.login-form .form-group { margin-bottom: 1.25rem; }
-.login-form label {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-weight: 500;
-    font-size: 0.85rem;
-    color: #334155;
-    margin-bottom: 0.3rem;
-}
-.dark .login-form label { color: #cbd5e1; }
-.login-form input,
-.login-form select {
-    width: 100%;
-    padding: 0.7rem 1rem;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 0.75rem;
-    font-size: 0.95rem;
-    background: white;
-    transition: border 0.2s, box-shadow 0.2s;
-    outline: none;
-}
-.dark .login-form input,
-.dark .login-form select {
-    background: #0f172a;
-    border-color: #334155;
-    color: #f1f5f9;
-}
-.login-form input:focus,
-.login-form select:focus {
-    border-color: #7c3aed;
-    box-shadow: 0 0 0 3px rgba(124,58,237,0.15);
-}
-.login-form .hint {
-    display: block;
-    font-size: 0.75rem;
-    color: #94a3b8;
-    margin-top: 0.25rem;
-}
-
-/* Buttons */
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 0.75rem;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
-    text-decoration: none;
-}
-.btn-primary {
-    background: #7c3aed;
-    color: white;
-    width: 100%;
-}
-.btn-primary:hover { background: #6d28d9; }
-.btn-primary:active { transform: scale(0.97); }
-
-.btn-google {
-    background: #ffffff;
-    color: #1e293b;
-    border: 1.5px solid #e2e8f0;
-    width: 100%;
-    margin-top: 0.5rem;
-}
-.btn-google:hover { background: #f1f5f9; }
-.dark .btn-google {
-    background: #0f172a;
-    color: #f1f5f9;
-    border-color: #334155;
-}
-.dark .btn-google:hover { background: #1e293b; }
-
-.login-divider {
-    display: flex;
-    align-items: center;
-    margin: 1.5rem 0 1rem;
-    color: #94a3b8;
-    font-size: 0.85rem;
-}
-.login-divider::before,
-.login-divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: #e2e8f0;
-}
-.login-divider::before { margin-right: 1rem; }
-.login-divider::after { margin-left: 1rem; }
-.dark .login-divider::before,
-.dark .login-divider::after { background: #334155; }
-
-.login-footer {
-    margin-top: 1.5rem;
-    text-align: center;
-    font-size: 0.8rem;
-    color: #94a3b8;
-}
-
-/* Right side – branding */
-.login-right {
+/* ---- Left side – Branding ---- */
+.login-left.branding {
     flex: 1 1 50%;
     display: flex;
     align-items: center;
@@ -220,7 +78,7 @@ body.dark {
     position: relative;
     overflow: hidden;
 }
-.login-right::before {
+.login-left.branding::before {
     content: '';
     position: absolute;
     top: -50%;
@@ -244,16 +102,195 @@ body.dark {
 .brand-features span { display: flex; align-items: center; gap: 0.75rem; font-size: 1rem; }
 .brand-features i { color: #a78bfa; }
 
-/* Mobile: stack */
-@media (max-width: 768px) {
-    .login-container { flex-direction: column; height: 100vh; }
-    .login-left { flex: 1; order: 2; padding: 1.5rem; }
-    .login-right { flex: 1; order: 1; min-height: 35vh; text-align: center; }
-    .brand-content { text-align: center; }
-    .brand-title { font-size: 2.2rem; }
-    .brand-features { align-items: center; }
-    .login-card { max-width: 100%; }
+/* ---- Right side – Forms ---- */
+.login-right.forms {
+    flex: 1 1 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: white;
+    overflow-y: auto;
+}
+.dark .login-right.forms { background: #1e293b; }
+
+.form-card {
+    width: 100%;
+    max-width: 460px;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+}
+.form-header { text-align: center; margin-bottom: 1.5rem; }
+.form-logo {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #7c3aed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+.form-logo i { font-size: 1.6rem; }
+.form-sub {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin-top: 0.2rem;
+}
+.dark .form-sub { color: #94a3b8; }
+
+/* ---- Auth Form ---- */
+.auth-form .form-group {
+    margin-bottom: 0.8rem;
+}
+.auth-form label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 500;
+    font-size: 0.8rem;
+    color: #334155;
+    margin-bottom: 0.2rem;
+}
+.dark .auth-form label { color: #cbd5e1; }
+.auth-form input,
+.auth-form select {
+    width: 100%;
+    padding: 0.5rem 0.8rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    background: white;
+    transition: border 0.2s, box-shadow 0.2s;
+    outline: none;
+}
+.dark .auth-form input,
+.dark .auth-form select {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+.auth-form input:focus,
+.auth-form select:focus {
+    border-color: #7c3aed;
+    box-shadow: 0 0 0 3px rgba(124,58,237,0.15);
+}
+.auth-form .hint {
+    display: block;
+    font-size: 0.65rem;
+    color: #94a3b8;
+    margin-top: 0.15rem;
 }
 
-/* ===== SIDEBAR & DASHBOARD (unchanged) ===== */
-/* ... (the rest of your dashboard styles go here – I'll keep it minimal to save space, but you can paste your full dashboard CSS from earlier) */
+/* Forgot password link */
+.forgot-link { text-align: right; margin-top: -0.3rem; }
+.forgot-link a {
+    font-size: 0.8rem;
+    color: #7c3aed;
+    text-decoration: none;
+}
+.forgot-link a:hover { text-decoration: underline; }
+
+/* Checkbox */
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.5rem 0 0.8rem;
+}
+.checkbox-group input[type="checkbox"] {
+    width: auto;
+    accent-color: #7c3aed;
+}
+.checkbox-group label {
+    font-weight: 400;
+    font-size: 0.85rem;
+    color: #334155;
+    margin-bottom: 0;
+}
+.dark .checkbox-group label { color: #cbd5e1; }
+
+/* Two‑column grid for signup fields */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+}
+@media (max-width: 500px) {
+    .form-row { grid-template-columns: 1fr; }
+}
+
+/* Toggle link */
+.toggle-link {
+    text-align: center;
+    margin-top: 1.2rem;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+.toggle-link a {
+    color: #7c3aed;
+    font-weight: 600;
+    text-decoration: none;
+}
+.toggle-link a:hover { text-decoration: underline; }
+.dark .toggle-link { color: #94a3b8; }
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 0.6rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    text-decoration: none;
+}
+.btn-primary {
+    background: #7c3aed;
+    color: white;
+    width: 100%;
+}
+.btn-primary:hover { background: #6d28d9; }
+.btn-primary:active { transform: scale(0.97); }
+
+/* ---- Responsive: stack on smaller screens ---- */
+@media (max-width: 768px) {
+    .login-container { flex-direction: column; height: 100vh; }
+    .login-left.branding { flex: 0 0 35vh; padding: 1.5rem; text-align: center; }
+    .brand-content { text-align: center; }
+    .brand-title { font-size: 2rem; }
+    .brand-features { align-items: center; }
+    .login-right.forms { flex: 1; padding: 1rem; overflow-y: auto; }
+    .form-card { max-width: 100%; }
+}
+
+/* ===== SIDEBAR & DASHBOARD (keep your existing styles) ===== */
+/* ... (paste your full dashboard styles here – I'll include a minimal version) ... */
+.app-container { display: flex; min-height: 100vh; }
+.sidebar {
+    width: 260px;
+    background: #ffffff;
+    border-right: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem 1rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 100;
+    transition: transform 0.3s ease;
+    transform: translateX(-100%);
+}
+.dark .sidebar { background: #1e293b; border-color: #334155; }
+.sidebar.open { transform: translateX(0); }
+@media (min-width: 901px) {
+    .sidebar { transform: translateX(0); }
+    .sidebar.open ~ .main-content { margin-left: 260px; }
+}
+/* ... (rest of dashboard styles – you already have them) ... */
