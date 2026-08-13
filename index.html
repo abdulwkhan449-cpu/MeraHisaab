@@ -39,13 +39,14 @@
 
             <!-- Right side – Forms -->
             <div class="login-right forms">
-                <!-- LOGIN FORM -->
+
+                <!-- ===== LOGIN FORM ===== -->
                 <div id="loginFormContainer" class="form-card">
                     <div class="form-header">
                         <div class="form-logo"><i class="fas fa-chart-pie"></i> My Hisab</div>
                         <p class="form-sub">Welcome back! Please login to your account.</p>
                     </div>
-                    <form class="auth-form" id="loginForm">
+                    <form class="auth-form" id="loginForm" autocomplete="off">
                         <div class="form-group">
                             <label><i class="fas fa-envelope"></i> Email or Phone</label>
                             <input type="email" id="loginEmail" placeholder="you@example.com" required />
@@ -66,14 +67,13 @@
                     </p>
                 </div>
 
-                <!-- SIGNUP FORM -->
+                <!-- ===== SIGNUP FORM ===== -->
                 <div id="signupFormContainer" class="form-card" style="display: none;">
                     <div class="form-header">
                         <div class="form-logo"><i class="fas fa-chart-pie"></i> My Hisab</div>
                         <p class="form-sub">Create your free account.</p>
                     </div>
-                    <form class="auth-form" id="signupForm">
-                        <!-- Two-column grid for fields -->
+                    <form class="auth-form" id="signupForm" autocomplete="off">
                         <div class="form-row">
                             <div class="form-group">
                                 <label><i class="fas fa-user"></i> Enter your name</label>
@@ -124,6 +124,7 @@
                         Already have an account? <a href="#" id="switchToLogin">Login now</a>
                     </p>
                 </div>
+
             </div>
         </div>
     </div>
