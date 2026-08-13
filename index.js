@@ -577,4 +577,4 @@ document.addEventListener('DOMContentLoaded', async () => {
         updatePeriodLabel();
         renderAll();
     });
-});
+});s
