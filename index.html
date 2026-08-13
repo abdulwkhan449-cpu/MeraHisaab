@@ -14,16 +14,14 @@
     <link rel="icon" href="./logo.png" type="image/x-icon" />
 </head>
 <body>
-    <!-- Toast Container -->
+
     <div id="toastContainer" class="toast-container"></div>
 
-    <!-- ========================================================== -->
-    <!-- LOGIN & SIGNUP PAGE                                        -->
-    <!-- ========================================================== -->
+    <!-- ===== LOGIN & SIGNUP PAGE ===== -->
     <div id="loginPage" class="login-page">
         <div class="login-container">
 
-            <!-- Left side – Branding -->
+            <!-- Left: Branding -->
             <div class="login-left branding">
                 <div class="brand-content">
                     <div class="brand-icon"><i class="fas fa-chart-pie"></i></div>
@@ -37,11 +35,11 @@
                 </div>
             </div>
 
-            <!-- Right side – Forms -->
+            <!-- Right: Forms -->
             <div class="login-right forms">
 
-                <!-- ===== LOGIN FORM ===== -->
-                <div id="loginFormContainer" class="form-card">
+                <!-- ===== LOGIN FORM (hidden by default) ===== -->
+                <div id="loginFormContainer" class="form-card" style="display: none;">
                     <div class="form-header">
                         <div class="form-logo"><i class="fas fa-chart-pie"></i> My Hisab</div>
                         <p class="form-sub">Welcome back! Please login to your account.</p>
@@ -63,12 +61,12 @@
                         </button>
                     </form>
                     <p class="toggle-link">
-                        Don't have an account? <a href="signupFormContainer" id="switchToSignup">Sign Up</a>
+                        Don't have an account? <a href="#" id="switchToSignup">Sign Up</a>
                     </p>
                 </div>
 
-                <!-- ===== SIGNUP FORM ===== -->
-                <div id="signupFormContainer" class="form-card" style="display: none;">
+                <!-- ===== SIGNUP FORM (visible by default) ===== -->
+                <div id="signupFormContainer" class="form-card" style="display: block;">
                     <div class="form-header">
                         <div class="form-logo"><i class="fas fa-chart-pie"></i> My Hisab</div>
                         <p class="form-sub">Create your free account.</p>
@@ -129,9 +127,7 @@
         </div>
     </div>
 
-    <!-- ========================================================== -->
-    <!-- SETTINGS MODAL                                             -->
-    <!-- ========================================================== -->
+    <!-- ===== SETTINGS MODAL ===== -->
     <div id="settingsModal" class="modal-overlay">
         <div class="modal-content">
             <h2 class="text-2xl font-bold mb-4"><i class="fas fa-cog"></i> Settings</h2>
@@ -158,11 +154,9 @@
         </div>
     </div>
 
-    <!-- ========================================================== -->
-    <!-- DASHBOARD                                                 -->
-    <!-- ========================================================== -->
+    <!-- ===== DASHBOARD ===== -->
     <div id="appContainer" class="app-container" style="display: none;">
-        <!-- Sidebar -->
+        <!-- Sidebar, main content – same as before -->
         <aside class="sidebar" id="sidebar">
             <div class="logo"><span class="logo-icon"><i class="fas fa-chart-pie"></i></span> My Hisab</div>
             <nav class="sidebar-nav">
@@ -179,8 +173,8 @@
         </aside>
         <div class="overlay" id="sidebarOverlay"></div>
 
-        <!-- Main Content -->
         <main class="main-content" id="mainContent">
+            <!-- Dashboard content – copy from earlier -->
             <header class="top-header">
                 <div class="flex items-center gap-4">
                     <button class="hamburger" id="menuToggle"><i class="fas fa-bars"></i></button>
@@ -196,109 +190,12 @@
                 </div>
             </header>
 
-            <!-- Summary Cards -->
-            <section class="summary-grid">
-                <div class="card card-balance">
-                    <div class="card-header"><i class="fas fa-wallet"></i> Total Balance</div>
-                    <div class="card-value" id="balanceDisplay">$0.00</div>
-                    <div class="card-footer" id="balanceChange">+ $0.00 this month</div>
-                </div>
-                <div class="card card-income">
-                    <div class="card-header"><i class="fas fa-arrow-up"></i> Income</div>
-                    <div class="card-value" id="incomeDisplay">$0.00</div>
-                    <div class="card-footer">Total earned</div>
-                </div>
-                <div class="card card-expense">
-                    <div class="card-header"><i class="fas fa-arrow-down"></i> Expenses</div>
-                    <div class="card-value" id="expenseDisplay">$0.00</div>
-                    <div class="card-footer">Total spent</div>
-                </div>
-                <div class="card card-savings">
-                    <div class="card-header"><i class="fas fa-piggy-bank"></i> Savings Rate</div>
-                    <div class="card-value" id="savingsDisplay">0%</div>
-                    <div class="card-footer">of total income</div>
-                </div>
-            </section>
-
-            <!-- Filter Bar -->
-            <div class="filter-bar">
-                <div class="filter-left">
-                    <label for="yearFilter"><i class="fas fa-calendar-alt"></i> Year:</label>
-                    <select id="yearFilter"></select>
-                    <label for="monthFilter">Month:</label>
-                    <select id="monthFilter">
-                        <option value="all">All</option>
-                        <option value="01">January</option>
-                        <option value="02">February</option>
-                        <option value="03">March</option>
-                        <option value="04">April</option>
-                        <option value="05">May</option>
-                        <option value="06">June</option>
-                        <option value="07">July</option>
-                        <option value="08">August</option>
-                        <option value="09">September</option>
-                        <option value="10">October</option>
-                        <option value="11">November</option>
-                        <option value="12">December</option>
-                    </select>
-                </div>
-                <div class="filter-right">
-                    <span class="stat-badge" id="txCountBadge"><i class="fas fa-list"></i> 0 Transactions</span>
-                    <span class="stat-badge" id="topCategoryBadge"><i class="fas fa-tag"></i> Top: None</span>
-                </div>
-            </div>
-
-            <!-- Row -->
-            <div class="row">
-                <div class="form-box">
-                    <h2 id="formTitle" class="text-xl font-semibold mb-4"><i class="fas fa-plus-circle text-purple-600"></i> Add Transaction</h2>
-                    <form id="transactionForm">
-                        <div class="form-group">
-                            <label for="description"><i class="fas fa-pen"></i> Description</label>
-                            <input type="text" id="description" placeholder="e.g., Uber ride" required />
-                        </div>
-                        <div class="form-group">
-                            <label for="amount"><i class="fas fa-dollar-sign"></i> Amount</label>
-                            <input type="number" id="amount" placeholder="0.00" step="0.01" min="0.01" required />
-                        </div>
-                        <div class="form-group">
-                            <label for="category"><i class="fas fa-tags"></i> Category</label>
-                            <select id="category">
-                                <option value="Food & Dining">Food & Dining</option>
-                                <option value="Transport">Transport</option>
-                                <option value="Shopping">Shopping</option>
-                                <option value="Bills & Utilities">Bills & Utilities</option>
-                                <option value="Entertainment">Entertainment</option>
-                                <option value="Salary">Salary</option>
-                                <option value="Rent">Rent</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Type</label>
-                            <div class="radio-group">
-                                <label><input type="radio" name="type" value="income" checked /> <i class="fas fa-arrow-up text-green-500"></i> Income</label>
-                                <label><input type="radio" name="type" value="expense" /> <i class="fas fa-arrow-down text-red-500"></i> Expense</label>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary" id="submitBtn"><i class="fas fa-plus"></i> Add Transaction</button>
-                    </form>
-                </div>
-                <div class="chart-box">
-                    <h2 class="text-xl font-semibold mb-2"><i class="fas fa-chart-pie text-purple-600"></i> Spending Breakdown</h2>
-                    <div class="chart-wrapper"><canvas id="expenseChart"></canvas></div>
-                    <p id="chartEmptyMsg" class="chart-empty-msg">No expenses logged for this period.</p>
-                </div>
-            </div>
-
-            <!-- Transaction List -->
-            <div class="list-box">
-                <div class="list-header">
-                    <h2 class="text-xl font-semibold"><i class="fas fa-receipt text-purple-600"></i> Recent Transactions</h2>
-                    <span id="listMonthLabel" class="text-sm text-gray-500 dark:text-gray-400">Showing Full Year 2026</span>
-                </div>
-                <div id="transactionList"></div>
-            </div>
+            <!-- Summary Cards, Filter Bar, Form, Chart, List -->
+            <!-- (keep your existing dashboard HTML here) -->
+            <section class="summary-grid">...</section>
+            <div class="filter-bar">...</div>
+            <div class="row">...</div>
+            <div class="list-box">...</div>
         </main>
     </div>
 
