@@ -60,6 +60,22 @@ function showLoginPage(show) {
 }
 
 // ============================================================
+// TOGGLE BETWEEN LOGIN AND SIGNUP FORMS (LINKED)
+// ============================================================
+function toggleForms(showLogin) {
+    const loginContainer = document.getElementById('loginFormContainer');
+    const signupContainer = document.getElementById('signupFormContainer');
+    
+    if (showLogin) {
+        loginContainer.style.display = 'block';
+        signupContainer.style.display = 'none';
+    } else {
+        loginContainer.style.display = 'none';
+        signupContainer.style.display = 'block';
+    }
+}
+
+// ============================================================
 // AUTH & PROFILE
 // ============================================================
 async function loadProfile(userId) {
@@ -135,6 +151,11 @@ async function handleLogin() {
         currentUser = data.user;
 
         const profile = await loadProfile(currentUser.id);
+        if (!profile) {
+            showToast('Profile not found. Please sign up.', 'error');
+            return;
+        }
+        
         userProfile = {
             name: profile.name,
             currency: profile.currency,
@@ -153,7 +174,7 @@ async function handleLogin() {
 }
 
 // ============================================================
-// SIGNUP HANDLER
+// SIGNUP HANDLER – saves data to Supabase
 // ============================================================
 async function handleSignup() {
     const name = document.getElementById('signupName').value.trim();
@@ -164,6 +185,7 @@ async function handleSignup() {
     const balance = parseFloat(document.getElementById('signupBalance').value) || 0;
     const termsChecked = document.getElementById('termsCheck').checked;
 
+    // Validation
     if (!name || !email || !password || !confirm) {
         showToast('Please fill in all required fields.', 'error');
         return;
@@ -182,23 +204,38 @@ async function handleSignup() {
     }
 
     try {
-        const { data, error } = await supabase.auth.signUp({ email, password });
+        // 1. Create user in Supabase Auth
+        const { data, error } = await supabase.auth.signUp({ 
+            email, 
+            password,
+            options: {
+                data: { name: name }
+            }
+        });
         if (error) throw error;
         currentUser = data.user;
 
+        // 2. Create profile in Supabase Database
         await ensureProfile(currentUser.id, name, currency);
         userProfile = { name, currency, symbol: CURRENCY_SYMBOLS[currency] || 'Rs' };
 
+        // 3. Add initial balance if provided
         if (balance > 0) {
             const today = new Date().toISOString().slice(0, 10);
             await addTransaction('💰 Initial Deposit (Sign-up)', balance, 'Salary', 'income', today);
         }
 
+        // 4. Show dashboard
         showLoginPage(false);
         updateUIWithUser();
         await loadTransactions();
         renderAll();
-        showToast(`Welcome, ${userProfile.name}!`, 'success');
+        showToast(`Welcome, ${userProfile.name}! Your account is ready.`, 'success');
+        
+        console.log('✅ User signed up successfully:', email);
+        console.log('✅ Profile saved to Supabase:', userProfile);
+        console.log('✅ Initial balance added:', balance > 0 ? balance : 'None');
+        
     } catch (error) {
         console.error('Signup error:', error);
         showToast('Signup failed: ' + error.message, 'error');
@@ -216,14 +253,6 @@ async function logoutUser() {
         userProfile = { name: 'Guest', currency: 'PKR', symbol: 'Rs' };
         location.reload();
     }
-}
-
-// ============================================================
-// TOGGLE FORMS
-// ============================================================
-function toggleForms(showLogin) {
-    document.getElementById('loginFormContainer').style.display = showLogin ? 'block' : 'none';
-    document.getElementById('signupFormContainer').style.display = showLogin ? 'none' : 'block';
 }
 
 // ============================================================
@@ -343,7 +372,7 @@ function initTransactionForm() {
 }
 
 // ============================================================
-// RENDER FUNCTIONS (dashboard, chart, list)
+// RENDER FUNCTIONS
 // ============================================================
 function getFilteredTransactions() {
     const year = document.getElementById('yearFilter').value;
@@ -546,9 +575,11 @@ function initDarkMode() {
 }
 
 // ============================================================
-// INIT – runs when DOM is ready
+// INIT
 // ============================================================
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log('🚀 App initialising...');
+
     // Dark mode
     if (localStorage.getItem('darkMode') === 'true') {
         document.body.classList.add('dark');
@@ -567,19 +598,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Init transaction form
     initTransactionForm();
 
-    // Login / Signup buttons
+    // ===== LOGIN / SIGNUP BUTTONS =====
     document.getElementById('loginBtn').addEventListener('click', handleLogin);
     document.getElementById('signupBtn').addEventListener('click', handleSignup);
 
-    // Toggle links
-    document.getElementById('switchToSignup').addEventListener('click', (e) => {
-        e.preventDefault();
-        toggleForms(false);
-    });
-    document.getElementById('switchToLogin').addEventListener('click', (e) => {
-        e.preventDefault();
-        toggleForms(true);
-    });
+    // ===== TOGGLE LINKS (Login ↔ Signup) =====
+    const switchToSignup = document.getElementById('switchToSignup');
+    const switchToLogin = document.getElementById('switchToLogin');
+
+    if (switchToSignup) {
+        switchToSignup.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('🔄 Switching to Signup');
+            toggleForms(false);
+            // Clear login fields
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+        });
+    }
+
+    if (switchToLogin) {
+        switchToLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('🔄 Switching to Login');
+            toggleForms(true);
+            // Clear signup fields
+            document.getElementById('signupName').value = '';
+            document.getElementById('signupEmail').value = '';
+            document.getElementById('signupPassword').value = '';
+            document.getElementById('signupConfirm').value = '';
+            document.getElementById('signupBalance').value = '';
+            document.getElementById('termsCheck').checked = false;
+        });
+    }
 
     // Quick add button
     document.getElementById('addQuickBtn').addEventListener('click', () => {
@@ -589,6 +640,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Check existing session
     const { data: { session } } = await supabase.auth.getSession();
+    console.log('📋 Session check:', session ? 'User logged in' : 'No session');
+
     if (session) {
         currentUser = session.user;
         const profile = await loadProfile(currentUser.id);
@@ -613,18 +666,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         let defaultOpen = isDesktop;
         if (saved !== null) defaultOpen = saved === 'true';
         toggleSidebar(defaultOpen);
+        console.log('✅ User logged in:', userProfile.name);
     } else {
         showLoginPage(true);
-        toggleForms(true); // show login by default
-        // Clear fields
-        document.getElementById('loginEmail').value = '';
-        document.getElementById('loginPassword').value = '';
-        document.getElementById('signupName').value = '';
-        document.getElementById('signupEmail').value = '';
-        document.getElementById('signupPassword').value = '';
-        document.getElementById('signupConfirm').value = '';
-        document.getElementById('signupBalance').value = '';
-        document.getElementById('termsCheck').checked = false;
+        toggleForms(true); // Show login by default
+        console.log('📝 Showing login page');
     }
 
     // Event listeners for filters
@@ -636,4 +682,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         updatePeriodLabel();
         renderAll();
     });
+
+    console.log('✅ App initialised successfully');
 });
