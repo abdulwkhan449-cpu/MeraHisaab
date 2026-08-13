@@ -21,7 +21,12 @@ let editingId = null;
 let myChart = null;
 
 const CURRENCY_SYMBOLS = {
-    PKR: 'Rs', USD: '$', EUR: '€', GBP: '£', INR: '₹', JPY: '¥'
+    PKR: 'Rs',
+    USD: '$',
+    EUR: '€',
+    GBP: '£',
+    INR: '₹',
+    JPY: '¥'
 };
 
 // ============================================================
@@ -31,11 +36,13 @@ function formatCurrency(amount) {
     const symbol = userProfile.symbol || 'Rs';
     return symbol + amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
+
 function escapeHTML(text) {
     const d = document.createElement('div');
     d.textContent = text;
     return d.innerHTML;
 }
+
 function showToast(message, type = 'info') {
     const container = document.getElementById('toastContainer');
     const toast = document.createElement('div');
@@ -48,12 +55,14 @@ function showToast(message, type = 'info') {
         setTimeout(() => toast.remove(), 300);
     }, 3000);
 }
+
 function updateUIWithUser() {
     document.getElementById('sidebarUserName').textContent = userProfile.name;
     const initials = userProfile.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
     document.getElementById('userAvatar').textContent = initials;
     document.getElementById('headerCurrencyDisplay').textContent = userProfile.currency;
 }
+
 function showLoginPage(show) {
     document.getElementById('loginPage').classList.toggle('hidden', !show);
     document.getElementById('appContainer').style.display = show ? 'none' : 'flex';
@@ -89,6 +98,7 @@ async function loadProfile(userId) {
     if (error && error.code !== 'PGRST116') throw error;
     return data;
 }
+
 async function ensureProfile(userId, name, currency) {
     let profile = await loadProfile(userId);
     if (!profile) {
@@ -114,24 +124,36 @@ async function loadTransactions() {
     if (error) throw error;
     transactions = data || [];
 }
+
 async function addTransaction(description, amount, category, type, date) {
     const { error } = await supabase
         .from('transactions')
-        .insert([{ user_id: currentUser.id, description, amount, category, type, date }]);
+        .insert([{
+            user_id: currentUser.id,
+            description,
+            amount,
+            category,
+            type,
+            date
+        }]);
     if (error) throw error;
 }
+
 async function updateTransaction(id, description, amount, category, type, date) {
     const { error } = await supabase
         .from('transactions')
         .update({ description, amount, category, type, date })
-        .eq('id', id).eq('user_id', currentUser.id);
+        .eq('id', id)
+        .eq('user_id', currentUser.id);
     if (error) throw error;
 }
+
 async function deleteTransaction(id) {
     const { error } = await supabase
         .from('transactions')
         .delete()
-        .eq('id', id).eq('user_id', currentUser.id);
+        .eq('id', id)
+        .eq('user_id', currentUser.id);
     if (error) throw error;
 }
 
@@ -220,7 +242,7 @@ async function handleSignup() {
         await ensureProfile(currentUser.id, name, currency);
         userProfile = { name, currency, symbol: CURRENCY_SYMBOLS[currency] || 'Rs' };
 
-        // 3. Add initial balance
+        // 3. Add initial balance if provided
         if (balance > 0) {
             const today = new Date().toISOString().slice(0, 10);
             await addTransaction('💰 Initial Deposit (Sign-up)', balance, 'Salary', 'income', today);
@@ -371,7 +393,7 @@ function initTransactionForm() {
 }
 
 // ============================================================
-// RENDER FUNCTIONS
+// RENDER FUNCTIONS (dashboard, chart, list)
 // ============================================================
 function getFilteredTransactions() {
     const year = document.getElementById('yearFilter').value;
@@ -440,7 +462,10 @@ function renderChart(expenses) {
     const ctx = document.getElementById('expenseChart').getContext('2d');
     myChart = new Chart(ctx, {
         type: 'doughnut',
-        data: { labels, datasets: [{ data: dataValues, backgroundColor: colors, borderColor: '#fff', borderWidth: 3 }] },
+        data: {
+            labels,
+            datasets: [{ data: dataValues, backgroundColor: colors, borderColor: '#fff', borderWidth: 3 }]
+        },
         options: {
             responsive: true,
             maintainAspectRatio: true,
@@ -574,7 +599,7 @@ function initDarkMode() {
 }
 
 // ============================================================
-// INIT
+// INIT – runs when DOM is ready
 // ============================================================
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🚀 App initialising...');
@@ -597,43 +622,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Init transaction form
     initTransactionForm();
 
-    // ===== LOGIN / SIGNUP BUTTONS =====
+    // Login / Signup buttons
     document.getElementById('loginBtn').addEventListener('click', handleLogin);
     document.getElementById('signupBtn').addEventListener('click', handleSignup);
 
-    // ===== TOGGLE LINKS (Login ↔ Signup) =====
-    const switchToSignup = document.getElementById('switchToSignup');
-    const switchToLogin = document.getElementById('switchToLogin');
+    // Toggle links
+    document.getElementById('switchToSignup').addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log('🔄 Switching to Signup');
+        toggleForms(false);
+        // Clear login fields
+        document.getElementById('loginEmail').value = '';
+        document.getElementById('loginPassword').value = '';
+    });
 
-    if (switchToSignup) {
-        switchToSignup.addEventListener('click', (e) => {
-            e.preventDefault();
-            console.log('🔄 Switching to Signup');
-            toggleForms(false);
-            // Clear login fields
-            document.getElementById('loginEmail').value = '';
-            document.getElementById('loginPassword').value = '';
-        });
-    } else {
-        console.warn('⚠️ switchToSignup element not found');
-    }
-
-    if (switchToLogin) {
-        switchToLogin.addEventListener('click', (e) => {
-            e.preventDefault();
-            console.log('🔄 Switching to Login');
-            toggleForms(true);
-            // Clear signup fields
-            document.getElementById('signupName').value = '';
-            document.getElementById('signupEmail').value = '';
-            document.getElementById('signupPassword').value = '';
-            document.getElementById('signupConfirm').value = '';
-            document.getElementById('signupBalance').value = '';
-            document.getElementById('termsCheck').checked = false;
-        });
-    } else {
-        console.warn('⚠️ switchToLogin element not found');
-    }
+    document.getElementById('switchToLogin').addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log('🔄 Switching to Login');
+        toggleForms(true);
+        // Clear signup fields
+        document.getElementById('signupName').value = '';
+        document.getElementById('signupEmail').value = '';
+        document.getElementById('signupPassword').value = '';
+        document.getElementById('signupConfirm').value = '';
+        document.getElementById('signupBalance').value = '';
+        document.getElementById('termsCheck').checked = false;
+    });
 
     // Quick add button
     document.getElementById('addQuickBtn').addEventListener('click', () => {
@@ -672,8 +686,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('✅ User logged in:', userProfile.name);
     } else {
         showLoginPage(true);
-        toggleForms(true); // Show login by default
-        console.log('📝 Showing login page');
+        toggleForms(false); // Show signup by default
+        console.log('📝 Showing signup page (default)');
     }
 
     // Event listeners for filters
