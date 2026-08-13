@@ -44,7 +44,7 @@
                         <p class="login-sub">Sign in or create your account</p>
                     </div>
 
-                    <form autocomplete="off" class="login-form">
+                    <form autocomplete="off" class="login-form" id="loginForm">
                         <div class="form-group">
                             <label for="loginEmail"><i class="fas fa-envelope"></i> Email</label>
                             <input type="email" id="loginEmail" placeholder="you@example.com" required />
@@ -73,13 +73,13 @@
                             <input type="number" id="loginBalance" placeholder="e.g., 5000" step="0.01" min="0" />
                             <small class="hint">This will be added as your initial income.</small>
                         </div>
-                        <button class="btn btn-primary w-full" id="loginBtn" type="button">
+                        <button type="button" class="btn btn-primary w-full" id="loginBtn">
                             <i class="fas fa-rocket"></i> Start Tracking
                         </button>
                     </form>
 
                     <div class="login-divider"><span>or continue with</span></div>
-                    <button class="btn btn-google w-full" id="googleLoginBtn" type="button">
+                    <button type="button" class="btn btn-google w-full" id="googleLoginBtn">
                         <i class="fab fa-google"></i> Google
                     </button>
 
@@ -96,9 +96,9 @@
                     <h1 class="brand-title">Hello MeraHisaab!</h1>
                     <p class="brand-sub">Take control of your finances, track every penny, and achieve your goals with ease.</p>
                     <div class="brand-features">
-                        <span><i class="fas fa-check-circle"></i> Cloud Sync</span>
-                        <span><i class="fas fa-check-circle"></i> Secure & Private</span>
-                        <span><i class="fas fa-check-circle"></i> Smart Insights</span>
+                        <span><i class="fas fa-check-circle" style="color: #a78bfa;"></i> Cloud Sync</span>
+                        <span><i class="fas fa-check-circle" style="color: #a78bfa;"></i> Secure & Private</span>
+                        <span><i class="fas fa-check-circle" style="color: #a78bfa;"></i> Smart Insights</span>
                     </div>
                 </div>
             </div>
@@ -149,7 +149,7 @@
                 <a href="./index.html" class="nav-item active"><i class="fas fa-home"></i> Dashboard</a>
                 <a href="./report.html" class="nav-item"><i class="fas fa-chart-line"></i> Reports</a>
                 <a href="./budget.html" class="nav-item"><i class="fas fa-wallet"></i> Budgets</a>
-                <a href="setting.html" class="nav-item" id="settingsNavTrigger"><i class="fas fa-cog"></i> Settings</a>
+                <a href="#" class="nav-item" id="settingsNavTrigger"><i class="fas fa-cog"></i> Settings</a>
             </nav>
             <div class="sidebar-user">
                 <div class="avatar" id="userAvatar">JD</div>
