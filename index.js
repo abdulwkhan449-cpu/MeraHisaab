@@ -60,7 +60,7 @@ function showLoginPage(show) {
 }
 
 // ============================================================
-// TOGGLE BETWEEN LOGIN AND SIGNUP FORMS (LINKED)
+// TOGGLE BETWEEN LOGIN AND SIGNUP FORMS
 // ============================================================
 function toggleForms(showLogin) {
     const loginContainer = document.getElementById('loginFormContainer');
@@ -69,9 +69,11 @@ function toggleForms(showLogin) {
     if (showLogin) {
         loginContainer.style.display = 'block';
         signupContainer.style.display = 'none';
+        console.log('🔄 Switched to Login form');
     } else {
         loginContainer.style.display = 'none';
         signupContainer.style.display = 'block';
+        console.log('🔄 Switched to Signup form');
     }
 }
 
@@ -174,7 +176,7 @@ async function handleLogin() {
 }
 
 // ============================================================
-// SIGNUP HANDLER – saves data to Supabase
+// SIGNUP HANDLER
 // ============================================================
 async function handleSignup() {
     const name = document.getElementById('signupName').value.trim();
@@ -185,7 +187,6 @@ async function handleSignup() {
     const balance = parseFloat(document.getElementById('signupBalance').value) || 0;
     const termsChecked = document.getElementById('termsCheck').checked;
 
-    // Validation
     if (!name || !email || !password || !confirm) {
         showToast('Please fill in all required fields.', 'error');
         return;
@@ -204,7 +205,7 @@ async function handleSignup() {
     }
 
     try {
-        // 1. Create user in Supabase Auth
+        // 1. Sign up with Supabase Auth
         const { data, error } = await supabase.auth.signUp({ 
             email, 
             password,
@@ -215,11 +216,11 @@ async function handleSignup() {
         if (error) throw error;
         currentUser = data.user;
 
-        // 2. Create profile in Supabase Database
+        // 2. Create profile in database
         await ensureProfile(currentUser.id, name, currency);
         userProfile = { name, currency, symbol: CURRENCY_SYMBOLS[currency] || 'Rs' };
 
-        // 3. Add initial balance if provided
+        // 3. Add initial balance
         if (balance > 0) {
             const today = new Date().toISOString().slice(0, 10);
             await addTransaction('💰 Initial Deposit (Sign-up)', balance, 'Salary', 'income', today);
@@ -234,8 +235,6 @@ async function handleSignup() {
         
         console.log('✅ User signed up successfully:', email);
         console.log('✅ Profile saved to Supabase:', userProfile);
-        console.log('✅ Initial balance added:', balance > 0 ? balance : 'None');
-        
     } catch (error) {
         console.error('Signup error:', error);
         showToast('Signup failed: ' + error.message, 'error');
@@ -615,6 +614,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('loginEmail').value = '';
             document.getElementById('loginPassword').value = '';
         });
+    } else {
+        console.warn('⚠️ switchToSignup element not found');
     }
 
     if (switchToLogin) {
@@ -630,6 +631,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('signupBalance').value = '';
             document.getElementById('termsCheck').checked = false;
         });
+    } else {
+        console.warn('⚠️ switchToLogin element not found');
     }
 
     // Quick add button
