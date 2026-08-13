@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MeraHisaab · Personal Finance</title>
+    <title>My Hisab · Personal Finance</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
@@ -14,64 +14,20 @@
     <link rel="icon" href="./logo.png" type="image/x-icon" />
 </head>
 <body>
-    <!-- Toast container -->
+    <!-- Toast Container -->
     <div id="toastContainer" class="toast-container"></div>
 
-    <!-- ===== LOGIN PAGE ===== -->
+    <!-- ========================================================== -->
+    <!-- LOGIN & SIGNUP PAGE                                        -->
+    <!-- ========================================================== -->
     <div id="loginPage" class="login-page">
         <div class="login-container">
-            <!-- Left: Form -->
-            <div class="login-left">
-                <div class="login-card">
-                    <div class="login-header">
-                        <div class="login-logo"><i class="fas fa-chart-pie"></i> MeraHisaab</div>
-                        <p class="login-sub">Sign in or create your account</p>
-                    </div>
-                    <form autocomplete="off" class="login-form" id="loginForm">
-                        <div class="form-group">
-                            <label for="loginEmail"><i class="fas fa-envelope"></i> Email</label>
-                            <input type="email" id="loginEmail" placeholder="you@example.com" required />
-                        </div>
-                        <div class="form-group">
-                            <label for="loginPassword"><i class="fas fa-lock"></i> Password</label>
-                            <input type="password" id="loginPassword" placeholder="••••••••" required />
-                        </div>
-                        <div class="form-group">
-                            <label for="loginName"><i class="fas fa-user"></i> Full Name</label>
-                            <input type="text" id="loginName" placeholder="e.g., Alex Rivera" />
-                        </div>
-                        <div class="form-group">
-                            <label for="loginCurrency"><i class="fas fa-coins"></i> Preferred Currency</label>
-                            <select id="loginCurrency">
-                                <option value="PKR" selected>🇵🇰 PKR (Rs)</option>
-                                <option value="USD">🇺🇸 USD ($)</option>
-                                <option value="EUR">🇪🇺 EUR (€)</option>
-                                <option value="GBP">🇬🇧 GBP (£)</option>
-                                <option value="INR">🇮🇳 INR (₹)</option>
-                                <option value="JPY">🇯🇵 JPY (¥)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="loginBalance"><i class="fas fa-wallet"></i> Starting Balance (Optional)</label>
-                            <input type="number" id="loginBalance" placeholder="e.g., 5000" step="0.01" min="0" />
-                            <small class="hint">This will be added as your initial income.</small>
-                        </div>
-                        <button type="button" class="btn btn-primary w-full" id="loginBtn">
-                            <i class="fas fa-rocket"></i> Start Tracking
-                        </button>
-                    </form>
-                    <div class="login-divider"><span>or continue with</span></div>
-                    <button type="button" class="btn btn-google w-full" id="googleLoginBtn">
-                        <i class="fab fa-google"></i> Google
-                    </button>
-                    <p class="login-footer">&copy; 2026 MeraHisaab. All rights reserved.</p>
-                </div>
-            </div>
-            <!-- Right: Branding -->
-            <div class="login-right">
+
+            <!-- Left side – Branding -->
+            <div class="login-left branding">
                 <div class="brand-content">
                     <div class="brand-icon"><i class="fas fa-chart-pie"></i></div>
-                    <h1 class="brand-title">Hello MeraHisaab!</h1>
+                    <h1 class="brand-title">My Hisab</h1>
                     <p class="brand-sub">Take control of your finances, track every penny, and achieve your goals with ease.</p>
                     <div class="brand-features">
                         <span><i class="fas fa-check-circle"></i> Cloud Sync</span>
@@ -80,10 +36,101 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Right side – Forms -->
+            <div class="login-right forms">
+                <!-- LOGIN FORM -->
+                <div id="loginFormContainer" class="form-card">
+                    <div class="form-header">
+                        <div class="form-logo"><i class="fas fa-chart-pie"></i> My Hisab</div>
+                        <p class="form-sub">Welcome back! Please login to your account.</p>
+                    </div>
+                    <form class="auth-form" id="loginForm">
+                        <div class="form-group">
+                            <label><i class="fas fa-envelope"></i> Email or Phone</label>
+                            <input type="email" id="loginEmail" placeholder="you@example.com" required />
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-lock"></i> Password</label>
+                            <input type="password" id="loginPassword" placeholder="••••••••" required />
+                        </div>
+                        <div class="form-group forgot-link">
+                            <a href="#">Forgot password?</a>
+                        </div>
+                        <button type="button" class="btn btn-primary w-full" id="loginBtn">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </button>
+                    </form>
+                    <p class="toggle-link">
+                        Don't have an account? <a href="#" id="switchToSignup">Sign Up</a>
+                    </p>
+                </div>
+
+                <!-- SIGNUP FORM -->
+                <div id="signupFormContainer" class="form-card" style="display: none;">
+                    <div class="form-header">
+                        <div class="form-logo"><i class="fas fa-chart-pie"></i> My Hisab</div>
+                        <p class="form-sub">Create your free account.</p>
+                    </div>
+                    <form class="auth-form" id="signupForm">
+                        <!-- Two-column grid for fields -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label><i class="fas fa-user"></i> Enter your name</label>
+                                <input type="text" id="signupName" placeholder="Full Name" required />
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-envelope"></i> Enter your email</label>
+                                <input type="email" id="signupEmail" placeholder="you@example.com" required />
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label><i class="fas fa-lock"></i> Create password</label>
+                                <input type="password" id="signupPassword" placeholder="••••••••" required />
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-check-circle"></i> Confirm password</label>
+                                <input type="password" id="signupConfirm" placeholder="••••••••" required />
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label><i class="fas fa-coins"></i> Preferred Currency</label>
+                                <select id="signupCurrency">
+                                    <option value="PKR" selected>🇵🇰 PKR (Rs)</option>
+                                    <option value="USD">🇺🇸 USD ($)</option>
+                                    <option value="EUR">🇪🇺 EUR (€)</option>
+                                    <option value="GBP">🇬🇧 GBP (£)</option>
+                                    <option value="INR">🇮🇳 INR (₹)</option>
+                                    <option value="JPY">🇯🇵 JPY (¥)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-wallet"></i> Starting Balance (Optional)</label>
+                                <input type="number" id="signupBalance" placeholder="e.g., 5000" step="0.01" min="0" />
+                                <small class="hint">This will be added as your initial income.</small>
+                            </div>
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="termsCheck" required />
+                            <label for="termsCheck">I accept all terms &amp; conditions</label>
+                        </div>
+                        <button type="button" class="btn btn-primary w-full" id="signupBtn">
+                            <i class="fas fa-rocket"></i> Start Tracking
+                        </button>
+                    </form>
+                    <p class="toggle-link">
+                        Already have an account? <a href="#" id="switchToLogin">Login now</a>
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- ===== SETTINGS MODAL ===== -->
+    <!-- ========================================================== -->
+    <!-- SETTINGS MODAL                                             -->
+    <!-- ========================================================== -->
     <div id="settingsModal" class="modal-overlay">
         <div class="modal-content">
             <h2 class="text-2xl font-bold mb-4"><i class="fas fa-cog"></i> Settings</h2>
@@ -110,10 +157,13 @@
         </div>
     </div>
 
-    <!-- ===== DASHBOARD ===== -->
+    <!-- ========================================================== -->
+    <!-- DASHBOARD                                                 -->
+    <!-- ========================================================== -->
     <div id="appContainer" class="app-container" style="display: none;">
+        <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
-            <div class="logo"><span class="logo-icon"><i class="fas fa-chart-pie"></i></span> MeraHisaab</div>
+            <div class="logo"><span class="logo-icon"><i class="fas fa-chart-pie"></i></span> My Hisab</div>
             <nav class="sidebar-nav">
                 <a href="./index.html" class="nav-item active"><i class="fas fa-home"></i> Dashboard</a>
                 <a href="./report.html" class="nav-item"><i class="fas fa-chart-line"></i> Reports</a>
@@ -127,6 +177,8 @@
             </div>
         </aside>
         <div class="overlay" id="sidebarOverlay"></div>
+
+        <!-- Main Content -->
         <main class="main-content" id="mainContent">
             <header class="top-header">
                 <div class="flex items-center gap-4">
@@ -142,6 +194,8 @@
                     <button class="btn btn-primary px-5 py-2" id="addQuickBtn"><i class="fas fa-plus"></i> New</button>
                 </div>
             </header>
+
+            <!-- Summary Cards -->
             <section class="summary-grid">
                 <div class="card card-balance">
                     <div class="card-header"><i class="fas fa-wallet"></i> Total Balance</div>
@@ -164,6 +218,8 @@
                     <div class="card-footer">of total income</div>
                 </div>
             </section>
+
+            <!-- Filter Bar -->
             <div class="filter-bar">
                 <div class="filter-left">
                     <label for="yearFilter"><i class="fas fa-calendar-alt"></i> Year:</label>
@@ -190,6 +246,8 @@
                     <span class="stat-badge" id="topCategoryBadge"><i class="fas fa-tag"></i> Top: None</span>
                 </div>
             </div>
+
+            <!-- Row -->
             <div class="row">
                 <div class="form-box">
                     <h2 id="formTitle" class="text-xl font-semibold mb-4"><i class="fas fa-plus-circle text-purple-600"></i> Add Transaction</h2>
@@ -231,6 +289,8 @@
                     <p id="chartEmptyMsg" class="chart-empty-msg">No expenses logged for this period.</p>
                 </div>
             </div>
+
+            <!-- Transaction List -->
             <div class="list-box">
                 <div class="list-header">
                     <h2 class="text-xl font-semibold"><i class="fas fa-receipt text-purple-600"></i> Recent Transactions</h2>
