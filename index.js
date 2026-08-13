@@ -1,5 +1,5 @@
 // ============================================================
-// SUPABASE – initialised only once
+// SUPABASE – declared only ONCE
 // ============================================================
 const SUPABASE_URL = 'https://yrlfdjxotruhgjxykxvi.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yVhkAwx7LXgJg8klHwCm4w_L5SUoGmk';
@@ -8,6 +8,8 @@ if (typeof window.supabase === 'undefined') {
     alert('Supabase library failed to load. Check your internet connection.');
     throw new Error('Supabase not loaded');
 }
+
+// ✅ Only one declaration
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 console.log('✅ Supabase initialised');
 
@@ -393,7 +395,7 @@ function initTransactionForm() {
 }
 
 // ============================================================
-// RENDER FUNCTIONS (dashboard, chart, list)
+// RENDER FUNCTIONS
 // ============================================================
 function getFilteredTransactions() {
     const year = document.getElementById('yearFilter').value;
@@ -631,7 +633,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         e.preventDefault();
         console.log('🔄 Switching to Signup');
         toggleForms(false);
-        // Clear login fields
         document.getElementById('loginEmail').value = '';
         document.getElementById('loginPassword').value = '';
     });
@@ -640,7 +641,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         e.preventDefault();
         console.log('🔄 Switching to Login');
         toggleForms(true);
-        // Clear signup fields
         document.getElementById('signupName').value = '';
         document.getElementById('signupEmail').value = '';
         document.getElementById('signupPassword').value = '';
