@@ -1,5 +1,5 @@
 // ============================================================
-// SUPABASE CLIENT
+// SUPABASE CLIENT (only once)
 // ============================================================
 const SUPABASE_URL = 'https://yrlfdjxotruhgjxykxvi.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yVhkAwx7LXgJg8klHwCm4w_L5SUoGmk';
@@ -7,21 +7,20 @@ const SUPABASE_ANON_KEY = 'sb_publishable_yVhkAwx7LXgJg8klHwCm4w_L5SUoGmk';
 // Check if Supabase is loaded
 if (typeof window.supabase === 'undefined') {
     alert('Supabase library failed to load. Please check your internet connection.');
-} else {
-    console.log('Supabase loaded successfully.');
+    throw new Error('Supabase not loaded');
 }
-
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+console.log('✅ Supabase initialized');
 
+// ============================================================
+// STATE
+// ============================================================
 let currentUser = null;
 let userProfile = { name: 'Guest', currency: 'PKR', symbol: 'Rs' };
 let transactions = [];
 let editingId = null;
 let myChart = null;
 
-// ============================================================
-// CURRENCY SYMBOLS
-// ============================================================
 const CURRENCY_SYMBOLS = {
     PKR: 'Rs',
     USD: '$',
@@ -142,7 +141,7 @@ async function deleteTransaction(id) {
 }
 
 // ============================================================
-// LOGIN / SIGNUP – now inside DOMContentLoaded
+// LOGIN / SIGNUP HANDLER
 // ============================================================
 async function handleLogin() {
     const email = document.getElementById('loginEmail').value.trim();
@@ -262,7 +261,7 @@ function initSettingsModal() {
 }
 
 // ============================================================
-// TRANSACTION FORM HANDLING
+// TRANSACTION FORM
 // ============================================================
 function initTransactionForm() {
     const form = document.getElementById('transactionForm');
@@ -308,7 +307,7 @@ function initTransactionForm() {
         }
     });
 
-    // Edit and Delete (global for onclick)
+    // Edit and Delete (global functions for onclick)
     window.editTransaction = async function(id) {
         const tx = transactions.find(t => t.id === id);
         if (!tx) return;
@@ -459,7 +458,7 @@ function renderTransactionList(filtered) {
 }
 
 // ============================================================
-// PERIOD LABEL, YEAR DROPDOWN
+// PERIOD LABEL & YEAR DROPDOWN
 // ============================================================
 function updatePeriodLabel() {
     const year = document.getElementById('yearFilter').value;
@@ -530,7 +529,6 @@ function initSidebar() {
         }
     });
 
-    // Return toggle function for later use
     return toggleSidebar;
 }
 
@@ -545,7 +543,7 @@ function initDarkMode() {
 }
 
 // ============================================================
-// INIT
+// INIT – runs when DOM is ready
 // ============================================================
 document.addEventListener('DOMContentLoaded', async () => {
     // Dark mode
