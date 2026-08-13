@@ -3,6 +3,14 @@
 // ============================================================
 const SUPABASE_URL = 'https://yrlfdjxotruhgjxykxvi.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yVhkAwx7LXgJg8klHwCm4w_L5SUoGmk';
+
+// Check if Supabase is loaded
+if (typeof window.supabase === 'undefined') {
+    alert('Supabase library failed to load. Please check your internet connection.');
+} else {
+    console.log('Supabase loaded successfully.');
+}
+
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let currentUser = null;
@@ -134,9 +142,9 @@ async function deleteTransaction(id) {
 }
 
 // ============================================================
-// LOGIN / SIGNUP
+// LOGIN / SIGNUP – now inside DOMContentLoaded
 // ============================================================
-document.getElementById('loginBtn').addEventListener('click', async () => {
+async function handleLogin() {
     const email = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value;
     const name = document.getElementById('loginName').value.trim();
@@ -186,17 +194,17 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
         renderAll();
         showToast(`Welcome, ${userProfile.name}!`, 'success');
     } catch (error) {
-        console.error(error);
+        console.error('Login error:', error);
         showToast('Login failed: ' + error.message, 'error');
     }
-});
+}
 
 // ============================================================
 // GOOGLE LOGIN (placeholder)
 // ============================================================
-document.getElementById('googleLoginBtn')?.addEventListener('click', () => {
+function handleGoogleLogin() {
     showToast('Google login coming soon!', 'info');
-});
+}
 
 // ============================================================
 // LOGOUT
@@ -214,115 +222,119 @@ async function logoutUser() {
 // ============================================================
 // SETTINGS MODAL
 // ============================================================
-const settingsModal = document.getElementById('settingsModal');
-document.getElementById('settingsNavTrigger').addEventListener('click', () => {
-    document.getElementById('settingsName').value = userProfile.name;
-    document.getElementById('settingsCurrency').value = userProfile.currency;
-    settingsModal.classList.add('active');
-});
-document.getElementById('closeSettingsBtn').addEventListener('click', () => settingsModal.classList.remove('active'));
-settingsModal.addEventListener('click', (e) => { if (e.target === settingsModal) settingsModal.classList.remove('active'); });
+function initSettingsModal() {
+    const settingsModal = document.getElementById('settingsModal');
+    document.getElementById('settingsNavTrigger').addEventListener('click', () => {
+        document.getElementById('settingsName').value = userProfile.name;
+        document.getElementById('settingsCurrency').value = userProfile.currency;
+        settingsModal.classList.add('active');
+    });
+    document.getElementById('closeSettingsBtn').addEventListener('click', () => settingsModal.classList.remove('active'));
+    settingsModal.addEventListener('click', (e) => { if (e.target === settingsModal) settingsModal.classList.remove('active'); });
 
-document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
-    const name = document.getElementById('settingsName').value.trim();
-    const currency = document.getElementById('settingsCurrency').value;
-    if (!name) return showToast('Please enter a name.', 'error');
+    document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
+        const name = document.getElementById('settingsName').value.trim();
+        const currency = document.getElementById('settingsCurrency').value;
+        if (!name) return showToast('Please enter a name.', 'error');
 
-    try {
-        await supabase
-            .from('profiles')
-            .update({ name, currency })
-            .eq('id', currentUser.id);
+        try {
+            await supabase
+                .from('profiles')
+                .update({ name, currency })
+                .eq('id', currentUser.id);
 
-        userProfile.name = name;
-        userProfile.currency = currency;
-        userProfile.symbol = CURRENCY_SYMBOLS[currency] || 'Rs';
-        updateUIWithUser();
-        renderAll();
+            userProfile.name = name;
+            userProfile.currency = currency;
+            userProfile.symbol = CURRENCY_SYMBOLS[currency] || 'Rs';
+            updateUIWithUser();
+            renderAll();
+            settingsModal.classList.remove('active');
+            showToast('✅ Settings updated!', 'success');
+        } catch (error) {
+            showToast('Update failed: ' + error.message, 'error');
+        }
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
         settingsModal.classList.remove('active');
-        showToast('✅ Settings updated!', 'success');
-    } catch (error) {
-        showToast('Update failed: ' + error.message, 'error');
-    }
-});
-
-document.getElementById('logoutBtn').addEventListener('click', () => {
-    settingsModal.classList.remove('active');
-    logoutUser();
-});
+        logoutUser();
+    });
+}
 
 // ============================================================
 // TRANSACTION FORM HANDLING
 // ============================================================
-const form = document.getElementById('transactionForm');
-const descInput = document.getElementById('description');
-const amountInput = document.getElementById('amount');
-const categorySelect = document.getElementById('category');
-const typeRadios = document.querySelectorAll('input[name="type"]');
-const submitBtn = document.getElementById('submitBtn');
-const formTitle = document.getElementById('formTitle');
+function initTransactionForm() {
+    const form = document.getElementById('transactionForm');
+    const descInput = document.getElementById('description');
+    const amountInput = document.getElementById('amount');
+    const categorySelect = document.getElementById('category');
+    const typeRadios = document.querySelectorAll('input[name="type"]');
+    const submitBtn = document.getElementById('submitBtn');
+    const formTitle = document.getElementById('formTitle');
 
-form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-    const description = descInput.value.trim();
-    const amount = parseFloat(amountInput.value);
-    const category = categorySelect.value;
-    let type = 'expense';
-    typeRadios.forEach(r => { if (r.checked) type = r.value; });
+        const description = descInput.value.trim();
+        const amount = parseFloat(amountInput.value);
+        const category = categorySelect.value;
+        let type = 'expense';
+        typeRadios.forEach(r => { if (r.checked) type = r.value; });
 
-    if (!description) return showToast('Please enter a description.', 'error');
-    if (isNaN(amount) || amount <= 0) return showToast('Please enter a valid positive amount.', 'error');
+        if (!description) return showToast('Please enter a description.', 'error');
+        if (isNaN(amount) || amount <= 0) return showToast('Please enter a valid positive amount.', 'error');
 
-    const today = new Date().toISOString().slice(0, 10);
+        const today = new Date().toISOString().slice(0, 10);
 
-    try {
-        if (editingId !== null) {
-            await updateTransaction(editingId, description, amount, category, type, today);
-            showToast('✅ Transaction updated!', 'success');
-            editingId = null;
-            submitBtn.innerHTML = '<i class="fas fa-plus"></i> Add Transaction';
-            formTitle.innerHTML = '<i class="fas fa-plus-circle"></i> Add Transaction';
-        } else {
-            await addTransaction(description, amount, category, type, today);
-            showToast('🎉 Transaction added!', 'success');
+        try {
+            if (editingId !== null) {
+                await updateTransaction(editingId, description, amount, category, type, today);
+                showToast('✅ Transaction updated!', 'success');
+                editingId = null;
+                submitBtn.innerHTML = '<i class="fas fa-plus"></i> Add Transaction';
+                formTitle.innerHTML = '<i class="fas fa-plus-circle"></i> Add Transaction';
+            } else {
+                await addTransaction(description, amount, category, type, today);
+                showToast('🎉 Transaction added!', 'success');
+            }
+
+            await loadTransactions();
+            renderAll();
+            form.reset();
+            document.querySelector('input[name="type"][value="income"]').checked = true;
+        } catch (error) {
+            showToast('Error saving: ' + error.message, 'error');
         }
+    });
 
-        await loadTransactions();
-        renderAll();
-        form.reset();
-        document.querySelector('input[name="type"][value="income"]').checked = true;
-    } catch (error) {
-        showToast('Error saving: ' + error.message, 'error');
-    }
-});
+    // Edit and Delete (global for onclick)
+    window.editTransaction = async function(id) {
+        const tx = transactions.find(t => t.id === id);
+        if (!tx) return;
+        descInput.value = tx.description;
+        amountInput.value = tx.amount;
+        categorySelect.value = tx.category;
+        typeRadios.forEach(r => { r.checked = (r.value === tx.type); });
+        editingId = tx.id;
+        submitBtn.innerHTML = '<i class="fas fa-pen"></i> Update Transaction';
+        formTitle.innerHTML = '<i class="fas fa-pen"></i> Edit Transaction';
+        document.querySelector('.form-box').scrollIntoView({ behavior: 'smooth' });
+        descInput.focus();
+    };
 
-// Edit and Delete (global for onclick)
-window.editTransaction = async function(id) {
-    const tx = transactions.find(t => t.id === id);
-    if (!tx) return;
-    descInput.value = tx.description;
-    amountInput.value = tx.amount;
-    categorySelect.value = tx.category;
-    typeRadios.forEach(r => { r.checked = (r.value === tx.type); });
-    editingId = tx.id;
-    submitBtn.innerHTML = '<i class="fas fa-pen"></i> Update Transaction';
-    formTitle.innerHTML = '<i class="fas fa-pen"></i> Edit Transaction';
-    document.querySelector('.form-box').scrollIntoView({ behavior: 'smooth' });
-    descInput.focus();
-};
-
-window.deleteTransaction = async function(id) {
-    if (!confirm('Permanently delete this transaction?')) return;
-    try {
-        await deleteTransaction(id);
-        await loadTransactions();
-        renderAll();
-        showToast('🗑️ Transaction deleted.', 'info');
-    } catch (error) {
-        showToast('Delete failed: ' + error.message, 'error');
-    }
-};
+    window.deleteTransaction = async function(id) {
+        if (!confirm('Permanently delete this transaction?')) return;
+        try {
+            await deleteTransaction(id);
+            await loadTransactions();
+            renderAll();
+            showToast('🗑️ Transaction deleted.', 'info');
+        } catch (error) {
+            showToast('Delete failed: ' + error.message, 'error');
+        }
+    };
+}
 
 // ============================================================
 // FILTERS & RENDER
@@ -486,49 +498,51 @@ function populateYearFilter() {
 // ============================================================
 // SIDEBAR & DARK MODE
 // ============================================================
-const sidebar = document.getElementById('sidebar');
-const overlay = document.getElementById('sidebarOverlay');
-const menuToggle = document.getElementById('menuToggle');
-const mainContent = document.getElementById('mainContent');
+function initSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const menuToggle = document.getElementById('menuToggle');
+    const mainContent = document.getElementById('mainContent');
 
-function toggleSidebar(forceState) {
-    const isOpen = forceState !== undefined ? forceState : !sidebar.classList.contains('open');
-    sidebar.classList.toggle('open', isOpen);
-    if (window.innerWidth < 901) overlay.classList.toggle('active', isOpen);
-    else overlay.classList.remove('active');
-    if (window.innerWidth >= 901) mainContent.classList.toggle('sidebar-open', isOpen);
-    else mainContent.classList.remove('sidebar-open');
-    localStorage.setItem('sidebarOpen', isOpen);
+    function toggleSidebar(forceState) {
+        const isOpen = forceState !== undefined ? forceState : !sidebar.classList.contains('open');
+        sidebar.classList.toggle('open', isOpen);
+        if (window.innerWidth < 901) overlay.classList.toggle('active', isOpen);
+        else overlay.classList.remove('active');
+        if (window.innerWidth >= 901) mainContent.classList.toggle('sidebar-open', isOpen);
+        else mainContent.classList.remove('sidebar-open');
+        localStorage.setItem('sidebarOpen', isOpen);
+    }
+
+    menuToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleSidebar(); });
+    overlay.addEventListener('click', () => { if (window.innerWidth < 901) toggleSidebar(false); });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && sidebar.classList.contains('open') && window.innerWidth < 901) toggleSidebar(false);
+    });
+
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 901 && sidebar.classList.contains('open')) {
+            mainContent.classList.add('sidebar-open');
+            overlay.classList.remove('active');
+        } else {
+            mainContent.classList.remove('sidebar-open');
+            if (!sidebar.classList.contains('open')) overlay.classList.remove('active');
+        }
+    });
+
+    // Return toggle function for later use
+    return toggleSidebar;
 }
 
-menuToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleSidebar(); });
-overlay.addEventListener('click', () => { if (window.innerWidth < 901) toggleSidebar(false); });
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && sidebar.classList.contains('open') && window.innerWidth < 901) toggleSidebar(false);
-});
-
-window.addEventListener('resize', () => {
-    if (window.innerWidth >= 901 && sidebar.classList.contains('open')) {
-        mainContent.classList.add('sidebar-open');
-        overlay.classList.remove('active');
-    } else {
-        mainContent.classList.remove('sidebar-open');
-        if (!sidebar.classList.contains('open')) overlay.classList.remove('active');
-    }
-});
-
-document.getElementById('darkModeToggle').addEventListener('click', () => {
-    document.body.classList.toggle('dark');
-    const isDark = document.body.classList.contains('dark');
-    document.getElementById('darkModeToggle').innerHTML = isDark ? '<i class="fas fa-sun"></i> Light' : '<i class="fas fa-moon"></i> Dark';
-    localStorage.setItem('darkMode', isDark);
-    renderAll();
-});
-
-document.getElementById('addQuickBtn').addEventListener('click', () => {
-    document.querySelector('.form-box').scrollIntoView({ behavior: 'smooth' });
-    descInput.focus();
-});
+function initDarkMode() {
+    document.getElementById('darkModeToggle').addEventListener('click', () => {
+        document.body.classList.toggle('dark');
+        const isDark = document.body.classList.contains('dark');
+        document.getElementById('darkModeToggle').innerHTML = isDark ? '<i class="fas fa-sun"></i> Light' : '<i class="fas fa-moon"></i> Dark';
+        localStorage.setItem('darkMode', isDark);
+        renderAll();
+    });
+}
 
 // ============================================================
 // INIT
@@ -539,6 +553,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.body.classList.add('dark');
         document.getElementById('darkModeToggle').innerHTML = '<i class="fas fa-sun"></i> Light';
     }
+
+    // Init sidebar
+    const toggleSidebar = initSidebar();
+
+    // Init dark mode
+    initDarkMode();
+
+    // Init settings modal
+    initSettingsModal();
+
+    // Init transaction form
+    initTransactionForm();
+
+    // Set up login and Google buttons
+    document.getElementById('loginBtn').addEventListener('click', handleLogin);
+    document.getElementById('googleLoginBtn').addEventListener('click', handleGoogleLogin);
+
+    // Quick add button
+    document.getElementById('addQuickBtn').addEventListener('click', () => {
+        document.querySelector('.form-box').scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('description').focus();
+    });
 
     // Check session
     const { data: { session } } = await supabase.auth.getSession();
