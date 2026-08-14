@@ -22,7 +22,7 @@
     <!-- Your custom CSS -->
     <link rel="stylesheet" href="index.css" />
 
-    <link rel="icon" href="./image.png" type="image/x-icon">
+    <link rel="icon" href="./logo.png" type="image/x-icon">
 </head>
 <body>
 
@@ -30,107 +30,38 @@
     <div id="toastContainer" class="toast-container"></div>
 
     <!-- ========================================================== -->
-    <!-- LOGIN PAGE — Two‑Column Layout                              -->
+    <!-- LOGIN PAGE                                                 -->
     <!-- ========================================================== -->
-    <div class="login-wrapper">
-
-        <!-- LEFT COLUMN — Form -->
-        <div class="login-col login-col-form">
-            <div class="login-card">
-
-                <!-- Brand -->
-                <div class="login-brand">
-                    <span class="brand-icon"><i class="fas fa-chart-pie"></i></span>
-                    <span class="brand-name">MeraHisaab</span>
+    <div id="loginPage" class="login-page">
+        <div class="login-card">
+            <div class="login-logo"><i class="fas fa-chart-pie"></i>MeraHisaab</div>
+            <p class="login-sub">Welcome! Set up your profile to start tracking.</p>
+            <form autocomplete="off" class="login-form">
+                <div class="form-group">
+                    <label for="loginName">Your Full Name</label>
+                    <input type="text" id="loginName" placeholder="e.g., Alex Rivera" autocomplete="off" />
                 </div>
-
-                <h1 class="login-heading">Welcome Back!</h1>
-                <p class="login-sub">Set up your profile to start tracking your finances.</p>
-
-                <form autocomplete="off" class="login-form" id="loginForm">
-
-                    <!-- Name -->
-                    <div class="form-group">
-                        <label for="loginName"><i class="fas fa-user"></i> Your Full Name</label>
-                        <input type="text" id="loginName" placeholder="e.g., Alex Rivera" autocomplete="off" />
-                    </div>
-
-                    <!-- Currency -->
-                    <div class="form-group">
-                        <label for="loginCurrency"><i class="fas fa-coins"></i> Preferred Currency</label>
-                        <select id="loginCurrency">
-                            <option value="PKR" selected>🇵🇰 PKR (Rs)</option>
-                            <option value="USD">🇺🇸 USD ($)</option>
-                            <option value="EUR">🇪🇺 EUR (€)</option>
-                            <option value="GBP">🇬🇧 GBP (£)</option>
-                            <option value="INR">🇮🇳 INR (₹)</option>
-                            <option value="JPY">🇯🇵 JPY (¥)</option>
-                        </select>
-                    </div>
-
-                    <!-- Starting Balance -->
-                    <div class="form-group">
-                        <label for="loginBalance"><i class="fas fa-wallet"></i> Starting Balance <span class="text-sm text-gray-400 font-normal">(optional)</span></label>
-                        <input type="number" id="loginBalance" placeholder="e.g., 5000" step="0.01" min="0" autocomplete="off" />
-                        <small class="form-hint">This will be added as your initial income.</small>
-                    </div>
-
-                    <!-- Submit -->
-                    <button class="btn btn-primary w-full" id="loginBtn" type="button">
-                        <i class="fas fa-rocket"></i> Start Tracking
-                    </button>
-
-                    <!-- Divider -->
-                    <div class="login-divider">
-                        <span>or continue with</span>
-                    </div>
-
-                    <!-- Google Button (placeholder) -->
-                    <button class="btn btn-google w-full" type="button" disabled>
-                        <i class="fab fa-google"></i> Login with Google
-                    </button>
-
-                    <!-- Footer -->
-                    <p class="login-footer-text">
-                        Don't have an account? <a href="#" class="text-purple-600 font-semibold">Create one now</a>
-                        <span class="text-xs text-gray-400 block mt-1">It's FREE! Takes less than a minute.</span>
-                    </p>
-
-                    <p class="login-copy">© 2026 MeraHisaab. All rights reserved.</p>
-                </form>
-
-            </div>
+                <div class="form-group">
+                    <label for="loginCurrency">Preferred Currency</label>
+                    <select id="loginCurrency">
+                        <option value="PKR" selected>🇵🇰 PKR (Rs)</option>
+                        <option value="USD">🇺🇸 USD ($)</option>
+                        <option value="EUR">🇪🇺 EUR (€)</option>
+                        <option value="GBP">🇬🇧 GBP (£)</option>
+                        <option value="INR">🇮🇳 INR (₹)</option>
+                        <option value="JPY">🇯🇵 JPY (¥)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="loginBalance">Starting Balance (Optional)</label>
+                    <input type="number" id="loginBalance" placeholder="e.g., 5000" step="0.01" min="0" autocomplete="off" />
+                    <small class="text-gray-500 dark:text-gray-400 block mt-1">This will be added as your initial income.</small>
+                </div>
+                <button class="btn btn-primary w-full mt-3" id="loginBtn" type="button"><i class="fas fa-rocket"></i> Start Tracking</button>
+            </form>
         </div>
+    </div>
 
-        <!-- RIGHT COLUMN — Image / Decorative -->
-        <div class="login-col login-col-image">
-            <div class="image-content">
-                <div class="image-badge">
-                    <i class="fas fa-chart-line"></i> Smart Finance
-                </div>
-                <h2>Track. Save. <br />Grow.</h2>
-                <p>Your personal finance companion — <br />simple, secure, and always with you.</p>
-                <div class="image-stats">
-                    <div class="stat-item">
-                        <span class="stat-number">10K+</span>
-                        <span class="stat-label">Users</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number">₨ 2.5M</span>
-                        <span class="stat-label">Tracked</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number">98%</span>
-                        <span class="stat-label">Satisfaction</span>
-                    </div>
-                </div>
-                <!-- Decorative floating shapes -->
-                <div class="float-shape shape-1"></div>
-                <div class="float-shape shape-2"></div>
-                <div class="float-shape shape-3"></div>
-                <div class="float-shape shape-4"></div>
-            </div>
-        </div>
     <!-- ========================================================== -->
     <!-- SETTINGS MODAL                                             -->
     <!-- ========================================================== -->
