@@ -2,7 +2,6 @@
    SETTINGS PAGE – Full Styling with Dark/Light Mode
    ============================================================ */
 
-/* ----- CSS Variables ----- */
 :root {
     --bg-body: #f8f9fc;
     --bg-card: #ffffff;
@@ -20,36 +19,34 @@
     --transition: 0.3s ease;
 }
 
-/* ----- Dark Mode Variables ----- */
 body.dark {
-    --bg-body: #0f0f1a;
-    --bg-card: #1a1a2e;
-    --bg-input: #252540;
-    --text-primary: #f1f5f9;
-    --text-secondary: #94a3b8;
-    --border-color: #2d2d4a;
-    --hover-bg: #252540;
-    --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-    --shadow-hover: 0 8px 30px rgba(124, 58, 237, 0.2);
+    --bg-body: #0f0f1a !important;
+    --bg-card: #1a1a2e !important;
+    --bg-input: #252540 !important;
+    --text-primary: #f1f5f9 !important;
+    --text-secondary: #94a3b8 !important;
+    --border-color: #2d2d4a !important;
+    --hover-bg: #252540 !important;
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+    --shadow-hover: 0 8px 30px rgba(124, 58, 237, 0.2) !important;
 }
 
-/* ----- Sidebar logo color ----- */
+/* Sidebar logo color */
 .sidebar .logo .logo-icon i,
 .sidebar .logo span {
     color: #7C3AED !important;
 }
 
-/* ----- Main content – push when sidebar is open ----- */
+/* Main content layout */
 .main-content {
     transition: margin-left 0.3s ease;
     margin-left: 0;
     padding: 20px;
 }
 .main-content.sidebar-open {
-    margin-left: 260px; /* sidebar width */
+    margin-left: 260px;
 }
 
-/* Sidebar itself – fixed, slides in/out */
 .sidebar {
     position: fixed;
     top: 0;
@@ -66,8 +63,6 @@ body.dark {
 .sidebar.open {
     transform: translateX(0);
 }
-
-/* Overlay for mobile */
 .overlay {
     display: none;
     position: fixed;
@@ -85,7 +80,6 @@ body.dark {
     }
 }
 
-/* ----- Settings Container – full width ----- */
 .settings-container {
     width: 100%;
     max-width: 100% !important;
@@ -94,12 +88,10 @@ body.dark {
     box-sizing: border-box;
 }
 
-/* ----- Settings Section ----- */
 .settings-section {
     margin-bottom: 32px;
     width: 100%;
 }
-
 .section-header {
     display: flex;
     align-items: center;
@@ -107,26 +99,22 @@ body.dark {
     margin-bottom: 14px;
     flex-wrap: wrap;
 }
-
 .section-header i {
     font-size: 1.3rem;
     width: 32px;
     text-align: center;
 }
-
 .section-header h2 {
     font-size: 1.2rem;
     font-weight: 700;
     color: var(--text-primary);
     margin: 0;
 }
-
 .section-header .section-subtitle {
     font-size: 0.85rem;
     color: var(--text-secondary);
     margin-left: auto;
 }
-
 @media (max-width: 600px) {
     .section-header .section-subtitle {
         margin-left: 0;
@@ -138,7 +126,6 @@ body.dark {
     }
 }
 
-/* ----- Settings Card ----- */
 .settings-card {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
@@ -149,12 +136,10 @@ body.dark {
     width: 100%;
     box-sizing: border-box;
 }
-
 .settings-card:hover {
     box-shadow: var(--shadow-hover);
 }
 
-/* Form elements */
 .settings-card .form-group {
     margin-bottom: 16px;
 }
@@ -191,7 +176,6 @@ body.dark {
     opacity: 0.6;
 }
 
-/* Radio group */
 .settings-card .radio-group {
     display: flex;
     gap: 25px;
@@ -213,7 +197,6 @@ body.dark {
     cursor: pointer;
 }
 
-/* Appearance toggle */
 .appearance-option {
     padding: 4px 0;
 }
@@ -256,7 +239,6 @@ body.dark {
     transform: translateX(22px);
 }
 
-/* Data action buttons */
 .data-actions {
     display: flex;
     flex-direction: column;
@@ -305,7 +287,6 @@ body.dark {
 .clear-btn i:first-child { color: #ef4444; }
 .logout-btn i:first-child { color: #ef4444; }
 
-/* Quick add success */
 #quickAddSuccess {
     animation: fadeInUp 0.5s ease;
     display: none;
@@ -315,7 +296,6 @@ body.dark {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Confirmation modal */
 .modal-overlay {
     position: fixed;
     inset: 0;
@@ -372,7 +352,6 @@ body.dark {
     box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
 }
 
-/* Buttons */
 .btn {
     padding: 12px 24px;
     border: none;
@@ -399,7 +378,6 @@ body.dark {
     box-shadow: 0 8px 20px rgba(124, 58, 237, 0.3);
 }
 
-/* Toast */
 .toast-container {
     position: fixed;
     bottom: 30px;
@@ -430,7 +408,6 @@ body.dark {
     to { opacity: 1; transform: translateX(0); }
 }
 
-/* Responsive */
 @media (max-width: 600px) {
     .settings-card { padding: 18px 16px; }
     .data-btn { padding: 12px 14px; gap: 12px; }
@@ -442,25 +419,25 @@ body.dark {
     .btn { padding: 10px 18px; font-size: 0.85rem; }
 }
 
-/* Dark mode overrides */
-body.dark .settings-card { background: var(--bg-card); }
-body.dark .data-btn { background: var(--bg-input); }
-body.dark .data-btn:hover { background: var(--hover-bg); }
-body.dark .toggle-slider { background: var(--border-color); }
+/* Dark mode overrides (with !important for safety) */
+body.dark .settings-card { background: var(--bg-card) !important; }
+body.dark .data-btn { background: var(--bg-input) !important; }
+body.dark .data-btn:hover { background: var(--hover-bg) !important; }
+body.dark .toggle-slider { background: var(--border-color) !important; }
 body.dark .settings-card .form-group input,
 body.dark .settings-card .form-group select {
-    background: var(--bg-input);
-    color: var(--text-primary);
+    background: var(--bg-input) !important;
+    color: var(--text-primary) !important;
 }
 body.dark .settings-card .form-group input:focus,
 body.dark .settings-card .form-group select:focus {
-    outline: 2px solid var(--accent-purple);
+    outline: 2px solid var(--accent-purple) !important;
 }
-body.dark #quickAddSuccess { background: rgba(16, 185, 129, 0.15); color: #34d399; }
-body.dark .confirmation-modal p { color: var(--text-secondary); }
-body.dark .modal-overlay { background: rgba(0, 0, 0, 0.7); }
+body.dark #quickAddSuccess { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
+body.dark .confirmation-modal p { color: var(--text-secondary) !important; }
+body.dark .modal-overlay { background: rgba(0, 0, 0, 0.7) !important; }
 
-/* Sidebar & header overrides (match dashboard) */
+/* Sidebar & header overrides */
 .sidebar {
     background: var(--bg-card);
     border-right: 1px solid var(--border-color);
