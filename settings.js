@@ -42,7 +42,7 @@ function formatCurrency(amount) {
 }
 
 // ============================================================
-// SIDEBAR LOGIC
+// SIDEBAR (exact same logic as dashboard)
 // ============================================================
 const sidebar = document.getElementById('sidebar');
 const overlay = document.getElementById('sidebarOverlay');
@@ -104,16 +104,12 @@ window.addEventListener('resize', () => {
 });
 
 // ============================================================
-// DARK MODE – FIXED (with debug logs)
+// DARK MODE – fully synced (same as dashboard)
 // ============================================================
 const darkToggle = document.getElementById('darkModeToggle');
 const darkModeSwitch = document.getElementById('darkModeSwitch');
 
-console.log('Dark toggle element:', darkToggle);
-console.log('Dark switch element:', darkModeSwitch);
-
 function applyDarkMode(isDark) {
-    console.log('Applying dark mode:', isDark);
     if (isDark) {
         document.body.classList.add('dark');
         if (darkToggle) darkToggle.innerHTML = '<i class="fas fa-sun"></i> Light';
@@ -124,6 +120,7 @@ function applyDarkMode(isDark) {
         if (darkModeSwitch) darkModeSwitch.checked = false;
     }
     localStorage.setItem('darkMode', isDark);
+    // Notify other tabs (like dashboard)
     window.dispatchEvent(new Event('storage'));
 }
 
@@ -135,29 +132,20 @@ function toggleDarkMode() {
 // Attach events
 if (darkToggle) {
     darkToggle.addEventListener('click', toggleDarkMode);
-    console.log('Dark toggle event attached');
-} else {
-    console.warn('Dark toggle button not found!');
 }
-
 if (darkModeSwitch) {
     darkModeSwitch.addEventListener('change', (e) => {
         applyDarkMode(e.target.checked);
     });
-    console.log('Dark switch event attached');
-} else {
-    console.warn('Dark mode switch not found!');
 }
 
 function loadDarkMode() {
     const saved = localStorage.getItem('darkMode');
-    const isDark = saved === 'true';
-    console.log('Loading dark mode from storage:', isDark);
-    applyDarkMode(isDark);
+    applyDarkMode(saved === 'true');
 }
 
 // ============================================================
-// TOAST SYSTEM
+// TOAST (same as dashboard)
 // ============================================================
 function showToast(message, type = 'info') {
     const container = document.getElementById('toastContainer');
@@ -246,7 +234,7 @@ if (saveProfileBtn) {
 }
 
 // ============================================================
-// EXPORT CSV
+// EXPORT CSV (same as before)
 // ============================================================
 const exportBtn = document.getElementById('exportDataBtn');
 if (exportBtn) {
@@ -605,7 +593,7 @@ if (quickForm) {
 }
 
 // ============================================================
-// STORAGE LISTENER
+// STORAGE LISTENER (sync across tabs, like dashboard)
 // ============================================================
 window.addEventListener('storage', (e) => {
     if (e.key === 'userProfile') {
@@ -628,9 +616,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    // Load dark mode
     loadDarkMode();
+
+    // Update user UI
     updateUIWithUser();
 
+    // Restore sidebar state
     const savedSidebarState = localStorage.getItem('sidebarOpen');
     const isDesktop = window.innerWidth >= 901;
     let defaultOpen = isDesktop;
