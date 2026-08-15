@@ -282,6 +282,13 @@ body.dark {
     display: none;
 }
 
+.pdf-btn i:first-child {
+    color: #ef4444;  /* red */
+}
+.text-btn i:first-child {
+    color: #3b82f6;  /* blue */
+}
+
 @keyframes fadeInUp {
     from {
         opacity: 0;
