@@ -106,42 +106,59 @@ window.addEventListener('resize', () => {
 });
 
 // ============================================================
-// 3. DARK MODE
+// 3. DARK MODE (Improved with debugging)
 // ============================================================
 const darkToggle = document.getElementById('darkModeToggle');
 const darkModeSwitch = document.getElementById('darkModeSwitch');
 
-function toggleDarkMode() {
-    document.body.classList.toggle('dark');
-    const isDark = document.body.classList.contains('dark');
-    if (darkToggle) {
-        darkToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i> Light' : '<i class="fas fa-moon"></i> Dark';
-    }
-    if (darkModeSwitch) {
-        darkModeSwitch.checked = isDark;
+// Function to apply dark mode state
+function applyDarkMode(isDark) {
+    if (isDark) {
+        document.body.classList.add('dark');
+        if (darkToggle) darkToggle.innerHTML = '<i class="fas fa-sun"></i> Light';
+        if (darkModeSwitch) darkModeSwitch.checked = true;
+    } else {
+        document.body.classList.remove('dark');
+        if (darkToggle) darkToggle.innerHTML = '<i class="fas fa-moon"></i> Dark';
+        if (darkModeSwitch) darkModeSwitch.checked = false;
     }
     localStorage.setItem('darkMode', isDark);
+    console.log('Dark mode set to:', isDark); // for debugging
+}
+
+// Toggle function
+function toggleDarkMode() {
+    const isDark = !document.body.classList.contains('dark');
+    applyDarkMode(isDark);
     window.dispatchEvent(new Event('storage'));
 }
 
+// Attach events if elements exist
 if (darkToggle) {
     darkToggle.addEventListener('click', toggleDarkMode);
+    console.log('Dark toggle button found');
+} else {
+    console.warn('Dark toggle button not found!');
 }
 
 if (darkModeSwitch) {
     darkModeSwitch.addEventListener('change', (e) => {
         const isDark = e.target.checked;
-        if (isDark) {
-            document.body.classList.add('dark');
-            if (darkToggle) darkToggle.innerHTML = '<i class="fas fa-sun"></i> Light';
-        } else {
-            document.body.classList.remove('dark');
-            if (darkToggle) darkToggle.innerHTML = '<i class="fas fa-moon"></i> Dark';
-        }
-        localStorage.setItem('darkMode', isDark);
+        applyDarkMode(isDark);
         window.dispatchEvent(new Event('storage'));
     });
+    console.log('Dark mode switch found');
+} else {
+    console.warn('Dark mode switch not found!');
 }
+
+// Apply saved dark mode on page load (called during init)
+function loadDarkMode() {
+    const saved = localStorage.getItem('darkMode');
+    const isDark = saved === 'true';
+    applyDarkMode(isDark);
+}
+
 
 // ============================================================
 // 4. TOAST SYSTEM
@@ -631,13 +648,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Apply dark mode
-    if (localStorage.getItem('darkMode') === 'true') {
-        document.body.classList.add('dark');
-        if (darkToggle) darkToggle.innerHTML = '<i class="fas fa-sun"></i> Light';
-        if (darkModeSwitch) darkModeSwitch.checked = true;
-    }
+    // Apply dark mode from localStorage
+    loadDarkMode();
 
+    // Update UI with user data
     updateUIWithUser();
 
     // Restore sidebar state
