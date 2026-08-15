@@ -42,7 +42,7 @@ function formatCurrency(amount) {
 }
 
 // ============================================================
-// 2. SIDEBAR LOGIC
+// 2. SIDEBAR LOGIC (includes toggleSidebar function)
 // ============================================================
 const sidebar = document.getElementById('sidebar');
 const overlay = document.getElementById('sidebarOverlay');
@@ -66,31 +66,72 @@ function toggleSidebar(forceState) {
     }
     localStorage.setItem('sidebarOpen', isOpen);
 
-    // ⬇️ NEW: Sync the toggle switch UI
+    // 🔥 Sync the toggle switch in Settings
+    const sidebarVisibilitySwitch = document.getElementById('sidebarVisibilitySwitch');
     if (sidebarVisibilitySwitch) {
         sidebarVisibilitySwitch.checked = isOpen;
     }
 }
 
+// Hamburger menu
+if (menuToggle) {
+    menuToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleSidebar();
+    });
+}
+
+// Overlay click
+if (overlay) {
+    overlay.addEventListener('click', () => {
+        if (window.innerWidth < 901) toggleSidebar(false);
+    });
+}
+
+// Escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && sidebar.classList.contains('open') && window.innerWidth < 901) {
+        toggleSidebar(false);
+    }
+});
+
+// Resize handler
+let resizeTimer;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        const isDesktop = window.innerWidth >= 901;
+        if (isDesktop && sidebar.classList.contains('open')) {
+            mainContent.classList.add('sidebar-open');
+            overlay.classList.remove('active');
+        } else {
+            mainContent.classList.remove('sidebar-open');
+        }
+        if (!isDesktop && sidebar.classList.contains('open')) {
+            overlay.classList.add('active');
+        } else if (!isDesktop) {
+            overlay.classList.remove('active');
+        }
+    }, 150);
+});
+
 // ============================================================
-// SIDEBAR VISIBILITY TOGGLE (Settings Page Control)
+// 3. SIDEBAR VISIBILITY TOGGLE (Settings Page Control)
 // ============================================================
 const sidebarVisibilitySwitch = document.getElementById('sidebarVisibilitySwitch');
 
 if (sidebarVisibilitySwitch) {
-    // When the toggle changes, update the sidebar
-    sidebarVisibilitySwitch.addEventListener('change', (e) => {
+    sidebarVisibilitySwitch.addEventListener('change', function(e) {
         toggleSidebar(e.target.checked);
     });
 }
 
 // ============================================================
-// 3. DARK MODE (Improved with debugging)
+// 4. DARK MODE
 // ============================================================
 const darkToggle = document.getElementById('darkModeToggle');
 const darkModeSwitch = document.getElementById('darkModeSwitch');
 
-// Function to apply dark mode state
 function applyDarkMode(isDark) {
     if (isDark) {
         document.body.classList.add('dark');
@@ -102,50 +143,33 @@ function applyDarkMode(isDark) {
         if (darkModeSwitch) darkModeSwitch.checked = false;
     }
     localStorage.setItem('darkMode', isDark);
-    console.log('Dark mode set to:', isDark); // for debugging
 }
 
-// Toggle function
 function toggleDarkMode() {
     const isDark = !document.body.classList.contains('dark');
     applyDarkMode(isDark);
     window.dispatchEvent(new Event('storage'));
 }
 
-// Attach events if elements exist
 if (darkToggle) {
     darkToggle.addEventListener('click', toggleDarkMode);
-    console.log('Dark toggle button found');
-} else {
-    console.warn('Dark toggle button not found!');
 }
 
 if (darkModeSwitch) {
     darkModeSwitch.addEventListener('change', (e) => {
-        const isDark = e.target.checked;
-        applyDarkMode(isDark);
+        applyDarkMode(e.target.checked);
         window.dispatchEvent(new Event('storage'));
     });
-    console.log('Dark mode switch found');
-} else {
-    console.warn('Dark mode switch not found!');
 }
 
-// Apply saved dark mode on page load (called during init)
 function loadDarkMode() {
     const saved = localStorage.getItem('darkMode');
     const isDark = saved === 'true';
     applyDarkMode(isDark);
 }
-const sidebarHeaderToggle = document.getElementById('sidebarHeaderToggle');
-if (sidebarHeaderToggle) {
-    sidebarHeaderToggle.addEventListener('click', () => {
-        toggleSidebar();
-    });
-}
 
 // ============================================================
-// 4. TOAST SYSTEM
+// 5. TOAST SYSTEM
 // ============================================================
 function showToast(message, type = 'info') {
     const container = document.getElementById('toastContainer');
@@ -163,7 +187,7 @@ function showToast(message, type = 'info') {
 }
 
 // ============================================================
-// 5. CONFIRMATION MODAL (Reusable)
+// 6. CONFIRMATION MODAL (Reusable)
 // ============================================================
 const confirmationModal = document.getElementById('confirmationModal');
 const confirmTitle = document.getElementById('confirmationTitle');
@@ -211,7 +235,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ============================================================
-// 6. SAVE PROFILE
+// 7. SAVE PROFILE
 // ============================================================
 const saveProfileBtn = document.getElementById('saveProfileBtn');
 if (saveProfileBtn) {
@@ -237,7 +261,7 @@ if (saveProfileBtn) {
 }
 
 // ============================================================
-// 7. EXPORT DATA
+// 8. EXPORT AS CSV
 // ============================================================
 const exportBtn = document.getElementById('exportDataBtn');
 if (exportBtn) {
@@ -279,7 +303,139 @@ if (exportBtn) {
 }
 
 // ============================================================
-// 8. IMPORT DATA
+// 9. EXPORT AS PDF
+// ============================================================
+const exportPdfBtn = document.getElementById('exportPdfBtn');
+if (exportPdfBtn) {
+    exportPdfBtn.addEventListener('click', () => {
+        try {
+            if (typeof window.jspdf === 'undefined') {
+                showToast('❌ PDF library failed to load. Please check your internet connection.', 'error');
+                return;
+            }
+
+            const stored = localStorage.getItem('financeData');
+            if (!stored) {
+                showToast('No data to export.', 'error');
+                return;
+            }
+            const transactions = JSON.parse(stored);
+            if (transactions.length === 0) {
+                showToast('No transactions to export.', 'error');
+                return;
+            }
+
+            const sorted = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+            const rows = sorted.map(tx => [
+                tx.date || '',
+                tx.description || '',
+                tx.category || 'Other',
+                tx.type || 'expense',
+                formatCurrency(tx.amount)
+            ]);
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape', 'mm', 'a4');
+            const pageWidth = doc.internal.pageSize.getWidth();
+
+            doc.setFontSize(18);
+            doc.setTextColor(124, 58, 237);
+            doc.text('MeraHisaab - Transaction Report', pageWidth / 2, 15, { align: 'center' });
+            doc.setFontSize(10);
+            doc.setTextColor(100);
+            doc.text(`Generated: ${new Date().toLocaleString()}`, pageWidth / 2, 22, { align: 'center' });
+            doc.text(`User: ${userProfile.name}`, pageWidth / 2, 28, { align: 'center' });
+
+            doc.autoTable({
+                head: [['Date', 'Description', 'Category', 'Type', 'Amount']],
+                body: rows,
+                startY: 35,
+                theme: 'striped',
+                headStyles: { fillColor: [124, 58, 237], textColor: 255, fontSize: 10, fontStyle: 'bold' },
+                bodyStyles: { fontSize: 9 },
+                columnStyles: {
+                    0: { cellWidth: 30 },
+                    1: { cellWidth: 60 },
+                    2: { cellWidth: 30 },
+                    3: { cellWidth: 25 },
+                    4: { cellWidth: 30, halign: 'right' }
+                },
+                margin: { left: 10, right: 10 }
+            });
+
+            doc.save(`merahisaab_transactions_${new Date().toISOString().slice(0, 10)}.pdf`);
+            showToast(`✅ PDF exported successfully! (${sorted.length} transactions)`, 'success');
+        } catch (error) {
+            console.error('PDF Export Error:', error);
+            showToast('❌ Failed to export PDF. Please try again.', 'error');
+        }
+    });
+}
+
+// ============================================================
+// 10. EXPORT AS TEXT
+// ============================================================
+const exportTextBtn = document.getElementById('exportTextBtn');
+if (exportTextBtn) {
+    exportTextBtn.addEventListener('click', () => {
+        try {
+            const stored = localStorage.getItem('financeData');
+            if (!stored) {
+                showToast('No data to export.', 'error');
+                return;
+            }
+            const transactions = JSON.parse(stored);
+            if (transactions.length === 0) {
+                showToast('No transactions to export.', 'error');
+                return;
+            }
+
+            const sorted = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            let text = '========================================\n';
+            text += '  MERAHISAAB - TRANSACTION REPORT\n';
+            text += '========================================\n';
+            text += `  User: ${userProfile.name}\n`;
+            text += `  Generated: ${new Date().toLocaleString()}\n`;
+            text += `  Currency: ${userProfile.currency} (${userProfile.symbol})\n`;
+            text += `  Total transactions: ${sorted.length}\n`;
+            text += '========================================\n\n';
+            text += 'Date       | Description              | Category         | Type    | Amount\n';
+            text += '-----------+--------------------------+------------------+---------+--------\n';
+
+            sorted.forEach(tx => {
+                const date = (tx.date || '').padEnd(10);
+                const desc = (tx.description || '').padEnd(24).slice(0, 24);
+                const cat = (tx.category || 'Other').padEnd(16).slice(0, 16);
+                const type = (tx.type || 'expense').padEnd(7).slice(0, 7);
+                const amount = formatCurrency(tx.amount).padStart(8);
+                text += `${date} | ${desc} | ${cat} | ${type} | ${amount}\n`;
+            });
+
+            text += '\n========================================\n';
+            text += '  End of report\n';
+            text += '========================================\n';
+
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `merahisaab_transactions_${new Date().toISOString().slice(0, 10)}.txt`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            showToast(`✅ Text file exported successfully! (${sorted.length} transactions)`, 'success');
+        } catch (error) {
+            console.error('Text Export Error:', error);
+            showToast('❌ Failed to export text file. Please try again.', 'error');
+        }
+    });
+}
+
+// ============================================================
+// 11. IMPORT DATA
 // ============================================================
 const importBtn = document.getElementById('importDataBtn');
 const fileInput = document.getElementById('fileInput');
@@ -360,133 +516,7 @@ if (importBtn && fileInput) {
 }
 
 // ============================================================
-// 8b. EXPORT AS PDF
-// ============================================================
-const exportPdfBtn = document.getElementById('exportPdfBtn');
-if (exportPdfBtn) {
-    exportPdfBtn.addEventListener('click', () => {
-        const stored = localStorage.getItem('financeData');
-        if (!stored) {
-            showToast('No data to export.', 'error');
-            return;
-        }
-        const transactions = JSON.parse(stored);
-        if (transactions.length === 0) {
-            showToast('No transactions to export.', 'error');
-            return;
-        }
-
-        // Sort by date (newest first)
-        const sorted = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
-
-        // Prepare data rows
-        const rows = sorted.map(tx => [
-            tx.date || '',
-            tx.description || '',
-            tx.category || 'Other',
-            tx.type || 'expense',
-            formatCurrency(tx.amount)
-        ]);
-
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('landscape', 'mm', 'a4');
-        const pageWidth = doc.internal.pageSize.getWidth();
-
-        // Title
-        doc.setFontSize(18);
-        doc.setTextColor(40);
-        doc.text('MeraHisaab - Transaction Report', pageWidth / 2, 15, { align: 'center' });
-        doc.setFontSize(10);
-        doc.setTextColor(100);
-        doc.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth / 2, 22, { align: 'center' });
-        doc.text(`User: ${userProfile.name}`, pageWidth / 2, 28, { align: 'center' });
-
-        // Table
-        doc.autoTable({
-            head: [['Date', 'Description', 'Category', 'Type', 'Amount']],
-            body: rows,
-            startY: 35,
-            theme: 'striped',
-            headStyles: { fillColor: [124, 58, 237], textColor: 255, fontSize: 10 },
-            bodyStyles: { fontSize: 9 },
-            columnStyles: {
-                0: { cellWidth: 30 },
-                1: { cellWidth: 60 },
-                2: { cellWidth: 30 },
-                3: { cellWidth: 25 },
-                4: { cellWidth: 30, halign: 'right' }
-            },
-            margin: { left: 10, right: 10 }
-        });
-
-        // Save PDF
-        doc.save(`merahisaab_transactions_${new Date().toISOString().slice(0, 10)}.pdf`);
-        showToast(`✅ PDF exported successfully!`, 'success');
-    });
-}
-
-// ============================================================
-// 8c. EXPORT AS TEXT
-// ============================================================
-const exportTextBtn = document.getElementById('exportTextBtn');
-if (exportTextBtn) {
-    exportTextBtn.addEventListener('click', () => {
-        const stored = localStorage.getItem('financeData');
-        if (!stored) {
-            showToast('No data to export.', 'error');
-            return;
-        }
-        const transactions = JSON.parse(stored);
-        if (transactions.length === 0) {
-            showToast('No transactions to export.', 'error');
-            return;
-        }
-
-        // Sort by date (newest first)
-        const sorted = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
-
-        // Build text content
-        let text = '========================================\n';
-        text += '  MERAHISAAB - TRANSACTION REPORT\n';
-        text += '========================================\n';
-        text += `  User: ${userProfile.name}\n`;
-        text += `  Generated: ${new Date().toLocaleString()}\n`;
-        text += `  Currency: ${userProfile.currency} (${userProfile.symbol})\n`;
-        text += `  Total transactions: ${sorted.length}\n`;
-        text += '========================================\n\n';
-        text += 'Date       | Description              | Category         | Type    | Amount\n';
-        text += '-----------+--------------------------+------------------+---------+--------\n';
-
-        sorted.forEach(tx => {
-            const date = (tx.date || '').padEnd(10);
-            const desc = (tx.description || '').padEnd(24).slice(0, 24);
-            const cat = (tx.category || 'Other').padEnd(16).slice(0, 16);
-            const type = (tx.type || 'expense').padEnd(7).slice(0, 7);
-            const amount = formatCurrency(tx.amount).padStart(8);
-            text += `${date} | ${desc} | ${cat} | ${type} | ${amount}\n`;
-        });
-
-        text += '\n========================================\n';
-        text += '  End of report\n';
-        text += '========================================\n';
-
-        // Create and download text file
-        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        link.setAttribute('href', url);
-        link.setAttribute('download', `merahisaab_transactions_${new Date().toISOString().slice(0, 10)}.txt`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-
-        showToast(`✅ Text file exported successfully!`, 'success');
-    });
-}
-
-// ============================================================
-// 9. CLEAR ALL DATA (with custom confirmation)
+// 12. CLEAR ALL DATA
 // ============================================================
 const clearBtn = document.getElementById('clearDataBtn');
 if (clearBtn) {
@@ -510,7 +540,7 @@ if (clearBtn) {
 }
 
 // ============================================================
-// 10. LOGOUT (with custom confirmation)
+// 13. LOGOUT
 // ============================================================
 const logoutBtn = document.getElementById('settingsLogoutBtn');
 if (logoutBtn) {
@@ -527,7 +557,7 @@ if (logoutBtn) {
 }
 
 // ============================================================
-// 11. QUICK ADD MONEY
+// 14. QUICK ADD MONEY
 // ============================================================
 const quickForm = document.getElementById('quickAddForm');
 const quickDescription = document.getElementById('quickDescription');
@@ -590,49 +620,38 @@ if (quickForm) {
 }
 
 // ============================================================
-// 12. LISTEN FOR STORAGE CHANGES
+// 15. LISTEN FOR STORAGE CHANGES
 // ============================================================
 window.addEventListener('storage', (e) => {
     if (e.key === 'userProfile') {
         loadUserProfile();
         updateUIWithUser();
-        // Re-apply dark mode if needed
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.body.classList.add('dark');
-            if (darkToggle) darkToggle.innerHTML = '<i class="fas fa-sun"></i> Light';
-            if (darkModeSwitch) darkModeSwitch.checked = true;
-        } else {
-            document.body.classList.remove('dark');
-            if (darkToggle) darkToggle.innerHTML = '<i class="fas fa-moon"></i> Dark';
-            if (darkModeSwitch) darkModeSwitch.checked = false;
-        }
+        loadDarkMode();
     }
     if (e.key === 'darkMode') {
         const isDark = e.newValue === 'true';
-        if (isDark) {
-            document.body.classList.add('dark');
-            if (darkToggle) darkToggle.innerHTML = '<i class="fas fa-sun"></i> Light';
-            if (darkModeSwitch) darkModeSwitch.checked = true;
-        } else {
-            document.body.classList.remove('dark');
-            if (darkToggle) darkToggle.innerHTML = '<i class="fas fa-moon"></i> Dark';
-            if (darkModeSwitch) darkModeSwitch.checked = false;
+        applyDarkMode(isDark);
+    }
+    if (e.key === 'sidebarOpen') {
+        const isOpen = e.newValue === 'true';
+        const sidebarVisibilitySwitch = document.getElementById('sidebarVisibilitySwitch');
+        if (sidebarVisibilitySwitch) {
+            sidebarVisibilitySwitch.checked = isOpen;
         }
     }
 });
 
 // ============================================================
-// 13. INITIALIZATION
+// 16. INITIALIZATION
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
     const hasUser = loadUserProfile();
     if (!hasUser) {
-        // If no user, redirect to index (dashboard) to create one
         window.location.href = 'index.html';
         return;
     }
 
-    // Apply dark mode from localStorage
+    // Load dark mode
     loadDarkMode();
 
     // Update UI with user data
