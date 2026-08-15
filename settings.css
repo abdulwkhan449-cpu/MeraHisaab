@@ -584,11 +584,10 @@ body.dark .modal-overlay {
 }
 
 .dark-toggle {
+    color: var(--text-primary);
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    color: var(--text-primary);
 }
-
 .dark-toggle:hover {
     background: var(--hover-bg);
 }
