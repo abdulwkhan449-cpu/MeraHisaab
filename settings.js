@@ -106,7 +106,7 @@ window.addEventListener('resize', () => {
 });
 
 // ============================================================
-// 3. DARK MODE (Fully functional)
+// 3. DARK MODE (FIXED)
 // ============================================================
 const darkToggle = document.getElementById('darkModeToggle');
 const darkModeSwitch = document.getElementById('darkModeSwitch');
@@ -122,23 +122,25 @@ function applyDarkMode(isDark) {
         if (darkModeSwitch) darkModeSwitch.checked = false;
     }
     localStorage.setItem('darkMode', isDark);
+    // Dispatch event to notify other tabs (optional)
+    window.dispatchEvent(new Event('storage'));
 }
 
 function toggleDarkMode() {
     const isDark = !document.body.classList.contains('dark');
     applyDarkMode(isDark);
-    window.dispatchEvent(new Event('storage'));
 }
 
+// Attach event listeners
 if (darkToggle) {
     darkToggle.addEventListener('click', toggleDarkMode);
+    console.log('Dark toggle attached');
 }
-
 if (darkModeSwitch) {
     darkModeSwitch.addEventListener('change', (e) => {
         applyDarkMode(e.target.checked);
-        window.dispatchEvent(new Event('storage'));
     });
+    console.log('Dark switch attached');
 }
 
 function loadDarkMode() {
@@ -166,7 +168,7 @@ function showToast(message, type = 'info') {
 }
 
 // ============================================================
-// 5. CONFIRMATION MODAL (Reusable)
+// 5. CONFIRMATION MODAL
 // ============================================================
 const confirmationModal = document.getElementById('confirmationModal');
 const confirmTitle = document.getElementById('confirmationTitle');
@@ -196,17 +198,14 @@ if (confirmYesBtn) {
         closeConfirmation();
     });
 }
-
 if (confirmNoBtn) {
     confirmNoBtn.addEventListener('click', closeConfirmation);
 }
-
 if (confirmationModal) {
     confirmationModal.addEventListener('click', (e) => {
         if (e.target === confirmationModal) closeConfirmation();
     });
 }
-
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && confirmationModal && confirmationModal.classList.contains('active')) {
         closeConfirmation();
