@@ -1,6 +1,6 @@
 /* ============================================================
-   BUDGETS PAGE – ONLY Budgets-Specific Styles
-   Width & padding come from index.css (matches Dashboard)
+   BUDGETS PAGE – Budgets-Specific Styles
+   Unified hover effects from index.css
    ============================================================ */
 
 /* ----- Budget List Items ----- */
@@ -17,6 +17,7 @@
     box-sizing: border-box;
     position: relative;
     overflow: hidden;
+    box-shadow: var(--shadow);
 }
 
 .budget-item::before {
@@ -29,14 +30,21 @@
     background: var(--accent-purple);
     border-radius: 0 4px 4px 0;
     opacity: 0.6;
+    transition: opacity 0.3s ease;
 }
 
+/* ----- Hover effect (matches index.css cards) ----- */
 .budget-item:hover {
     border-color: var(--accent-purple);
     box-shadow: var(--shadow-hover);
-    transform: translateX(4px);
+    transform: translateY(-2px);
 }
 
+.budget-item:hover::before {
+    opacity: 1;
+}
+
+/* ----- Header & numbers (unchanged) ----- */
 .budget-item .budget-header {
     display: flex;
     justify-content: space-between;
@@ -125,7 +133,7 @@
     cursor: pointer;
     font-weight: 600;
     font-size: 0.75rem;
-    transition: 0.2s;
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     gap: 4px;
@@ -138,6 +146,7 @@
 .budget-item .budget-actions .edit-budget-btn:hover {
     background: #d97706;
     transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
 }
 
 .budget-item .budget-actions .delete-budget-btn {
@@ -147,6 +156,7 @@
 .budget-item .budget-actions .delete-budget-btn:hover {
     background: #dc2626;
     transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
 /* ----- Progress Bar ----- */
@@ -237,7 +247,7 @@
     }
 }
 
-/* ----- Dark mode ----- */
+/* ----- Dark mode (unchanged) ----- */
 body.dark .budget-item {
     background: var(--bg-card);
 }
