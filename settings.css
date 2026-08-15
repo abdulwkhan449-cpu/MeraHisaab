@@ -1,13 +1,45 @@
 /* ============================================================
-   SETTINGS PAGE – ONLY Settings-Specific Styles
-   Width & padding come from index.css (matches Dashboard)
+   SETTINGS PAGE – Full Styling with Dark/Light Mode
+   Matches Dashboard Design
    ============================================================ */
 
-/* ----- Settings Container – full width (no max-width) ----- */
+/* ----- CSS Variables ----- */
+:root {
+    --bg-body: #f8f9fc;
+    --bg-card: #ffffff;
+    --bg-input: #f1f4f9;
+    --text-primary: #1a1a2e;
+    --text-secondary: #6b7280;
+    --border-color: #e5e7eb;
+    --accent-purple: #7c3aed;
+    --accent-green: #10b981;
+    --accent-red: #ef4444;
+    --hover-bg: #f3f4f6;
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    --shadow-hover: 0 8px 30px rgba(124, 58, 237, 0.12);
+    --card-radius: 16px;
+    --transition: 0.3s ease;
+}
+
+/* ----- Dark Mode Variables ----- */
+body.dark {
+    --bg-body: #0f0f1a;
+    --bg-card: #1a1a2e;
+    --bg-input: #252540;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --border-color: #2d2d4a;
+    --hover-bg: #252540;
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    --shadow-hover: 0 8px 30px rgba(124, 58, 237, 0.2);
+}
+
+/* ----- Settings Container ----- */
 .settings-container {
     width: 100%;
     padding: 0;
     margin: 0;
+    max-width: 900px;
 }
 
 /* ----- Settings Section ----- */
@@ -94,12 +126,14 @@
     color: var(--text-primary);
     font-size: 0.95rem;
     transition: 0.2s;
+    outline: none;
 }
 
 .settings-card .form-group input:focus,
 .settings-card .form-group select:focus {
     outline: 2px solid var(--accent-purple);
     border-color: transparent;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
 }
 
 .settings-card .form-group input::placeholder {
@@ -128,6 +162,7 @@
     width: auto;
     margin-right: 4px;
     accent-color: var(--accent-purple);
+    cursor: pointer;
 }
 
 /* ----- Appearance Toggle ----- */
@@ -168,6 +203,7 @@
     background: white;
     border-radius: 50%;
     transition: 0.3s;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .toggle-switch input:checked + .toggle-slider {
@@ -198,6 +234,7 @@
     width: 100%;
     text-align: left;
     color: var(--text-primary);
+    font-size: 0.95rem;
 }
 
 .data-btn:hover {
@@ -257,6 +294,44 @@
 }
 
 /* ===== CONFIRMATION MODAL (Reusable) ===== */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(6px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    padding: 20px;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: 32px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-color);
+    animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
 .confirmation-modal {
     max-width: 420px;
     text-align: center;
@@ -290,73 +365,7 @@
     box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
 }
 
-/* ----- Responsive ----- */
-@media (max-width: 600px) {
-    .settings-card {
-        padding: 18px 16px;
-    }
-
-    .data-btn {
-        padding: 12px 14px;
-        gap: 12px;
-    }
-
-    .data-btn i:first-child {
-        font-size: 1.1rem;
-        width: 28px;
-    }
-
-    .settings-container {
-        padding: 0;
-    }
-
-    .settings-card .radio-group {
-        gap: 15px;
-    }
-
-    .confirmation-modal {
-        padding: 28px 20px 24px;
-    }
-}
-
-/* ----- Dark Mode Overrides ----- */
-body.dark .settings-card {
-    background: var(--bg-card);
-}
-
-body.dark .data-btn {
-    background: var(--bg-input);
-}
-
-body.dark .data-btn:hover {
-    background: var(--hover-bg);
-}
-
-body.dark .toggle-slider {
-    background: var(--border-color);
-}
-
-body.dark .settings-card .form-group input,
-body.dark .settings-card .form-group select {
-    background: var(--bg-input);
-    color: var(--text-primary);
-}
-
-body.dark .settings-card .form-group input:focus,
-body.dark .settings-card .form-group select:focus {
-    outline: 2px solid var(--accent-purple);
-}
-
-body.dark #quickAddSuccess {
-    background: rgba(16, 185, 129, 0.15);
-    color: #34d399;
-}
-
-body.dark .confirmation-modal p {
-    color: var(--text-secondary);
-}
-
-/* ----- Button Styles (reused from index.css) ----- */
+/* ===== BUTTONS ===== */
 .btn {
     padding: 12px 24px;
     border: none;
@@ -365,16 +374,19 @@ body.dark .confirmation-modal p {
     font-size: 0.95rem;
     cursor: pointer;
     transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .btn i {
-    margin-right: 8px;
+    margin-right: 4px;
 }
 
 .btn-primary {
     background: var(--accent-purple);
     color: white;
-    width: 100%;
 }
 
 .btn-primary:hover {
@@ -383,7 +395,7 @@ body.dark .confirmation-modal p {
     box-shadow: 0 8px 20px rgba(124, 58, 237, 0.3);
 }
 
-/* ----- Toast notification ----- */
+/* ===== TOAST ===== */
 .toast-container {
     position: fixed;
     bottom: 30px;
@@ -427,4 +439,154 @@ body.dark .confirmation-modal p {
         opacity: 1;
         transform: translateX(0);
     }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+    .settings-card {
+        padding: 18px 16px;
+    }
+
+    .data-btn {
+        padding: 12px 14px;
+        gap: 12px;
+    }
+
+    .data-btn i:first-child {
+        font-size: 1.1rem;
+        width: 28px;
+    }
+
+    .settings-container {
+        padding: 0;
+    }
+
+    .settings-card .radio-group {
+        gap: 15px;
+    }
+
+    .confirmation-modal {
+        padding: 28px 20px 24px;
+    }
+
+    .modal-content {
+        padding: 24px;
+        margin: 16px;
+    }
+
+    .btn {
+        padding: 10px 18px;
+        font-size: 0.85rem;
+    }
+}
+
+/* ===== DARK MODE OVERRIDES ===== */
+body.dark .settings-card {
+    background: var(--bg-card);
+}
+
+body.dark .data-btn {
+    background: var(--bg-input);
+}
+
+body.dark .data-btn:hover {
+    background: var(--hover-bg);
+}
+
+body.dark .toggle-slider {
+    background: var(--border-color);
+}
+
+body.dark .settings-card .form-group input,
+body.dark .settings-card .form-group select {
+    background: var(--bg-input);
+    color: var(--text-primary);
+}
+
+body.dark .settings-card .form-group input:focus,
+body.dark .settings-card .form-group select:focus {
+    outline: 2px solid var(--accent-purple);
+}
+
+body.dark #quickAddSuccess {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+}
+
+body.dark .confirmation-modal p {
+    color: var(--text-secondary);
+}
+
+body.dark .modal-overlay {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+/* ===== SIDEBAR OVERRIDES (matching dashboard) ===== */
+.sidebar {
+    background: var(--bg-card);
+    border-right: 1px solid var(--border-color);
+}
+
+.sidebar .logo {
+    color: var(--text-primary);
+}
+
+.sidebar .nav-item {
+    color: var(--text-secondary);
+}
+
+.sidebar .nav-item:hover {
+    background: var(--hover-bg);
+    color: var(--accent-purple);
+}
+
+.sidebar .nav-item.active {
+    background: rgba(124, 58, 237, 0.1);
+    color: var(--accent-purple);
+}
+
+.sidebar-user {
+    border-top: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.sidebar-user small {
+    color: var(--text-secondary);
+}
+
+.avatar {
+    background: var(--accent-purple);
+    color: white;
+}
+
+/* ===== HEADER ===== */
+.top-header {
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-body);
+}
+
+.top-header h1 {
+    color: var(--text-primary);
+}
+
+.subtitle {
+    color: var(--text-secondary);
+}
+
+.dark-toggle {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.dark-toggle:hover {
+    background: var(--hover-bg);
+}
+
+.hamburger {
+    color: var(--text-primary);
+}
+
+.hamburger:hover {
+    color: var(--accent-purple);
 }
