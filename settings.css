@@ -22,16 +22,18 @@
 }
 
 /* ----- Dark Mode Variables ----- */
+/* Dark Mode Variables – with !important for safety */
 body.dark {
-    --bg-body: #0f0f1a;
-    --bg-card: #1a1a2e;
-    --bg-input: #252540;
-    --text-primary: #f1f5f9;
-    --text-secondary: #94a3b8;
-    --border-color: #2d2d4a;
-    --hover-bg: #252540;
-    --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-    --shadow-hover: 0 8px 30px rgba(124, 58, 237, 0.2);
+    --bg-body: #0f0f1a !important;
+    --bg-card: #1a1a2e !important;
+    --bg-input: #252540 !important;
+    --text-primary: #f1f5f9 !important;
+    --text-secondary: #94a3b8 !important;
+    --border-color: #2d2d4a !important;
+    --hover-bg: #252540 !important;
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+    --shadow-hover: 0 8px 30px rgba(124, 58, 237, 0.2) !important;
+}  --shadow-hover: 0 8px 30px rgba(124, 58, 237, 0.2);
 }
 
 /* ----- Settings Container ----- */
