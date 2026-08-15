@@ -137,7 +137,12 @@ function loadDarkMode() {
     const isDark = saved === 'true';
     applyDarkMode(isDark);
 }
-
+const sidebarHeaderToggle = document.getElementById('sidebarHeaderToggle');
+if (sidebarHeaderToggle) {
+    sidebarHeaderToggle.addEventListener('click', () => {
+        toggleSidebar();
+    });
+}
 
 // ============================================================
 // 4. TOAST SYSTEM
