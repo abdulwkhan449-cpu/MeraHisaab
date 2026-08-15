@@ -65,45 +65,24 @@ function toggleSidebar(forceState) {
         mainContent.classList.remove('sidebar-open');
     }
     localStorage.setItem('sidebarOpen', isOpen);
-}
 
-if (menuToggle) {
-    menuToggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleSidebar();
-    });
-}
-
-if (overlay) {
-    overlay.addEventListener('click', () => {
-        if (window.innerWidth < 901) toggleSidebar(false);
-    });
-}
-
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && sidebar.classList.contains('open') && window.innerWidth < 901) {
-        toggleSidebar(false);
+    // ⬇️ NEW: Sync the toggle switch UI
+    if (sidebarVisibilitySwitch) {
+        sidebarVisibilitySwitch.checked = isOpen;
     }
-});
+}
 
-let resizeTimer;
-window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-        const isDesktop = window.innerWidth >= 901;
-        if (isDesktop && sidebar.classList.contains('open')) {
-            mainContent.classList.add('sidebar-open');
-            overlay.classList.remove('active');
-        } else {
-            mainContent.classList.remove('sidebar-open');
-        }
-        if (!isDesktop && sidebar.classList.contains('open')) {
-            overlay.classList.add('active');
-        } else if (!isDesktop) {
-            overlay.classList.remove('active');
-        }
-    }, 150);
-});
+// ============================================================
+// SIDEBAR VISIBILITY TOGGLE (Settings Page Control)
+// ============================================================
+const sidebarVisibilitySwitch = document.getElementById('sidebarVisibilitySwitch');
+
+if (sidebarVisibilitySwitch) {
+    // When the toggle changes, update the sidebar
+    sidebarVisibilitySwitch.addEventListener('change', (e) => {
+        toggleSidebar(e.target.checked);
+    });
+}
 
 // ============================================================
 // 3. DARK MODE (Improved with debugging)
