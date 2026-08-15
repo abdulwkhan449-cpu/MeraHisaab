@@ -41,10 +41,72 @@ function formatCurrency(amount) {
     return symbol + ' ' + amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
+// ============================================================
+// 2. SIDEBAR LOGIC
+// ============================================================
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('sidebarOverlay');
+const menuToggle = document.getElementById('menuToggle');
+const mainContent = document.getElementById('mainContent');
 
+function toggleSidebar(forceState) {
+    const isOpen = forceState !== undefined ? forceState : !sidebar.classList.contains('open');
+    sidebar.classList.toggle('open', isOpen);
+
+    if (window.innerWidth < 901) {
+        overlay.classList.toggle('active', isOpen);
+    } else {
+        overlay.classList.remove('active');
+    }
+
+    if (window.innerWidth >= 901) {
+        mainContent.classList.toggle('sidebar-open', isOpen);
+    } else {
+        mainContent.classList.remove('sidebar-open');
+    }
+    localStorage.setItem('sidebarOpen', isOpen);
+}
+
+if (menuToggle) {
+    menuToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleSidebar();
+    });
+}
+
+if (overlay) {
+    overlay.addEventListener('click', () => {
+        if (window.innerWidth < 901) toggleSidebar(false);
+    });
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && sidebar.classList.contains('open') && window.innerWidth < 901) {
+        toggleSidebar(false);
+    }
+});
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        const isDesktop = window.innerWidth >= 901;
+        if (isDesktop && sidebar.classList.contains('open')) {
+            mainContent.classList.add('sidebar-open');
+            overlay.classList.remove('active');
+        } else {
+            mainContent.classList.remove('sidebar-open');
+        }
+        if (!isDesktop && sidebar.classList.contains('open')) {
+            overlay.classList.add('active');
+        } else if (!isDesktop) {
+            overlay.classList.remove('active');
+        }
+    }, 150);
+});
 
 // ============================================================
-// 4. DARK MODE
+// 3. DARK MODE (Fully functional)
 // ============================================================
 const darkToggle = document.getElementById('darkModeToggle');
 const darkModeSwitch = document.getElementById('darkModeSwitch');
@@ -86,7 +148,7 @@ function loadDarkMode() {
 }
 
 // ============================================================
-// 5. TOAST SYSTEM
+// 4. TOAST SYSTEM
 // ============================================================
 function showToast(message, type = 'info') {
     const container = document.getElementById('toastContainer');
@@ -104,7 +166,7 @@ function showToast(message, type = 'info') {
 }
 
 // ============================================================
-// 6. CONFIRMATION MODAL (Reusable)
+// 5. CONFIRMATION MODAL (Reusable)
 // ============================================================
 const confirmationModal = document.getElementById('confirmationModal');
 const confirmTitle = document.getElementById('confirmationTitle');
@@ -152,7 +214,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ============================================================
-// 7. SAVE PROFILE
+// 6. SAVE PROFILE
 // ============================================================
 const saveProfileBtn = document.getElementById('saveProfileBtn');
 if (saveProfileBtn) {
@@ -178,7 +240,7 @@ if (saveProfileBtn) {
 }
 
 // ============================================================
-// 8. EXPORT AS CSV
+// 7. EXPORT AS CSV
 // ============================================================
 const exportBtn = document.getElementById('exportDataBtn');
 if (exportBtn) {
@@ -220,7 +282,7 @@ if (exportBtn) {
 }
 
 // ============================================================
-// 9. EXPORT AS PDF
+// 8. EXPORT AS PDF
 // ============================================================
 const exportPdfBtn = document.getElementById('exportPdfBtn');
 if (exportPdfBtn) {
@@ -290,7 +352,7 @@ if (exportPdfBtn) {
 }
 
 // ============================================================
-// 10. EXPORT AS TEXT
+// 9. EXPORT AS TEXT
 // ============================================================
 const exportTextBtn = document.getElementById('exportTextBtn');
 if (exportTextBtn) {
@@ -352,7 +414,7 @@ if (exportTextBtn) {
 }
 
 // ============================================================
-// 11. IMPORT DATA
+// 10. IMPORT DATA
 // ============================================================
 const importBtn = document.getElementById('importDataBtn');
 const fileInput = document.getElementById('fileInput');
@@ -433,7 +495,7 @@ if (importBtn && fileInput) {
 }
 
 // ============================================================
-// 12. CLEAR ALL DATA
+// 11. CLEAR ALL DATA
 // ============================================================
 const clearBtn = document.getElementById('clearDataBtn');
 if (clearBtn) {
@@ -457,7 +519,7 @@ if (clearBtn) {
 }
 
 // ============================================================
-// 13. LOGOUT
+// 12. LOGOUT
 // ============================================================
 const logoutBtn = document.getElementById('settingsLogoutBtn');
 if (logoutBtn) {
@@ -474,7 +536,7 @@ if (logoutBtn) {
 }
 
 // ============================================================
-// 14. QUICK ADD MONEY
+// 13. QUICK ADD MONEY
 // ============================================================
 const quickForm = document.getElementById('quickAddForm');
 const quickDescription = document.getElementById('quickDescription');
@@ -537,29 +599,21 @@ if (quickForm) {
 }
 
 // ============================================================
-// 15. LISTEN FOR STORAGE CHANGES
+// 14. LISTEN FOR STORAGE CHANGES
 // ============================================================
 window.addEventListener('storage', (e) => {
     if (e.key === 'userProfile') {
         loadUserProfile();
         updateUIWithUser();
-        loadDarkMode();
     }
     if (e.key === 'darkMode') {
         const isDark = e.newValue === 'true';
         applyDarkMode(isDark);
     }
-    if (e.key === 'sidebarOpen') {
-        const isOpen = e.newValue === 'true';
-        const sidebarVisibilitySwitch = document.getElementById('sidebarVisibilitySwitch');
-        if (sidebarVisibilitySwitch) {
-            sidebarVisibilitySwitch.checked = isOpen;
-        }
-    }
 });
 
 // ============================================================
-// 16. INITIALIZATION
+// 15. INITIALIZATION
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
     const hasUser = loadUserProfile();
