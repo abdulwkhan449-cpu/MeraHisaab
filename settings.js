@@ -1,11 +1,11 @@
 // ============================================================
-// 0. USER PROFILE & GLOBAL STATE
+// USER PROFILE & GLOBAL STATE
 // ============================================================
 let userProfile = { name: 'Guest', currency: 'PKR', symbol: 'Rs' };
 const CURRENCY_SYMBOLS = { PKR: 'Rs', USD: '$', EUR: '€', GBP: '£', INR: '₹', JPY: '¥' };
 
 // ============================================================
-// 1. LOAD USER PROFILE
+// LOAD USER PROFILE
 // ============================================================
 function loadUserProfile() {
     const stored = localStorage.getItem('userProfile');
@@ -42,7 +42,7 @@ function formatCurrency(amount) {
 }
 
 // ============================================================
-// 2. SIDEBAR LOGIC
+// SIDEBAR LOGIC
 // ============================================================
 const sidebar = document.getElementById('sidebar');
 const overlay = document.getElementById('sidebarOverlay');
@@ -73,13 +73,11 @@ if (menuToggle) {
         toggleSidebar();
     });
 }
-
 if (overlay) {
     overlay.addEventListener('click', () => {
         if (window.innerWidth < 901) toggleSidebar(false);
     });
 }
-
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && sidebar.classList.contains('open') && window.innerWidth < 901) {
         toggleSidebar(false);
@@ -106,12 +104,16 @@ window.addEventListener('resize', () => {
 });
 
 // ============================================================
-// 3. DARK MODE (FIXED)
+// DARK MODE – FIXED (with debug logs)
 // ============================================================
 const darkToggle = document.getElementById('darkModeToggle');
 const darkModeSwitch = document.getElementById('darkModeSwitch');
 
+console.log('Dark toggle element:', darkToggle);
+console.log('Dark switch element:', darkModeSwitch);
+
 function applyDarkMode(isDark) {
+    console.log('Applying dark mode:', isDark);
     if (isDark) {
         document.body.classList.add('dark');
         if (darkToggle) darkToggle.innerHTML = '<i class="fas fa-sun"></i> Light';
@@ -122,7 +124,6 @@ function applyDarkMode(isDark) {
         if (darkModeSwitch) darkModeSwitch.checked = false;
     }
     localStorage.setItem('darkMode', isDark);
-    // Dispatch event to notify other tabs (optional)
     window.dispatchEvent(new Event('storage'));
 }
 
@@ -131,26 +132,32 @@ function toggleDarkMode() {
     applyDarkMode(isDark);
 }
 
-// Attach event listeners
+// Attach events
 if (darkToggle) {
     darkToggle.addEventListener('click', toggleDarkMode);
-    console.log('Dark toggle attached');
+    console.log('Dark toggle event attached');
+} else {
+    console.warn('Dark toggle button not found!');
 }
+
 if (darkModeSwitch) {
     darkModeSwitch.addEventListener('change', (e) => {
         applyDarkMode(e.target.checked);
     });
-    console.log('Dark switch attached');
+    console.log('Dark switch event attached');
+} else {
+    console.warn('Dark mode switch not found!');
 }
 
 function loadDarkMode() {
     const saved = localStorage.getItem('darkMode');
     const isDark = saved === 'true';
+    console.log('Loading dark mode from storage:', isDark);
     applyDarkMode(isDark);
 }
 
 // ============================================================
-// 4. TOAST SYSTEM
+// TOAST SYSTEM
 // ============================================================
 function showToast(message, type = 'info') {
     const container = document.getElementById('toastContainer');
@@ -168,7 +175,7 @@ function showToast(message, type = 'info') {
 }
 
 // ============================================================
-// 5. CONFIRMATION MODAL
+// CONFIRMATION MODAL
 // ============================================================
 const confirmationModal = document.getElementById('confirmationModal');
 const confirmTitle = document.getElementById('confirmationTitle');
@@ -213,7 +220,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ============================================================
-// 6. SAVE PROFILE
+// SAVE PROFILE
 // ============================================================
 const saveProfileBtn = document.getElementById('saveProfileBtn');
 if (saveProfileBtn) {
@@ -239,7 +246,7 @@ if (saveProfileBtn) {
 }
 
 // ============================================================
-// 7. EXPORT AS CSV
+// EXPORT CSV
 // ============================================================
 const exportBtn = document.getElementById('exportDataBtn');
 if (exportBtn) {
@@ -281,7 +288,7 @@ if (exportBtn) {
 }
 
 // ============================================================
-// 8. EXPORT AS PDF
+// EXPORT PDF
 // ============================================================
 const exportPdfBtn = document.getElementById('exportPdfBtn');
 if (exportPdfBtn) {
@@ -351,7 +358,7 @@ if (exportPdfBtn) {
 }
 
 // ============================================================
-// 9. EXPORT AS TEXT
+// EXPORT TEXT
 // ============================================================
 const exportTextBtn = document.getElementById('exportTextBtn');
 if (exportTextBtn) {
@@ -413,7 +420,7 @@ if (exportTextBtn) {
 }
 
 // ============================================================
-// 10. IMPORT DATA
+// IMPORT DATA
 // ============================================================
 const importBtn = document.getElementById('importDataBtn');
 const fileInput = document.getElementById('fileInput');
@@ -494,7 +501,7 @@ if (importBtn && fileInput) {
 }
 
 // ============================================================
-// 11. CLEAR ALL DATA
+// CLEAR ALL DATA
 // ============================================================
 const clearBtn = document.getElementById('clearDataBtn');
 if (clearBtn) {
@@ -518,7 +525,7 @@ if (clearBtn) {
 }
 
 // ============================================================
-// 12. LOGOUT
+// LOGOUT
 // ============================================================
 const logoutBtn = document.getElementById('settingsLogoutBtn');
 if (logoutBtn) {
@@ -535,7 +542,7 @@ if (logoutBtn) {
 }
 
 // ============================================================
-// 13. QUICK ADD MONEY
+// QUICK ADD MONEY
 // ============================================================
 const quickForm = document.getElementById('quickAddForm');
 const quickDescription = document.getElementById('quickDescription');
@@ -598,7 +605,7 @@ if (quickForm) {
 }
 
 // ============================================================
-// 14. LISTEN FOR STORAGE CHANGES
+// STORAGE LISTENER
 // ============================================================
 window.addEventListener('storage', (e) => {
     if (e.key === 'userProfile') {
@@ -612,7 +619,7 @@ window.addEventListener('storage', (e) => {
 });
 
 // ============================================================
-// 15. INITIALIZATION
+// INIT
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
     const hasUser = loadUserProfile();
@@ -621,13 +628,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Load dark mode
     loadDarkMode();
-
-    // Update UI with user data
     updateUIWithUser();
 
-    // Restore sidebar state
     const savedSidebarState = localStorage.getItem('sidebarOpen');
     const isDesktop = window.innerWidth >= 901;
     let defaultOpen = isDesktop;
