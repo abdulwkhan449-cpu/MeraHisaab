@@ -5,41 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MeraHisaab · Settings</title>
 
-    <!-- Google Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
-
-    <!-- Favicon -->
     <link rel="icon" href="./image.png" type="image/x-icon" />
-
-    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- jsPDF for PDF export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
-    <!-- Base CSS (Sidebar & Themes) -->
     <link rel="stylesheet" href="index.css" />
-
-    <!-- Settings-specific styles -->
     <link rel="stylesheet" href="settings.css" />
 </head>
 <body>
 
-    <!-- ===== TOAST CONTAINER ===== -->
     <div id="toastContainer" class="toast-container"></div>
 
-    <!-- ========================================================== -->
-    <!-- MAIN APP                                                   -->
-    <!-- ========================================================== -->
     <div class="app-container">
 
-        <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="logo">
                 <span class="logo-icon"><i class="fas fa-chart-pie"></i></span>
@@ -58,10 +41,8 @@
             </div>
         </aside>
 
-        <!-- Overlay -->
         <div class="overlay" id="sidebarOverlay"></div>
 
-        <!-- Main Content -->
         <main class="main-content" id="mainContent">
 
             <header class="top-header">
@@ -78,10 +59,9 @@
                 </div>
             </header>
 
-            <!-- Settings Sections -->
             <div class="settings-container">
 
-                <!-- ===== PROFILE SECTION ===== -->
+                <!-- Profile Section -->
                 <div class="settings-section">
                     <div class="section-header">
                         <i class="fas fa-user-circle text-purple-600"></i>
@@ -110,7 +90,7 @@
                     </div>
                 </div>
 
-                <!-- ===== QUICK ADD MONEY SECTION ===== -->
+                <!-- Quick Add -->
                 <div class="settings-section">
                     <div class="section-header">
                         <i class="fas fa-plus-circle text-purple-600"></i>
@@ -157,7 +137,7 @@
                     </div>
                 </div>
 
-                <!-- ===== APPEARANCE SECTION ===== -->
+                <!-- Appearance (only Dark Mode) -->
                 <div class="settings-section">
                     <div class="section-header">
                         <i class="fas fa-palette text-purple-600"></i>
@@ -165,7 +145,6 @@
                         <span class="section-subtitle">Customize how MeraHisaab looks</span>
                     </div>
                     <div class="settings-card">
-                        <!-- Dark Mode Toggle ONLY -->
                         <div class="appearance-option">
                             <div class="flex items-center justify-between w-full">
                                 <div>
@@ -178,11 +157,10 @@
                                 </label>
                             </div>
                         </div>
-                        <!-- Sidebar Visibility toggle removed -->
                     </div>
                 </div>
 
-                <!-- ===== DATA MANAGEMENT SECTION ===== -->
+                <!-- Data Management -->
                 <div class="settings-section">
                     <div class="section-header">
                         <i class="fas fa-database text-purple-600"></i>
@@ -236,7 +214,7 @@
                     </div>
                 </div>
 
-                <!-- ===== ACCOUNT SECTION ===== -->
+                <!-- Account -->
                 <div class="settings-section">
                     <div class="section-header">
                         <i class="fas fa-shield-alt text-purple-600"></i>
@@ -255,7 +233,7 @@
                     </div>
                 </div>
 
-                <!-- ===== ABOUT SECTION ===== -->
+                <!-- About -->
                 <div class="settings-section">
                     <div class="section-header">
                         <i class="fas fa-info-circle text-purple-600"></i>
@@ -278,9 +256,7 @@
         </main>
     </div>
 
-    <!-- ========================================================== -->
-    <!-- CONFIRMATION MODAL                                          -->
-    <!-- ========================================================== -->
+    <!-- Confirmation Modal -->
     <div id="confirmationModal" class="modal-overlay">
         <div class="modal-content confirmation-modal">
             <div class="confirmation-icon">
@@ -299,9 +275,7 @@
         </div>
     </div>
 
-    <!-- ========================================================== -->
-    <!-- SETTINGS MODAL (reused from index)                        -->
-    <!-- ========================================================== -->
+    <!-- Settings Modal (reused) -->
     <div id="settingsModal" class="modal-overlay">
         <div class="modal-content">
             <h2 class="text-2xl font-bold mb-4"><i class="fas fa-cog"></i> Settings</h2>
