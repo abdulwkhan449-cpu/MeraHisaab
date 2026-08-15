@@ -535,7 +535,7 @@ body.dark .modal-overlay {
 }
 
 .sidebar .logo {
-    color: var(--text-primary);
+   color: #7C3AED !important;
 }
 
 .sidebar .nav-item {
