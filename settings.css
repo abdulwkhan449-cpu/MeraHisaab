@@ -22,27 +22,40 @@
 }
 
 /* ----- Dark Mode Variables ----- */
-/* Dark Mode Variables – with !important for safety */
 body.dark {
-    --bg-body: #0f0f1a !important;
-    --bg-card: #1a1a2e !important;
-    --bg-input: #252540 !important;
-    --text-primary: #f1f5f9 !important;
-    --text-secondary: #94a3b8 !important;
-    --border-color: #2d2d4a !important;
-    --hover-bg: #252540 !important;
-    --shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
-    --shadow-hover: 0 8px 30px rgba(124, 58, 237, 0.2) !important;
-}  --shadow-hover: 0 8px 30px rgba(124, 58, 237, 0.2);
+    --bg-body: #0f0f1a;
+    --bg-card: #1a1a2e;
+    --bg-input: #252540;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --border-color: #2d2d4a;
+    --hover-bg: #252540;
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    --shadow-hover: 0 8px 30px rgba(124, 58, 237, 0.2);
 }
 
-/* ----- Settings Container ----- */
+/* ----- Sidebar logo color ----- */
+.sidebar .logo .logo-icon i,
+.sidebar .logo span {
+    color: #7C3AED !important;
+}
+
+/* ----- Fix main content layout: push when sidebar is open ----- */
+.main-content {
+    transition: margin-left 0.3s ease;
+    margin-left: 0;
+}
+.main-content.sidebar-open {
+    margin-left: 260px; /* sidebar width */
+}
+
+/* ----- Settings Container – full width ----- */
 .settings-container {
     width: 100%;
-    max-width: 100% !important;  
-    padding: 0;
-    margin: 0;
-    max-width: 900px;
+    max-width: 100% !important;
+    padding: 0 20px;
+    margin: 0 auto;
+    box-sizing: border-box;
 }
 
 /* ----- Settings Section ----- */
@@ -83,6 +96,9 @@ body.dark {
         margin-left: 0;
         width: 100%;
         padding-left: 44px;
+    }
+    .main-content.sidebar-open {
+        margin-left: 0 !important;
     }
 }
 
@@ -269,6 +285,12 @@ body.dark {
 .export-btn i:first-child {
     color: #10b981;
 }
+.pdf-btn i:first-child {
+    color: #ef4444;
+}
+.text-btn i:first-child {
+    color: #3b82f6;
+}
 .import-btn i:first-child {
     color: #3b82f6;
 }
@@ -283,13 +305,6 @@ body.dark {
 #quickAddSuccess {
     animation: fadeInUp 0.5s ease;
     display: none;
-}
-
-.pdf-btn i:first-child {
-    color: #ef4444;  /* red */
-}
-.text-btn i:first-child {
-    color: #3b82f6;  /* blue */
 }
 
 @keyframes fadeInUp {
@@ -468,7 +483,7 @@ body.dark {
     }
 
     .settings-container {
-        padding: 0;
+        padding: 0 10px;
     }
 
     .settings-card .radio-group {
@@ -538,7 +553,7 @@ body.dark .modal-overlay {
 }
 
 .sidebar .logo {
-   color: #7C3AED !important;
+    color: var(--text-primary);
 }
 
 .sidebar .nav-item {
@@ -584,10 +599,11 @@ body.dark .modal-overlay {
 }
 
 .dark-toggle {
-    color: var(--text-primary);
     background: var(--bg-card);
     border: 1px solid var(--border-color);
+    color: var(--text-primary);
 }
+
 .dark-toggle:hover {
     background: var(--hover-bg);
 }
