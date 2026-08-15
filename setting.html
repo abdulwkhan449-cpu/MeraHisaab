@@ -185,44 +185,59 @@
                     </div>
                 </div>
 
-                <!-- ===== DATA MANAGEMENT SECTION ===== -->
-                <div class="settings-section">
-                    <div class="section-header">
-                        <i class="fas fa-database text-purple-600"></i>
-                        <h2>Data Management</h2>
-                        <span class="section-subtitle">Export, import, or clear your data</span>
-                    </div>
-                    <div class="settings-card">
-                        <div class="data-actions">
-                            <button class="data-btn export-btn" id="exportDataBtn">
-                                <i class="fas fa-file-export"></i>
-                                <div>
-                                    <span class="font-semibold">Export Data</span>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Download all transactions as CSV</p>
-                                </div>
-                                <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
-                            </button>
-                            <button class="data-btn import-btn" id="importDataBtn">
-                                <i class="fas fa-file-import"></i>
-                                <div>
-                                    <span class="font-semibold">Import Data</span>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Import transactions from CSV file</p>
-                                </div>
-                                <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
-                            </button>
-                            <input type="file" id="fileInput" accept=".csv" style="display: none;" />
-                            <button class="data-btn clear-btn" id="clearDataBtn">
-                                <i class="fas fa-trash-alt"></i>
-                                <div>
-                                    <span class="font-semibold text-red-500">Clear All Data</span>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Permanently delete all transactions</p>
-                                </div>
-                                <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
-                            </button>
-                        </div>
-                    </div>
+               <!-- ===== DATA MANAGEMENT SECTION ===== -->
+<div class="settings-section">
+    <div class="section-header">
+        <i class="fas fa-database text-purple-600"></i>
+        <h2>Data Management</h2>
+        <span class="section-subtitle">Export, import, or clear your data</span>
+    </div>
+    <div class="settings-card">
+        <div class="data-actions">
+            <button class="data-btn export-btn" id="exportDataBtn">
+                <i class="fas fa-file-export"></i>
+                <div>
+                    <span class="font-semibold">Export as CSV</span>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Download all transactions as CSV</p>
                 </div>
-
+                <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
+            </button>
+            <button class="data-btn pdf-btn" id="exportPdfBtn">
+                <i class="fas fa-file-pdf"></i>
+                <div>
+                    <span class="font-semibold">Export as PDF</span>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Download transactions as PDF document</p>
+                </div>
+                <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
+            </button>
+            <button class="data-btn text-btn" id="exportTextBtn">
+                <i class="fas fa-file-alt"></i>
+                <div>
+                    <span class="font-semibold">Export as Text</span>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Download transactions as text file</p>
+                </div>
+                <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
+            </button>
+            <button class="data-btn import-btn" id="importDataBtn">
+                <i class="fas fa-file-import"></i>
+                <div>
+                    <span class="font-semibold">Import Data</span>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Import transactions from CSV file</p>
+                </div>
+                <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
+            </button>
+            <input type="file" id="fileInput" accept=".csv" style="display: none;" />
+            <button class="data-btn clear-btn" id="clearDataBtn">
+                <i class="fas fa-trash-alt"></i>
+                <div>
+                    <span class="font-semibold text-red-500">Clear All Data</span>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Permanently delete all transactions</p>
+                </div>
+                <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
+            </button>
+        </div>
+    </div>
+</div>
                 <!-- ===== ACCOUNT SECTION ===== -->
                 <div class="settings-section">
                     <div class="section-header">
