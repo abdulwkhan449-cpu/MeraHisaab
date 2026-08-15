@@ -19,17 +19,15 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <!-- jsPDF for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
     <!-- Base CSS (Sidebar & Themes) -->
     <link rel="stylesheet" href="index.css" />
 
     <!-- Settings-specific styles -->
     <link rel="stylesheet" href="settings.css" />
-
-    <!-- jsPDF -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<!-- jspdf-autotable -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-    
 </head>
 <body>
 
@@ -74,13 +72,10 @@
                         <p class="subtitle">Manage your account and preferences</p>
                     </div>
                 </div>
-<div class="header-actions">
-    <span id="headerCurrencyDisplay" class="font-semibold text-gray-500 dark:text-gray-400">PKR</span>
-    <button class="dark-toggle" id="sidebarHeaderToggle" title="Toggle Sidebar">
-        <i class="fas fa-bars"></i>
-    </button>
-    <button class="dark-toggle" id="darkModeToggle"><i class="fas fa-moon"></i> Dark</button>
-</div>
+                <div class="header-actions">
+                    <span id="headerCurrencyDisplay" class="font-semibold text-gray-500 dark:text-gray-400">PKR</span>
+                    <button class="dark-toggle" id="darkModeToggle"><i class="fas fa-moon"></i> Dark</button>
+                </div>
             </header>
 
             <!-- Settings Sections -->
@@ -161,98 +156,86 @@
                         </div>
                     </div>
                 </div>
-<!-- ===== APPEARANCE SECTION ===== -->
-<div class="settings-section">
-    <div class="section-header">
-        <i class="fas fa-palette text-purple-600"></i>
-        <h2>Appearance</h2>
-        <span class="section-subtitle">Customize how MeraHisaab looks</span>
-    </div>
-    <div class="settings-card">
-        <!-- Dark Mode Toggle -->
-        <div class="appearance-option">
-            <div class="flex items-center justify-between w-full">
-                <div>
-                    <span class="font-semibold"><i class="fas fa-moon"></i> Dark Mode</span>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Switch between light and dark themes</p>
-                </div>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="darkModeSwitch" />
-                    <span class="toggle-slider"></span>
-                </label>
-            </div>
-        </div>
-    </div>
-</div>
 
-        <!-- NEW: Sidebar Visibility Toggle -->
-        <div class="appearance-option border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
-            <div class="flex items-center justify-between w-full">
-                <div>
-                    <span class="font-semibold"><i class="fas fa-sidebar"></i> Sidebar Visibility</span>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Show or hide the sidebar</p>
+                <!-- ===== APPEARANCE SECTION ===== -->
+                <div class="settings-section">
+                    <div class="section-header">
+                        <i class="fas fa-palette text-purple-600"></i>
+                        <h2>Appearance</h2>
+                        <span class="section-subtitle">Customize how MeraHisaab looks</span>
+                    </div>
+                    <div class="settings-card">
+                        <!-- Dark Mode Toggle ONLY -->
+                        <div class="appearance-option">
+                            <div class="flex items-center justify-between w-full">
+                                <div>
+                                    <span class="font-semibold"><i class="fas fa-moon"></i> Dark Mode</span>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Switch between light and dark themes</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="darkModeSwitch" />
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <!-- Sidebar Visibility toggle removed -->
+                    </div>
                 </div>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="sidebarVisibilitySwitch" checked />
-                    <span class="toggle-slider"></span>
-                </label>
-            </div>
-        </div>
-    </div>
-</div>
-               <!-- ===== DATA MANAGEMENT SECTION ===== -->
-<div class="settings-section">
-    <div class="section-header">
-        <i class="fas fa-database text-purple-600"></i>
-        <h2>Data Management</h2>
-        <span class="section-subtitle">Export, import, or clear your data</span>
-    </div>
-    <div class="settings-card">
-        <div class="data-actions">
-            <button class="data-btn export-btn" id="exportDataBtn">
-                <i class="fas fa-file-export"></i>
-                <div>
-                    <span class="font-semibold">Export as CSV</span>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">Download all transactions as CSV</p>
+
+                <!-- ===== DATA MANAGEMENT SECTION ===== -->
+                <div class="settings-section">
+                    <div class="section-header">
+                        <i class="fas fa-database text-purple-600"></i>
+                        <h2>Data Management</h2>
+                        <span class="section-subtitle">Export, import, or clear your data</span>
+                    </div>
+                    <div class="settings-card">
+                        <div class="data-actions">
+                            <button class="data-btn export-btn" id="exportDataBtn">
+                                <i class="fas fa-file-export"></i>
+                                <div>
+                                    <span class="font-semibold">Export as CSV</span>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Download all transactions as CSV</p>
+                                </div>
+                                <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
+                            </button>
+                            <button class="data-btn pdf-btn" id="exportPdfBtn">
+                                <i class="fas fa-file-pdf"></i>
+                                <div>
+                                    <span class="font-semibold">Export as PDF</span>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Download transactions as PDF document</p>
+                                </div>
+                                <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
+                            </button>
+                            <button class="data-btn text-btn" id="exportTextBtn">
+                                <i class="fas fa-file-alt"></i>
+                                <div>
+                                    <span class="font-semibold">Export as Text</span>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Download transactions as text file</p>
+                                </div>
+                                <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
+                            </button>
+                            <button class="data-btn import-btn" id="importDataBtn">
+                                <i class="fas fa-file-import"></i>
+                                <div>
+                                    <span class="font-semibold">Import Data</span>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Import transactions from CSV file</p>
+                                </div>
+                                <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
+                            </button>
+                            <input type="file" id="fileInput" accept=".csv" style="display: none;" />
+                            <button class="data-btn clear-btn" id="clearDataBtn">
+                                <i class="fas fa-trash-alt"></i>
+                                <div>
+                                    <span class="font-semibold text-red-500">Clear All Data</span>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Permanently delete all transactions</p>
+                                </div>
+                                <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
-            </button>
-            <button class="data-btn pdf-btn" id="exportPdfBtn">
-                <i class="fas fa-file-pdf"></i>
-                <div>
-                    <span class="font-semibold">Export as PDF</span>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">Download transactions as PDF document</p>
-                </div>
-                <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
-            </button>
-            <button class="data-btn text-btn" id="exportTextBtn">
-                <i class="fas fa-file-alt"></i>
-                <div>
-                    <span class="font-semibold">Export as Text</span>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">Download transactions as text file</p>
-                </div>
-                <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
-            </button>
-            <button class="data-btn import-btn" id="importDataBtn">
-                <i class="fas fa-file-import"></i>
-                <div>
-                    <span class="font-semibold">Import Data</span>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">Import transactions from CSV file</p>
-                </div>
-                <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
-            </button>
-            <input type="file" id="fileInput" accept=".csv" style="display: none;" />
-            <button class="data-btn clear-btn" id="clearDataBtn">
-                <i class="fas fa-trash-alt"></i>
-                <div>
-                    <span class="font-semibold text-red-500">Clear All Data</span>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">Permanently delete all transactions</p>
-                </div>
-                <i class="fas fa-chevron-right ml-auto text-gray-400"></i>
-            </button>
-        </div>
-    </div>
-</div>
+
                 <!-- ===== ACCOUNT SECTION ===== -->
                 <div class="settings-section">
                     <div class="section-header">
@@ -296,7 +279,7 @@
     </div>
 
     <!-- ========================================================== -->
-    <!-- CONFIRMATION MODAL (Reusable)                               -->
+    <!-- CONFIRMATION MODAL                                          -->
     <!-- ========================================================== -->
     <div id="confirmationModal" class="modal-overlay">
         <div class="modal-content confirmation-modal">
@@ -317,7 +300,7 @@
     </div>
 
     <!-- ========================================================== -->
-    <!-- SETTINGS MODAL (reused from index)                         -->
+    <!-- SETTINGS MODAL (reused from index)                        -->
     <!-- ========================================================== -->
     <div id="settingsModal" class="modal-overlay">
         <div class="modal-content">
