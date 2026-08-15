@@ -359,6 +359,132 @@ if (importBtn && fileInput) {
 }
 
 // ============================================================
+// 8b. EXPORT AS PDF
+// ============================================================
+const exportPdfBtn = document.getElementById('exportPdfBtn');
+if (exportPdfBtn) {
+    exportPdfBtn.addEventListener('click', () => {
+        const stored = localStorage.getItem('financeData');
+        if (!stored) {
+            showToast('No data to export.', 'error');
+            return;
+        }
+        const transactions = JSON.parse(stored);
+        if (transactions.length === 0) {
+            showToast('No transactions to export.', 'error');
+            return;
+        }
+
+        // Sort by date (newest first)
+        const sorted = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        // Prepare data rows
+        const rows = sorted.map(tx => [
+            tx.date || '',
+            tx.description || '',
+            tx.category || 'Other',
+            tx.type || 'expense',
+            formatCurrency(tx.amount)
+        ]);
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('landscape', 'mm', 'a4');
+        const pageWidth = doc.internal.pageSize.getWidth();
+
+        // Title
+        doc.setFontSize(18);
+        doc.setTextColor(40);
+        doc.text('MeraHisaab - Transaction Report', pageWidth / 2, 15, { align: 'center' });
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth / 2, 22, { align: 'center' });
+        doc.text(`User: ${userProfile.name}`, pageWidth / 2, 28, { align: 'center' });
+
+        // Table
+        doc.autoTable({
+            head: [['Date', 'Description', 'Category', 'Type', 'Amount']],
+            body: rows,
+            startY: 35,
+            theme: 'striped',
+            headStyles: { fillColor: [124, 58, 237], textColor: 255, fontSize: 10 },
+            bodyStyles: { fontSize: 9 },
+            columnStyles: {
+                0: { cellWidth: 30 },
+                1: { cellWidth: 60 },
+                2: { cellWidth: 30 },
+                3: { cellWidth: 25 },
+                4: { cellWidth: 30, halign: 'right' }
+            },
+            margin: { left: 10, right: 10 }
+        });
+
+        // Save PDF
+        doc.save(`merahisaab_transactions_${new Date().toISOString().slice(0, 10)}.pdf`);
+        showToast(`✅ PDF exported successfully!`, 'success');
+    });
+}
+
+// ============================================================
+// 8c. EXPORT AS TEXT
+// ============================================================
+const exportTextBtn = document.getElementById('exportTextBtn');
+if (exportTextBtn) {
+    exportTextBtn.addEventListener('click', () => {
+        const stored = localStorage.getItem('financeData');
+        if (!stored) {
+            showToast('No data to export.', 'error');
+            return;
+        }
+        const transactions = JSON.parse(stored);
+        if (transactions.length === 0) {
+            showToast('No transactions to export.', 'error');
+            return;
+        }
+
+        // Sort by date (newest first)
+        const sorted = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        // Build text content
+        let text = '========================================\n';
+        text += '  MERAHISAAB - TRANSACTION REPORT\n';
+        text += '========================================\n';
+        text += `  User: ${userProfile.name}\n`;
+        text += `  Generated: ${new Date().toLocaleString()}\n`;
+        text += `  Currency: ${userProfile.currency} (${userProfile.symbol})\n`;
+        text += `  Total transactions: ${sorted.length}\n`;
+        text += '========================================\n\n';
+        text += 'Date       | Description              | Category         | Type    | Amount\n';
+        text += '-----------+--------------------------+------------------+---------+--------\n';
+
+        sorted.forEach(tx => {
+            const date = (tx.date || '').padEnd(10);
+            const desc = (tx.description || '').padEnd(24).slice(0, 24);
+            const cat = (tx.category || 'Other').padEnd(16).slice(0, 16);
+            const type = (tx.type || 'expense').padEnd(7).slice(0, 7);
+            const amount = formatCurrency(tx.amount).padStart(8);
+            text += `${date} | ${desc} | ${cat} | ${type} | ${amount}\n`;
+        });
+
+        text += '\n========================================\n';
+        text += '  End of report\n';
+        text += '========================================\n';
+
+        // Create and download text file
+        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `merahisaab_transactions_${new Date().toISOString().slice(0, 10)}.txt`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        showToast(`✅ Text file exported successfully!`, 'success');
+    });
+}
+
+// ============================================================
 // 9. CLEAR ALL DATA (with custom confirmation)
 // ============================================================
 const clearBtn = document.getElementById('clearDataBtn');
