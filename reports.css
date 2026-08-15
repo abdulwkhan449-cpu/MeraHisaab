@@ -1,9 +1,9 @@
 /* ============================================================
    report PAGE – report-Specific Styles
-   Unified hover effects from index.css
+   Unified hover effects from settings.css
    ============================================================ */
 
-/* ----- Budget List Items ----- */
+/* ----- Budget List Items (reports) ----- */
 .budget-item {
     display: flex;
     flex-direction: column;
@@ -12,7 +12,7 @@
     border: 1px solid var(--border-color);
     border-radius: 14px;
     margin-bottom: 14px;
-    transition: all 0.3s ease;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
     width: 100%;
     box-sizing: border-box;
     position: relative;
@@ -33,11 +33,11 @@
     transition: opacity 0.3s ease;
 }
 
-/* ----- Hover effect (matches index.css cards) ----- */
+/* ----- Hover effect (mirrors settings-card) ----- */
 .budget-item:hover {
     border-color: var(--accent-purple);
     box-shadow: var(--shadow-hover);
-    transform: translateY(-2px);
+    /* no transform – matches settings.css exactly */
 }
 
 .budget-item:hover::before {
