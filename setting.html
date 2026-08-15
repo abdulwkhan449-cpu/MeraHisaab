@@ -159,38 +159,43 @@
                     </div>
                 </div>
 
-                <!-- ===== APPEARANCE SECTION ===== -->
-                <div class="settings-section">
-                    <div class="section-header">
-                        <i class="fas fa-palette text-purple-600"></i>
-                        <h2>Appearance</h2>
-                        <span class="section-subtitle">Customize how MeraHisaab looks</span>
-                    </div>
-                    <div class="settings-card">
-                        <div class="appearance-option">
-                            <div class="flex items-center justify-between w-full">
-                                <div>
-                                    <span class="font-semibold"><i class="fas fa-moon"></i> Dark Mode</span>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Switch between light and dark themes</p>
-                                </div>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="darkModeSwitch" />
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="appearance-option border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
-                            <div class="flex items-center justify-between w-full">
-                                <div>
-                                    <span class="font-semibold"><i class="fas fa-sidebar"></i> Sidebar Behavior</span>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Sidebar pushes content on desktop</p>
-                                </div>
-                                <span class="text-sm text-gray-400">Always on</span>
-                            </div>
-                        </div>
-                    </div>
+              <!-- ===== APPEARANCE SECTION ===== -->
+<div class="settings-section">
+    <div class="section-header">
+        <i class="fas fa-palette text-purple-600"></i>
+        <h2>Appearance</h2>
+        <span class="section-subtitle">Customize how MeraHisaab looks</span>
+    </div>
+    <div class="settings-card">
+        <!-- Dark Mode Toggle -->
+        <div class="appearance-option">
+            <div class="flex items-center justify-between w-full">
+                <div>
+                    <span class="font-semibold"><i class="fas fa-moon"></i> Dark Mode</span>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Switch between light and dark themes</p>
                 </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="darkModeSwitch" />
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
 
+        <!-- NEW: Sidebar Visibility Toggle -->
+        <div class="appearance-option border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
+            <div class="flex items-center justify-between w-full">
+                <div>
+                    <span class="font-semibold"><i class="fas fa-sidebar"></i> Sidebar Visibility</span>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Show or hide the sidebar</p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="sidebarVisibilitySwitch" checked />
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
                <!-- ===== DATA MANAGEMENT SECTION ===== -->
 <div class="settings-section">
     <div class="section-header">
