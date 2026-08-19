@@ -1,7 +1,7 @@
 /* ============================================================
    REPORTS PAGE – Complete Styles
    FIXED: Monthly chart compact (no empty space),
-          Combined doughnut + top spending (left/right)
+          Two separate boxes: Doughnut (left) + Top Spending (right)
    ============================================================ */
 
 /* ===== CHART BOXES ===== */
@@ -97,7 +97,7 @@
 }
 
 /* ============================================================
-   SUMMARY CARDS – VERTICAL ON MOBILE
+   SUMMARY CARDS
    ============================================================ */
 .summary-grid {
     display: grid;
@@ -186,42 +186,28 @@
 }
 
 /* ============================================================
-   COMBINED LAYOUT – Doughnut + Top Spending (LEFT/RIGHT)
+   DOUGHNUT BOX (Left) – Centered Chart
    ============================================================ */
-.combined-chart-box {
-    padding: 1.5rem;
-}
-
-.combined-chart-layout {
+.doughnut-box .chart-wrapper {
+    max-height: 280px;
     display: flex;
-    flex-direction: row;
-    gap: 2rem;
-    align-items: stretch;
-    width: 100%;
-}
-
-/* LEFT: Top Spending List */
-.top-spending-section {
-    flex: 1;
-    min-width: 0;
-    max-width: 50%;
-    display: flex;
-    flex-direction: column;
-}
-
-.top-spending-section h3 {
-    font-weight: 600;
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    margin-bottom: 0.75rem;
-    letter-spacing: 0.3px;
-    display: flex;
+    justify-content: center;
     align-items: center;
-    gap: 0.5rem;
+    padding: 4px 0;
 }
 
+.doughnut-box .chart-wrapper canvas {
+    max-width: 260px !important;
+    max-height: 260px !important;
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 auto;
+}
+
+/* ============================================================
+   TOP SPENDING BOX (Right) – List
+   ============================================================ */
 #topSpendingList {
-    flex: 1;
     max-height: 240px;
     overflow-y: auto;
     padding-right: 6px;
@@ -263,33 +249,22 @@
     max-width: 100%;
 }
 
-/* RIGHT: Doughnut Chart */
-.doughnut-section {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    max-width: 50%;
+/* Scrollbar */
+#topSpendingList::-webkit-scrollbar {
+    width: 4px;
+}
+#topSpendingList::-webkit-scrollbar-track {
+    background: var(--bg-body);
+    border-radius: 99px;
+}
+#topSpendingList::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 99px;
 }
 
-.doughnut-section .chart-wrapper {
-    width: 100%;
-    max-height: 280px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 4px 0;
-}
-
-.doughnut-section .chart-wrapper canvas {
-    max-width: 260px !important;
-    max-height: 260px !important;
-    width: 100% !important;
-    height: auto !important;
-    margin: 0 auto;
-}
-
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
 .chart-empty-msg {
     text-align: center;
     color: var(--text-secondary);
@@ -299,7 +274,7 @@
 }
 
 /* ============================================================
-   RESPONSIVE – MOBILE
+   RESPONSIVE – MOBILE (Stack: Doughnut upar, List neechay)
    ============================================================ */
 
 @media (max-width: 768px) {
@@ -307,6 +282,15 @@
     .summary-grid {
         grid-template-columns: 1fr !important;
         gap: 0.75rem;
+    }
+
+    /* === ROW – Single column === */
+    .row {
+        grid-template-columns: 1fr !important;
+        gap: 1.25rem;
+    }
+    .row .chart-box.full-width-chart {
+        grid-column: 1 / 1 !important;
     }
 
     .chart-box {
@@ -322,28 +306,13 @@
         max-height: 200px !important;
     }
 
-    /* === COMBINED LAYOUT – Stack vertically === */
-    .combined-chart-layout {
-        flex-direction: column !important;
-        gap: 1.5rem;
-        align-items: stretch;
-    }
-
-    .top-spending-section {
-        max-width: 100% !important;
-        flex: none;
-    }
-
-    .doughnut-section {
-        max-width: 100% !important;
-        flex: none;
-    }
-
-    .doughnut-section .chart-wrapper canvas {
+    /* === DOUGHNUT – Mobile size === */
+    .doughnut-box .chart-wrapper canvas {
         max-width: 220px !important;
         max-height: 220px !important;
     }
 
+    /* === TOP SPENDING – Mobile === */
     #topSpendingList {
         max-height: 180px;
     }
@@ -399,10 +368,6 @@
         font-size: 0.7rem;
         padding: 0.2rem 0.6rem;
     }
-
-    .combined-chart-box {
-        padding: 1rem;
-    }
 }
 
 /* Extra small phones (< 480px) */
@@ -412,36 +377,27 @@
         border-radius: 1rem;
     }
 
-    .combined-chart-box {
-        padding: 0.75rem;
-    }
-
-    .combined-chart-layout {
-        gap: 1rem;
-    }
-
-    .doughnut-section .chart-wrapper canvas {
-        max-width: 180px !important;
-        max-height: 180px !important;
-    }
-
-    .top-spending-section h3 {
-        font-size: 0.75rem;
-    }
-
-    .spending-item .category-name {
-        font-size: 0.7rem;
-    }
-    .spending-item .category-amount {
-        font-size: 0.7rem;
-    }
-
     .chart-box:has(#monthlyChart) .chart-wrapper {
         max-height: 180px;
         min-height: 140px;
     }
     .chart-box:has(#monthlyChart) .chart-wrapper canvas {
         max-height: 160px !important;
+    }
+
+    .doughnut-box .chart-wrapper canvas {
+        max-width: 180px !important;
+        max-height: 180px !important;
+    }
+
+    #topSpendingList {
+        max-height: 160px;
+    }
+    .spending-item .category-name {
+        font-size: 0.75rem;
+    }
+    .spending-item .category-amount {
+        font-size: 0.75rem;
     }
 }
 
