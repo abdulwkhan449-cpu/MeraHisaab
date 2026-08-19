@@ -1,6 +1,6 @@
 /* ============================================================
    REPORTS PAGE – Complete Styles
-   Mobile summary cards – same best styling as dashboard
+   Mobile summary cards – same layout & styling as dashboard
    ============================================================ */
 
 /* ===== CHART BOXES ===== */
@@ -273,11 +273,12 @@
 }
 
 /* ============================================================
-   RESPONSIVE – MOBILE (Same best styling as dashboard)
+   RESPONSIVE – MOBILE (Same layout as dashboard)
    ============================================================ */
 
 @media (max-width: 768px) {
-    /* === SUMMARY CARDS – VERTICAL, TALL & PROFESSIONAL === */
+    /* === SUMMARY CARDS – VERTICAL, LEFT-RIGHT LAYOUT === */
+    /* Same as dashboard – tall & professional */
     .summary-grid {
         display: flex;
         flex-direction: column;
