@@ -1,6 +1,7 @@
 /* ============================================================
    COMPLETE CSS – MeraHisaab (Dashboard + Reports)
-   FIXED: card overflow, chart centering, monthly chart full-width + bottom aligned
+   FIXED: Mobile summary cards stacked vertically,
+          Doughnut chart enlarged & professional
    ============================================================ */
 
 /* ===== RESET & BASE ===== */
@@ -334,13 +335,16 @@ body {
     font-size: 0.85rem;
 }
 
-/* ===== SUMMARY CARDS (FIXED OVERFLOW) ===== */
+/* ============================================================
+   SUMMARY CARDS – MOBILE STACKED VERTICALLY
+   ============================================================ */
 .summary-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 1rem;
     margin-bottom: 2rem;
 }
+
 .card {
     background: var(--bg-card);
     border-radius: var(--card-radius);
@@ -490,17 +494,21 @@ body {
     color: var(--text-primary);
 }
 
-/* ===== CHART WRAPPER – BASE ===== */
+/* ============================================================
+   CHART WRAPPER – DOUGHNUT ENLARGED
+   ============================================================ */
 .chart-wrapper {
     position: relative;
     width: 100%;
-    max-height: 300px;
+    max-height: 360px;
     margin: 0 auto;
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
+    padding: 8px 0;
 }
+
 .chart-wrapper canvas {
     display: block;
     width: 100% !important;
@@ -508,23 +516,42 @@ body {
     margin: 0 auto;
 }
 
-/* ----- Doughnut charts (Dashboard + Expense Breakdown) stay centered & compact ----- */
-#expenseChart,
+/* ----- DASHBOARD DOUGHNUT – ENLARGED ----- */
+#expenseChart {
+    max-width: 420px !important;
+    max-height: 420px !important;
+}
+
+/* ----- Reports Doughnut (stays centered & compact) ----- */
 #categoryChart {
     max-width: 280px !important;
     max-height: 280px !important;
 }
 
-/* ----- Monthly Bar Chart – FULL WIDTH + BOTTOM ALIGNED ----- */
-/* The container for monthly chart */
+.chart-empty-msg {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 2rem 0;
+    display: none;
+}
+
+/* ============================================================
+   MONTHLY CHART (Reports) – Full Width + Bottom Aligned
+   ============================================================ */
+.chart-box:has(#monthlyChart) {
+    display: flex;
+    flex-direction: column;
+}
+
 .chart-box:has(#monthlyChart) .chart-wrapper {
+    flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
     align-items: stretch;
     max-height: 320px;
     min-height: 260px;
-    padding-bottom: 6px;
+    padding-bottom: 4px;
 }
 
 .chart-box:has(#monthlyChart) .chart-wrapper canvas {
@@ -533,24 +560,6 @@ body {
     width: 100% !important;
     height: auto !important;
     margin: 0;
-}
-
-/* Ensure the chart-box itself uses flex column to push chart down */
-.chart-box:has(#monthlyChart) {
-    display: flex;
-    flex-direction: column;
-}
-
-.chart-box:has(#monthlyChart) .chart-wrapper {
-    flex: 1;
-}
-
-/* ===== EMPTY STATE ===== */
-.chart-empty-msg {
-    text-align: center;
-    color: var(--text-secondary);
-    padding: 2rem 0;
-    display: none;
 }
 
 /* ===== TRANSACTION LIST ===== */
@@ -813,8 +822,13 @@ body {
    RESPONSIVE – MOBILE FIRST
    ============================================================ */
 
-/* Tablet and smaller */
+/* === MOBILE: Summary Cards Stack Vertically === */
 @media (max-width: 768px) {
+    .summary-grid {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem;
+    }
+
     .row {
         grid-template-columns: 1fr !important;
         gap: 1.25rem;
@@ -830,20 +844,28 @@ body {
         padding: 1rem;
     }
 
-    /* Monthly chart on mobile – keep full width but smaller height */
+    /* === DASHBOARD DOUGHNUT – Larger on Mobile === */
+    .chart-wrapper {
+        max-height: 320px;
+    }
+    #expenseChart {
+        max-width: 320px !important;
+        max-height: 320px !important;
+    }
+
+    /* Reports doughnut */
+    #categoryChart {
+        max-width: 200px !important;
+        max-height: 200px !important;
+    }
+
+    /* Monthly chart on mobile */
     .chart-box:has(#monthlyChart) .chart-wrapper {
         max-height: 240px;
         min-height: 180px;
     }
     .chart-box:has(#monthlyChart) .chart-wrapper canvas {
         max-height: 220px !important;
-    }
-
-    /* Doughnut charts on mobile */
-    #expenseChart,
-    #categoryChart {
-        max-width: 200px !important;
-        max-height: 200px !important;
     }
 
     #topSpendingList {
@@ -883,10 +905,6 @@ body {
         width: 3px;
     }
 
-    .summary-grid {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: 0.75rem;
-    }
     .card {
         padding: 1rem;
     }
@@ -904,32 +922,7 @@ body {
         border-radius: 1rem;
     }
 
-    .chart-box:has(#monthlyChart) .chart-wrapper {
-        max-height: 200px;
-        min-height: 150px;
-    }
-    .chart-box:has(#monthlyChart) .chart-wrapper canvas {
-        max-height: 180px !important;
-    }
-
-    #expenseChart,
-    #categoryChart {
-        max-width: 160px !important;
-        max-height: 160px !important;
-    }
-
-    #topSpendingList {
-        max-height: 160px;
-    }
-    .spending-item .category-name {
-        font-size: 0.75rem;
-    }
-    .spending-item .category-amount {
-        font-size: 0.75rem;
-    }
-
     .summary-grid {
-        grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
         gap: 0.5rem;
     }
     .card {
@@ -943,6 +936,38 @@ body {
     }
     .card-footer {
         font-size: 0.65rem;
+    }
+
+    /* === DASHBOARD DOUGHNUT – Even larger on very small screens === */
+    .chart-wrapper {
+        max-height: 280px;
+    }
+    #expenseChart {
+        max-width: 280px !important;
+        max-height: 280px !important;
+    }
+
+    #categoryChart {
+        max-width: 160px !important;
+        max-height: 160px !important;
+    }
+
+    .chart-box:has(#monthlyChart) .chart-wrapper {
+        max-height: 200px;
+        min-height: 150px;
+    }
+    .chart-box:has(#monthlyChart) .chart-wrapper canvas {
+        max-height: 180px !important;
+    }
+
+    #topSpendingList {
+        max-height: 160px;
+    }
+    .spending-item .category-name {
+        font-size: 0.75rem;
+    }
+    .spending-item .category-amount {
+        font-size: 0.75rem;
     }
 
     .filter-bar {
