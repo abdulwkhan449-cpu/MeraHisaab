@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
     <title>MeraHisaab · Budgets</title>
 
-    <!-- Favicon (same as other pages) -->
+    <!-- Favicon -->
     <link rel="icon" href="./image.png" type="image/x-icon" />
 
     <!-- Google Font -->
@@ -16,13 +16,8 @@
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Base CSS (Sidebar & Themes) -->
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="index.css" />
-
-    <!-- Budgets-specific styles -->
     <link rel="stylesheet" href="budgets.css" />
 
 </head>
@@ -40,13 +35,13 @@
         <aside class="sidebar" id="sidebar">
             <div class="logo">
                 <span class="logo-icon"><i class="fas fa-chart-pie"></i></span>
-                <span>MeraHissab</span>
+                <span>MeraHisaab</span>
             </div>
             <nav class="sidebar-nav">
                 <a href="index.html" class="nav-item"><i class="fas fa-home"></i> Dashboard</a>
                 <a href="report.html" class="nav-item"><i class="fas fa-chart-line"></i> Reports</a>
                 <a href="budget.html" class="nav-item active"><i class="fas fa-wallet"></i> Budgets</a>
-                <a href="setting.html" class="nav-item" id="settingsNavTrigger"><i class="fas fa-cog"></i> Settings</a>
+                <a href="#" class="nav-item" id="settingsNavTrigger"><i class="fas fa-cog"></i> Settings</a>
             </nav>
             <div class="sidebar-user">
                 <div class="avatar" id="userAvatar">JD</div>
@@ -70,7 +65,7 @@
                     </div>
                 </div>
                 <div class="header-actions">
-                    <span id="headerCurrencyDisplay" class="font-semibold text-gray-500 dark:text-gray-400">PKR</span>
+                    <span id="headerCurrencyDisplay" class="font-semibold text-gray-500">PKR</span>
                     <button class="dark-toggle" id="darkModeToggle"><i class="fas fa-moon"></i> Dark</button>
                     <button class="btn btn-primary px-5 py-2" id="addBudgetBtn">
                         <i class="fas fa-plus"></i> New Budget
@@ -78,48 +73,58 @@
                 </div>
             </header>
 
-            <!-- Summary Cards (same as Dashboard) -->
+            <!-- ===== SUMMARY CARDS (Updated structure for mobile) ===== -->
             <section class="summary-grid">
                 <div class="card card-balance">
-                    <div class="card-header"><i class="fas fa-wallet"></i> Total Budget</div>
-                    <div class="card-value" id="totalBudgetDisplay">Rs0.00</div>
+                    <div class="card-left">
+                        <div class="card-header"><i class="fas fa-wallet"></i> Total Budget</div>
+                        <div class="card-value" id="totalBudgetDisplay">Rs0.00</div>
+                    </div>
                     <div class="card-footer">Across all categories</div>
                 </div>
                 <div class="card card-income">
-                    <div class="card-header"><i class="fas fa-arrow-up"></i> Total Spent</div>
-                    <div class="card-value" id="totalSpentDisplay">Rs0.00</div>
+                    <div class="card-left">
+                        <div class="card-header"><i class="fas fa-arrow-up"></i> Total Spent</div>
+                        <div class="card-value" id="totalSpentDisplay">Rs0.00</div>
+                    </div>
                     <div class="card-footer">Against budgets</div>
                 </div>
                 <div class="card card-savings">
-                    <div class="card-header"><i class="fas fa-percentage"></i> Overall Usage</div>
-                    <div class="card-value" id="overallUsageDisplay">0%</div>
+                    <div class="card-left">
+                        <div class="card-header"><i class="fas fa-percentage"></i> Overall Usage</div>
+                        <div class="card-value" id="overallUsageDisplay">0%</div>
+                    </div>
                     <div class="card-footer">of total budget used</div>
                 </div>
             </section>
 
-            <!-- Filter Bar (Year + Month) – same as Dashboard -->
+            <!-- Filter Bar (Year + Month) -->
             <div class="filter-bar">
                 <div class="filter-left">
-                    <label for="yearFilter"><i class="fas fa-calendar-alt"></i> Year:</label>
-                    <select id="yearFilter" class="px-4 py-2 rounded-lg border dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white font-semibold">
-                        <!-- populated by JS -->
-                    </select>
-                    <label for="monthFilter">Month:</label>
-                    <select id="monthFilter" class="px-4 py-2 rounded-lg border dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white font-semibold">
-                        <option value="all">All</option>
-                        <option value="01">January</option>
-                        <option value="02">February</option>
-                        <option value="03">March</option>
-                        <option value="04">April</option>
-                        <option value="05">May</option>
-                        <option value="06">June</option>
-                        <option value="07">July</option>
-                        <option value="08">August</option>
-                        <option value="09">September</option>
-                        <option value="10">October</option>
-                        <option value="11">November</option>
-                        <option value="12">December</option>
-                    </select>
+                    <div class="filter-group">
+                        <label for="yearFilter"><i class="fas fa-calendar-alt"></i> Year:</label>
+                        <select id="yearFilter">
+                            <!-- populated by JS -->
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="monthFilter">Month:</label>
+                        <select id="monthFilter">
+                            <option value="all">All</option>
+                            <option value="01">January</option>
+                            <option value="02">February</option>
+                            <option value="03">March</option>
+                            <option value="04">April</option>
+                            <option value="05">May</option>
+                            <option value="06">June</option>
+                            <option value="07">July</option>
+                            <option value="08">August</option>
+                            <option value="09">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="filter-right">
                     <span class="stat-badge" id="budgetCountBadge"><i class="fas fa-list"></i> 0 Budgets</span>
@@ -131,7 +136,7 @@
             <div class="list-box">
                 <div class="list-header">
                     <h2 class="text-xl font-semibold"><i class="fas fa-wallet text-purple-600"></i> Your Budgets</h2>
-                    <span id="listPeriodLabel" class="text-sm text-gray-500 dark:text-gray-400">For Full Year 2026</span>
+                    <span id="listPeriodLabel" class="text-sm text-gray-500">For Full Year 2026</span>
                 </div>
                 <div id="budgetList">
                     <!-- Rendered by JS -->
@@ -162,22 +167,22 @@
             <div class="form-group">
                 <label for="budgetMonth">Month (YYYY-MM)</label>
                 <input type="month" id="budgetMonth" required />
-                <small class="text-gray-500 dark:text-gray-400 block mt-1">Select the month this budget applies to.</small>
+                <small class="text-gray-500 block mt-1">Select the month this budget applies to.</small>
             </div>
             <div class="form-group">
                 <label for="budgetAmount">Monthly Limit</label>
                 <input type="number" id="budgetAmount" placeholder="0.00" step="0.01" min="0.01" required />
-                <small class="text-gray-500 dark:text-gray-400 block mt-1">Set your spending limit for this category per month.</small>
+                <small class="text-gray-500 block mt-1">Set your spending limit for this category per month.</small>
             </div>
             <div class="flex flex-wrap gap-3 mt-4">
                 <button class="btn btn-primary flex-1" id="saveBudgetBtn"><i class="fas fa-save"></i> Save Budget</button>
-                <button class="btn flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300" id="closeBudgetBtn">Cancel</button>
+                <button class="btn btn-secondary flex-1" id="closeBudgetBtn">Cancel</button>
             </div>
         </div>
     </div>
 
     <!-- ========================================================== -->
-    <!-- SETTINGS MODAL (reused from index)                         -->
+    <!-- SETTINGS MODAL                                             -->
     <!-- ========================================================== -->
     <div id="settingsModal" class="modal-overlay">
         <div class="modal-content">
@@ -199,7 +204,7 @@
             </div>
             <div class="flex flex-wrap gap-3 mt-4">
                 <button class="btn btn-primary flex-1" id="saveSettingsBtn"><i class="fas fa-save"></i> Save Changes</button>
-                <button class="btn flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300" id="closeSettingsBtn">Cancel</button>
+                <button class="btn btn-secondary flex-1" id="closeSettingsBtn">Cancel</button>
             </div>
         </div>
     </div>
