@@ -16,14 +16,9 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
-    <!-- Base CSS (Sidebar & Themes) -->
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="index.css" />
-
-    <!-- Reports-specific styles -->
     <link rel="stylesheet" href="reports.css" />
-
-        <!-- Favicon -->
-    <link rel="icon" href="./image.png" type="image/x-icon" />
 
 </head>
 <body>
@@ -75,14 +70,12 @@
                 </div>
             </header>
 
-            <!-- Filter Bar (Year + Month) -->
+            <!-- Filter Bar -->
             <div class="filter-bar">
                 <div class="filter-left">
                     <div class="filter-group">
                         <label for="yearFilter"><i class="fas fa-calendar-alt"></i> Year:</label>
-                        <select id="yearFilter">
-                            <!-- Options populated by JS -->
-                        </select>
+                        <select id="yearFilter"></select>
                     </div>
                     <div class="filter-group">
                         <label for="monthFilter">Month:</label>
@@ -108,21 +101,27 @@
                 </div>
             </div>
 
-            <!-- Summary Cards -->
+            <!-- ===== SUMMARY CARDS (Updated structure for mobile) ===== -->
             <section class="summary-grid">
                 <div class="card card-income">
-                    <div class="card-header"><i class="fas fa-arrow-up"></i> Total Income</div>
-                    <div class="card-value" id="totalIncomeDisplay">Rs0.00</div>
+                    <div class="card-left">
+                        <div class="card-header"><i class="fas fa-arrow-up"></i> Total Income</div>
+                        <div class="card-value" id="totalIncomeDisplay">Rs0.00</div>
+                    </div>
                     <div class="card-footer">For selected period</div>
                 </div>
                 <div class="card card-expense">
-                    <div class="card-header"><i class="fas fa-arrow-down"></i> Total Expenses</div>
-                    <div class="card-value" id="totalExpenseDisplay">Rs0.00</div>
+                    <div class="card-left">
+                        <div class="card-header"><i class="fas fa-arrow-down"></i> Total Expenses</div>
+                        <div class="card-value" id="totalExpenseDisplay">Rs0.00</div>
+                    </div>
                     <div class="card-footer">For selected period</div>
                 </div>
                 <div class="card card-balance">
-                    <div class="card-header"><i class="fas fa-wallet"></i> Net Savings</div>
-                    <div class="card-value" id="netSavingsDisplay">Rs0.00</div>
+                    <div class="card-left">
+                        <div class="card-header"><i class="fas fa-wallet"></i> Net Savings</div>
+                        <div class="card-value" id="netSavingsDisplay">Rs0.00</div>
+                    </div>
                     <div class="card-footer" id="netStatus">+ Rs0.00 saved</div>
                 </div>
             </section>
@@ -137,25 +136,24 @@
                 </div>
             </div>
 
-           <!-- Bottom Row: Doughnut (Left) + Top Spending (Right) -->
-<div class="row">
-    <!-- LEFT: Doughnut Chart -->
-    <div class="chart-box doughnut-box">
-        <h2 class="text-xl font-semibold mb-2"><i class="fas fa-chart-pie text-purple-600"></i> Expense Breakdown</h2>
-        <div class="chart-wrapper">
-            <canvas id="categoryChart"></canvas>
-        </div>
-        <p id="chartEmptyMsg" class="chart-empty-msg">No expenses this period.</p>
-    </div>
+            <!-- Bottom Row: Doughnut (Left) + Top Spending (Right) -->
+            <div class="row">
+                <div class="chart-box doughnut-box">
+                    <h2 class="text-xl font-semibold mb-2"><i class="fas fa-chart-pie text-purple-600"></i> Expense Breakdown</h2>
+                    <div class="chart-wrapper">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                    <p id="chartEmptyMsg" class="chart-empty-msg">No expenses this period.</p>
+                </div>
 
-    <!-- RIGHT: Top Spending List -->
-    <div class="chart-box top-spending-box">
-        <h2 class="text-xl font-semibold mb-2"><i class="fas fa-list text-purple-600"></i> Top Spending Categories</h2>
-        <div id="topSpendingList" class="space-y-2 max-h-52 overflow-y-auto">
-            <!-- Rendered by JS -->
-        </div>
-    </div>
-</div>
+                <div class="chart-box top-spending-box">
+                    <h2 class="text-xl font-semibold mb-2"><i class="fas fa-list text-purple-600"></i> Top Spending Categories</h2>
+                    <div id="topSpendingList" class="space-y-2 max-h-52 overflow-y-auto">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 
