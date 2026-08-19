@@ -1,8 +1,9 @@
 /* ============================================================
-   REPORTS PAGE – Complete Styles
-   FIXED: Monthly chart full-width + bottom aligned, 
-          Doughnut chart centered, mobile responsive,
-          Dark mode support
+   REPORTS PAGE – Complete Updated Styles
+   FIXED: Mobile summary cards vertical stack,
+          Filter section professional layout,
+          Monthly chart height increased,
+          Doughnut chart enlarged like dashboard
    ============================================================ */
 
 /* ===== CHART BOXES ===== */
@@ -23,7 +24,81 @@
     box-shadow: var(--shadow-hover);
 }
 
-/* ===== CHART WRAPPER – BASE ===== */
+/* ===== FILTER BAR – Professional Layout ===== */
+.filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem 1.25rem;
+    background: var(--bg-card);
+    border-radius: 1rem;
+    box-shadow: var(--shadow);
+}
+
+.filter-left {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    flex-wrap: wrap;
+}
+
+.filter-left .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.filter-left label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.filter-left select {
+    padding: 0.4rem 0.75rem;
+    border-radius: 0.5rem;
+    border: 1.5px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    min-width: 100px;
+}
+
+.filter-left select:focus {
+    border-color: var(--accent-purple);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+}
+
+.filter-right {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.stat-badge {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    background: var(--bg-input);
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+/* ============================================================
+   CHART WRAPPER – BASE
+   ============================================================ */
 .chart-wrapper {
     position: relative;
     width: 100%;
@@ -43,8 +118,8 @@
 
 /* ============================================================
    MONTHLY CHART (Bar Chart) – Full Width + Bottom Aligned
+   Height increased to match box scale
    ============================================================ */
-/* Target the chart-box that contains monthlyChart */
 .chart-box:has(#monthlyChart) {
     display: flex;
     flex-direction: column;
@@ -56,26 +131,31 @@
     flex-direction: column;
     justify-content: flex-end;
     align-items: stretch;
-    max-height: 320px;
-    min-height: 260px;
+    max-height: 400px;        /* Increased height */
+    min-height: 320px;        /* Taller minimum */
     padding-bottom: 4px;
 }
 
 .chart-box:has(#monthlyChart) .chart-wrapper canvas {
     max-width: 100% !important;
-    max-height: 300px !important;
+    max-height: 380px !important;  /* Taller chart */
     width: 100% !important;
     height: auto !important;
     margin: 0;
 }
 
 /* ============================================================
-   DOUGHNUT CHARTS (Expense Breakdown) – Centered & Compact
+   DOUGHNUT CHARTS (Expense Breakdown) – ENLARGED like Dashboard
    ============================================================ */
-#categoryChart,
+#categoryChart {
+    max-width: 420px !important;
+    max-height: 420px !important;
+}
+
+/* Dashboard doughnut also uses this */
 #expenseChart {
-    max-width: 280px !important;
-    max-height: 280px !important;
+    max-width: 420px !important;
+    max-height: 420px !important;
 }
 
 /* ============================================================
@@ -329,24 +409,75 @@
 
 /* Tablet and smaller */
 @media (max-width: 768px) {
+    /* === SUMMARY CARDS – VERTICAL STACK === */
+    .summary-grid {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem;
+    }
+
     .chart-box {
         padding: 1rem;
     }
 
-    /* Monthly chart on mobile – smaller height but still full width */
-    .chart-box:has(#monthlyChart) .chart-wrapper {
-        max-height: 240px;
-        min-height: 180px;
-    }
-    .chart-box:has(#monthlyChart) .chart-wrapper canvas {
-        max-height: 220px !important;
+    /* === FILTER SECTION – Stack labels & selects === */
+    .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
     }
 
-    /* Doughnut charts on mobile */
+    .filter-left {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .filter-left .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .filter-left label {
+        min-width: 50px;
+        font-size: 0.8rem;
+    }
+
+    .filter-left select {
+        flex: 1;
+        min-width: 0;
+        padding: 0.35rem 0.6rem;
+        font-size: 0.8rem;
+    }
+
+    .filter-right {
+        justify-content: center;
+        width: 100%;
+        gap: 0.4rem;
+    }
+
+    .stat-badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.6rem;
+    }
+
+    /* === MONTHLY CHART – Mobile height adjusted === */
+    .chart-box:has(#monthlyChart) .chart-wrapper {
+        max-height: 300px;
+        min-height: 220px;
+    }
+    .chart-box:has(#monthlyChart) .chart-wrapper canvas {
+        max-height: 280px !important;
+    }
+
+    /* === DOUGHNUT CHART – Larger on mobile === */
     #categoryChart,
     #expenseChart {
-        max-width: 200px !important;
-        max-height: 200px !important;
+        max-width: 320px !important;
+        max-height: 320px !important;
     }
 
     /* Top spending list */
@@ -388,6 +519,13 @@
     .budget-item::before {
         width: 3px;
     }
+
+    .card {
+        padding: 1rem;
+    }
+    .card-value {
+        font-size: 1.2rem;
+    }
 }
 
 /* Extra small phones (< 480px) */
@@ -397,18 +535,36 @@
         border-radius: 1rem;
     }
 
-    .chart-box:has(#monthlyChart) .chart-wrapper {
-        max-height: 200px;
-        min-height: 150px;
+    .summary-grid {
+        gap: 0.5rem;
     }
-    .chart-box:has(#monthlyChart) .chart-wrapper canvas {
-        max-height: 180px !important;
+    .card {
+        padding: 0.75rem;
+    }
+    .card-header {
+        font-size: 0.7rem;
+    }
+    .card-value {
+        font-size: 1.0rem;
+    }
+    .card-footer {
+        font-size: 0.65rem;
     }
 
+    /* Monthly chart – even smaller */
+    .chart-box:has(#monthlyChart) .chart-wrapper {
+        max-height: 240px;
+        min-height: 170px;
+    }
+    .chart-box:has(#monthlyChart) .chart-wrapper canvas {
+        max-height: 220px !important;
+    }
+
+    /* Doughnut chart – slightly smaller but still visible */
     #categoryChart,
     #expenseChart {
-        max-width: 160px !important;
-        max-height: 160px !important;
+        max-width: 260px !important;
+        max-height: 260px !important;
     }
 
     #topSpendingList {
@@ -419,6 +575,18 @@
     }
     .spending-item .category-amount {
         font-size: 0.75rem;
+    }
+
+    .filter-left .filter-group {
+        flex-wrap: wrap;
+    }
+    .filter-left label {
+        min-width: 40px;
+        font-size: 0.75rem;
+    }
+    .filter-left select {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.5rem;
     }
 }
 
