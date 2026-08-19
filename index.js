@@ -19,7 +19,6 @@ function loadUserProfile() {
         if (!userProfile.symbol || !CURRENCY_SYMBOLS[userProfile.currency]) {
             userProfile.symbol = CURRENCY_SYMBOLS[userProfile.currency] || 'Rs';
         }
-        console.log('✅ Profile loaded:', userProfile);
         return true;
     }
     return false;
@@ -32,7 +31,6 @@ function saveUserProfile(name, currency, initialBalance = 0) {
         symbol: CURRENCY_SYMBOLS[currency] || 'Rs'
     };
     localStorage.setItem('userProfile', JSON.stringify(userProfile));
-    console.log('✅ Profile saved:', userProfile);
     
     if (initialBalance > 0) {
         const today = new Date().toISOString().slice(0, 10);
@@ -48,7 +46,6 @@ function saveUserProfile(name, currency, initialBalance = 0) {
         txs.push(newTx);
         localStorage.setItem('financeData', JSON.stringify(txs));
     }
-    
     showLoginPage(false);
     initApp();
     renderAll();
@@ -60,11 +57,10 @@ function updateUIWithUser() {
     const initials = userProfile.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
     document.getElementById('userAvatar').textContent = initials;
     document.getElementById('headerCurrencyDisplay').textContent = userProfile.currency;
-    console.log('🔄 UI updated with currency:', userProfile.currency, 'symbol:', userProfile.symbol);
 }
 
 // ============================================================
-// LOGIN PAGE (with force-clear)
+// LOGIN
 // ============================================================
 function showLoginPage(show) {
     const loginPage = document.getElementById('loginPage');
@@ -72,17 +68,8 @@ function showLoginPage(show) {
     if (show) {
         loginPage.classList.remove('hidden');
         appContainer.style.display = 'none';
-
-        const nameInput = document.getElementById('loginName');
-        const balanceInput = document.getElementById('loginBalance');
-        nameInput.value = '';
-        balanceInput.value = '';
-        nameInput.setAttribute('autocomplete', 'off');
-        balanceInput.setAttribute('autocomplete', 'off');
-        setTimeout(() => {
-            nameInput.value = '';
-            balanceInput.value = '';
-        }, 50);
+        document.getElementById('loginName').value = '';
+        document.getElementById('loginBalance').value = '';
     } else {
         loginPage.classList.add('hidden');
         appContainer.style.display = 'flex';
@@ -97,7 +84,7 @@ function logoutUser() {
 }
 
 // ============================================================
-// 1. SIDEBAR LOGIC
+// 1. SIDEBAR
 // ============================================================
 const sidebar = document.getElementById('sidebar');
 const overlay = document.getElementById('sidebarOverlay');
@@ -107,17 +94,10 @@ const mainContent = document.getElementById('mainContent');
 function toggleSidebar(forceState) {
     const isOpen = forceState !== undefined ? forceState : !sidebar.classList.contains('open');
     sidebar.classList.toggle('open', isOpen);
-
     if (window.innerWidth < 901) {
         overlay.classList.toggle('active', isOpen);
     } else {
         overlay.classList.remove('active');
-    }
-
-    if (window.innerWidth >= 901) {
-        mainContent.classList.toggle('sidebar-open', isOpen);
-    } else {
-        mainContent.classList.remove('sidebar-open');
     }
     localStorage.setItem('sidebarOpen', isOpen);
 }
@@ -136,12 +116,8 @@ window.addEventListener('resize', () => {
     resizeTimer = setTimeout(() => {
         const isDesktop = window.innerWidth >= 901;
         if (isDesktop && sidebar.classList.contains('open')) {
-            mainContent.classList.add('sidebar-open');
             overlay.classList.remove('active');
-        } else {
-            mainContent.classList.remove('sidebar-open');
-        }
-        if (!isDesktop && sidebar.classList.contains('open')) {
+        } else if (!isDesktop && sidebar.classList.contains('open')) {
             overlay.classList.add('active');
         } else if (!isDesktop) {
             overlay.classList.remove('active');
@@ -165,14 +141,9 @@ function openSettings() {
     settingsCurrency.value = userProfile.currency;
     settingsModal.classList.add('active');
 }
-function closeSettings() {
-    settingsModal.classList.remove('active');
-}
+function closeSettings() { settingsModal.classList.remove('active'); }
 
-if (settingsNavTrigger) {
-    settingsNavTrigger.addEventListener('click', openSettings);
-}
-
+if (settingsNavTrigger) settingsNavTrigger.addEventListener('click', openSettings);
 closeSettingsBtn.addEventListener('click', closeSettings);
 settingsModal.addEventListener('click', (e) => {
     if (e.target === settingsModal) closeSettings();
@@ -182,7 +153,6 @@ saveSettingsBtn.addEventListener('click', () => {
     const name = settingsName.value.trim();
     const currency = settingsCurrency.value;
     if (!name) return showToast('Please enter a name.', 'error');
-    
     userProfile.name = name;
     userProfile.currency = currency;
     userProfile.symbol = CURRENCY_SYMBOLS[currency] || 'Rs';
@@ -190,13 +160,10 @@ saveSettingsBtn.addEventListener('click', () => {
     updateUIWithUser();
     renderAll();
     closeSettings();
-    showToast('✅ Settings updated successfully!', 'success');
+    showToast('✅ Settings updated!', 'success');
 });
 
-logoutBtn.addEventListener('click', () => {
-    closeSettings();
-    logoutUser();
-});
+logoutBtn.addEventListener('click', () => { closeSettings(); logoutUser(); });
 
 // ============================================================
 // 3. LOGIN HANDLER
@@ -206,30 +173,19 @@ const loginName = document.getElementById('loginName');
 const loginBalance = document.getElementById('loginBalance');
 const loginCurrency = document.getElementById('loginCurrency');
 
-loginName.value = '';
-loginBalance.value = '';
-
 loginBtn.addEventListener('click', () => {
     const name = loginName.value.trim();
     const currency = loginCurrency.value;
     const balance = parseFloat(loginBalance.value) || 0;
-    
-    if (!name) {
-        showToast('Please enter your name.', 'error');
-        return;
-    }
+    if (!name) { showToast('Please enter your name.', 'error'); return; }
     saveUserProfile(name, currency, balance);
 });
 
-loginBalance.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') loginBtn.click();
-});
-loginName.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') loginBtn.click();
-});
+loginBalance.addEventListener('keydown', (e) => { if (e.key === 'Enter') loginBtn.click(); });
+loginName.addEventListener('keydown', (e) => { if (e.key === 'Enter') loginBtn.click(); });
 
 // ============================================================
-// 4. MAIN APP STATE
+// 4. STATE
 // ============================================================
 let transactions = [];
 let editingId = null;
@@ -263,27 +219,20 @@ const topCategoryBadge = document.getElementById('topCategoryBadge');
 const toastContainer = document.getElementById('toastContainer');
 
 // ============================================================
-// 6. INIT (load data first, populate year dropdown)
+// 6. INIT
 // ============================================================
 function initApp() {
     loadFromLocalStorage();
     populateYearFilter();
     const now = new Date();
-    const currentYear = now.getFullYear();
-    yearFilter.value = currentYear;
+    yearFilter.value = now.getFullYear();
     monthFilter.value = 'all';
     updatePeriodLabel();
     renderAll();
 
     form.addEventListener('submit', handleFormSubmit);
-    yearFilter.addEventListener('change', () => {
-        updatePeriodLabel();
-        renderAll();
-    });
-    monthFilter.addEventListener('change', () => {
-        updatePeriodLabel();
-        renderAll();
-    });
+    yearFilter.addEventListener('change', () => { updatePeriodLabel(); renderAll(); });
+    monthFilter.addEventListener('change', () => { updatePeriodLabel(); renderAll(); });
     darkToggle.addEventListener('click', toggleDarkMode);
     document.getElementById('addQuickBtn').addEventListener('click', () => {
         document.querySelector('.form-box').scrollIntoView({ behavior: 'smooth' });
@@ -302,18 +251,14 @@ document.addEventListener('DOMContentLoaded', () => {
         showLoginPage(false);
         initApp();
         updateUIWithUser();
-        const savedSidebarState = localStorage.getItem('sidebarOpen');
+        const savedState = localStorage.getItem('sidebarOpen');
         const isDesktop = window.innerWidth >= 901;
         let defaultOpen = isDesktop;
-        if (savedSidebarState !== null) defaultOpen = savedSidebarState === 'true';
+        if (savedState !== null) defaultOpen = savedState === 'true';
         toggleSidebar(defaultOpen);
     } else {
         showLoginPage(true);
-        document.getElementById('loginName').value = '';
-        document.getElementById('loginBalance').value = '';
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.body.classList.add('dark');
-        }
+        if (localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark');
     }
 });
 
@@ -334,20 +279,15 @@ function showToast(message, type = 'info') {
 }
 
 // ============================================================
-// 8. LOCAL STORAGE (Data)
+// 8. LOCAL STORAGE
 // ============================================================
 function saveToLocalStorage() {
     localStorage.setItem('financeData', JSON.stringify(transactions));
 }
-
 function loadFromLocalStorage() {
     const stored = localStorage.getItem('financeData');
-    if (stored) {
-        transactions = JSON.parse(stored);
-        return;
-    }
-    transactions = [];
-    saveToLocalStorage();
+    transactions = stored ? JSON.parse(stored) : [];
+    if (!stored) saveToLocalStorage();
 }
 
 // ============================================================
@@ -357,18 +297,17 @@ function populateYearFilter() {
     const currentYear = new Date().getFullYear();
     let earliestYear = currentYear;
     transactions.forEach(tx => {
-        if (!tx.date) return;
-        const y = parseInt(tx.date.slice(0, 4));
-        if (y < earliestYear) earliestYear = y;
+        if (tx.date) {
+            const y = parseInt(tx.date.slice(0, 4));
+            if (y < earliestYear) earliestYear = y;
+        }
     });
     if (earliestYear > currentYear) earliestYear = currentYear;
-
     yearFilter.innerHTML = '';
     const allOpt = document.createElement('option');
     allOpt.value = 'all';
     allOpt.textContent = 'All Years';
     yearFilter.appendChild(allOpt);
-
     for (let y = currentYear; y >= earliestYear; y--) {
         const opt = document.createElement('option');
         opt.value = y;
@@ -383,13 +322,9 @@ function updatePeriodLabel() {
     const monthNames = ['January','February','March','April','May','June',
                         'July','August','September','October','November','December'];
     let label = '';
-    if (year === 'all') {
-        label = 'All Time';
-    } else if (month !== 'all') {
-        label = monthNames[parseInt(month)-1] + ' ' + year;
-    } else {
-        label = 'Full Year ' + year;
-    }
+    if (year === 'all') label = 'All Time';
+    else if (month !== 'all') label = monthNames[parseInt(month)-1] + ' ' + year;
+    else label = 'Full Year ' + year;
     currentMonthDisplay.textContent = label + ' Overview';
     listMonthLabel.textContent = 'Showing ' + label;
 }
@@ -404,14 +339,8 @@ function getFilteredTransactions() {
     const month = monthFilter.value;
     return transactions.filter(tx => {
         if (!tx.date) return false;
-        if (year !== 'all') {
-            const txYear = tx.date.slice(0, 4);
-            if (txYear !== year) return false;
-        }
-        if (month !== 'all') {
-            const txMonth = tx.date.slice(5, 7);
-            return txMonth === month;
-        }
+        if (year !== 'all' && tx.date.slice(0, 4) !== year) return false;
+        if (month !== 'all' && tx.date.slice(5, 7) !== month) return false;
         return true;
     });
 }
@@ -421,7 +350,6 @@ function getFilteredTransactions() {
 // ============================================================
 function renderAll() {
     const filtered = getFilteredTransactions();
-
     let totalIncome = 0, totalExpense = 0;
     filtered.forEach(tx => {
         if (tx.type === 'income') totalIncome += tx.amount;
@@ -439,8 +367,7 @@ function renderAll() {
     const expenses = filtered.filter(tx => tx.type === 'expense');
     const catMap = {};
     expenses.forEach(tx => { catMap[tx.category] = (catMap[tx.category] || 0) + tx.amount; });
-    let topCat = 'None';
-    let topVal = 0;
+    let topCat = 'None', topVal = 0;
     for (const [cat, val] of Object.entries(catMap)) {
         if (val > topVal) { topVal = val; topCat = cat; }
     }
@@ -457,7 +384,6 @@ function renderChart(filtered) {
     const expenses = filtered.filter(tx => tx.type === 'expense');
     const catMap = {};
     expenses.forEach(tx => { catMap[tx.category] = (catMap[tx.category] || 0) + tx.amount; });
-
     const labels = Object.keys(catMap);
     const dataValues = Object.values(catMap);
 
@@ -472,7 +398,6 @@ function renderChart(filtered) {
     const colors = labels.map((_, i) => palette[i % palette.length]);
 
     if (myChart) { myChart.destroy(); myChart = null; }
-
     const ctx = chartCanvas.getContext('2d');
     myChart = new Chart(ctx, {
         type: 'doughnut',
@@ -513,16 +438,13 @@ function renderTransactionList(filtered) {
         transactionList.innerHTML = `<p class="empty-msg">No transactions for this period. Add one above!</p>`;
         return;
     }
-
     const sorted = [...filtered].sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
-
     let html = '';
     sorted.forEach(tx => {
         const sign = tx.type === 'income' ? '+' : '-';
         const colorClass = tx.type === 'income' ? 'income-text' : 'expense-text';
         const dateObj = new Date(tx.date + 'T00:00:00');
         const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-
         html += `
             <div class="transaction-item" data-id="${tx.id}">
                 <div class="tx-info">
@@ -554,7 +476,6 @@ function escapeHTML(text) {
 // ============================================================
 function handleFormSubmit(e) {
     e.preventDefault();
-
     const description = descInput.value.trim();
     const amount = parseFloat(amountInput.value);
     const category = categorySelect.value;
@@ -565,35 +486,20 @@ function handleFormSubmit(e) {
     if (isNaN(amount) || amount <= 0) return showToast('Please enter a valid positive amount.', 'error');
 
     const today = new Date().toISOString().slice(0, 10);
-
     if (editingId !== null) {
         const index = transactions.findIndex(tx => tx.id === editingId);
         if (index !== -1) {
-            transactions[index] = { 
-                ...transactions[index], 
-                description, 
-                amount, 
-                category, 
-                type
-            };
+            transactions[index] = { ...transactions[index], description, amount, category, type };
             showToast('✅ Transaction updated!', 'success');
         }
         editingId = null;
         submitBtn.innerHTML = '<i class="fas fa-plus"></i> Add Transaction';
         formTitle.innerHTML = '<i class="fas fa-plus-circle"></i> Add Transaction';
     } else {
-        const newTx = { 
-            id: Date.now(), 
-            description, 
-            amount, 
-            category, 
-            type, 
-            date: today
-        };
+        const newTx = { id: Date.now(), description, amount, category, type, date: today };
         transactions.push(newTx);
         showToast('🎉 Transaction added!', 'success');
     }
-
     saveToLocalStorage();
     form.reset();
     document.querySelector('input[name="type"][value="income"]').checked = true;
@@ -613,12 +519,10 @@ function deleteTransaction(id) {
 function editTransaction(id) {
     const tx = transactions.find(t => t.id === id);
     if (!tx) return;
-
     descInput.value = tx.description;
     amountInput.value = tx.amount;
     categorySelect.value = tx.category;
     typeRadios.forEach(r => { r.checked = (r.value === tx.type); });
-
     editingId = tx.id;
     submitBtn.innerHTML = '<i class="fas fa-pen"></i> Update Transaction';
     formTitle.innerHTML = '<i class="fas fa-pen"></i> Edit Transaction';
