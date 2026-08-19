@@ -1,6 +1,6 @@
 /* ============================================================
    COMPLETE CSS – MeraHisaab (Dashboard + Reports)
-   FIXED: card overflow, chart centering, legend centering
+   FIXED: card overflow, chart centering, monthly chart full-width + bottom aligned
    ============================================================ */
 
 /* ===== RESET & BASE ===== */
@@ -348,8 +348,8 @@ body {
     border: 1px solid var(--border-color);
     box-shadow: var(--shadow);
     transition: box-shadow 0.2s, border-color 0.2s;
-    min-width: 0;           /* prevent flex overflow */
-    overflow: hidden;       /* keep everything inside */
+    min-width: 0;
+    overflow: hidden;
 }
 .card:hover {
     border-color: var(--accent-purple);
@@ -490,7 +490,7 @@ body {
     color: var(--text-primary);
 }
 
-/* ===== CHART WRAPPER – CENTER FIX ===== */
+/* ===== CHART WRAPPER – BASE ===== */
 .chart-wrapper {
     position: relative;
     width: 100%;
@@ -503,11 +503,49 @@ body {
 }
 .chart-wrapper canvas {
     display: block;
-    max-width: 280px !important;   /* keeps chart neat & centered */
     width: 100% !important;
     height: auto !important;
     margin: 0 auto;
 }
+
+/* ----- Doughnut charts (Dashboard + Expense Breakdown) stay centered & compact ----- */
+#expenseChart,
+#categoryChart {
+    max-width: 280px !important;
+    max-height: 280px !important;
+}
+
+/* ----- Monthly Bar Chart – FULL WIDTH + BOTTOM ALIGNED ----- */
+/* The container for monthly chart */
+.chart-box:has(#monthlyChart) .chart-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: stretch;
+    max-height: 320px;
+    min-height: 260px;
+    padding-bottom: 6px;
+}
+
+.chart-box:has(#monthlyChart) .chart-wrapper canvas {
+    max-width: 100% !important;
+    max-height: 300px !important;
+    width: 100% !important;
+    height: auto !important;
+    margin: 0;
+}
+
+/* Ensure the chart-box itself uses flex column to push chart down */
+.chart-box:has(#monthlyChart) {
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-box:has(#monthlyChart) .chart-wrapper {
+    flex: 1;
+}
+
+/* ===== EMPTY STATE ===== */
 .chart-empty-msg {
     text-align: center;
     color: var(--text-secondary);
@@ -792,15 +830,19 @@ body {
         padding: 1rem;
     }
 
-    .chart-wrapper {
-        max-height: 220px;
+    /* Monthly chart on mobile – keep full width but smaller height */
+    .chart-box:has(#monthlyChart) .chart-wrapper {
+        max-height: 240px;
+        min-height: 180px;
     }
-    .chart-wrapper canvas {
-        max-width: 220px !important;
+    .chart-box:has(#monthlyChart) .chart-wrapper canvas {
         max-height: 220px !important;
     }
 
-    #monthlyChart {
+    /* Doughnut charts on mobile */
+    #expenseChart,
+    #categoryChart {
+        max-width: 200px !important;
         max-height: 200px !important;
     }
 
@@ -841,7 +883,6 @@ body {
         width: 3px;
     }
 
-    /* === DASHBOARD CARD FIX (mobile numbers) === */
     .summary-grid {
         grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
         gap: 0.75rem;
@@ -863,15 +904,17 @@ body {
         border-radius: 1rem;
     }
 
-    .chart-wrapper {
-        max-height: 180px;
+    .chart-box:has(#monthlyChart) .chart-wrapper {
+        max-height: 200px;
+        min-height: 150px;
     }
-    .chart-wrapper canvas {
-        max-width: 180px !important;
+    .chart-box:has(#monthlyChart) .chart-wrapper canvas {
         max-height: 180px !important;
     }
 
-    #monthlyChart {
+    #expenseChart,
+    #categoryChart {
+        max-width: 160px !important;
         max-height: 160px !important;
     }
 
@@ -885,7 +928,6 @@ body {
         font-size: 0.75rem;
     }
 
-    /* === DASHBOARD CARD FIX (extra small) === */
     .summary-grid {
         grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
         gap: 0.5rem;
