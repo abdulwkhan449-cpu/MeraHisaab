@@ -1,8 +1,6 @@
 /* ============================================================
    COMPLETE CSS – MeraHisaab (Dashboard + Base)
-   FIXED: Mobile summary cards match report page style,
-          Filter stacked vertically on mobile,
-          Doughnut chart professional size
+   Desktop & Mobile styles properly separated
    ============================================================ */
 
 /* ===== RESET & BASE ===== */
@@ -337,7 +335,7 @@ body {
 }
 
 /* ============================================================
-   SUMMARY CARDS – Desktop (4 columns)
+   SUMMARY CARDS – DESKTOP (4 columns, original style)
    ============================================================ */
 .summary-grid {
     display: grid;
@@ -387,7 +385,7 @@ body {
 .card-savings .card-value { color: #f59e0b; }
 
 /* ============================================================
-   FILTER BAR – Desktop (horizontal)
+   FILTER BAR – DESKTOP (horizontal)
    ============================================================ */
 .filter-bar {
     display: flex;
@@ -640,7 +638,7 @@ body {
 }
 
 /* ============================================================
-   RESPONSIVE – MOBILE
+   RESPONSIVE – MOBILE (only applied on small screens)
    ============================================================ */
 
 @media (max-width: 768px) {
