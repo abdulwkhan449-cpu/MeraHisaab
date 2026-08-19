@@ -1,6 +1,7 @@
 /* ============================================================
-   REPORTS PAGE – Complete Updated Styles
-   ADDED: Combined layout for Doughnut + Top Spending
+   REPORTS PAGE – Complete Styles
+   FIXED: Monthly chart compact (no empty space),
+          Combined doughnut + top spending (left/right)
    ============================================================ */
 
 /* ===== CHART BOXES ===== */
@@ -19,105 +20,6 @@
 .chart-box:hover {
     border-color: var(--accent-purple);
     box-shadow: var(--shadow-hover);
-}
-
-/* ============================================================
-   COMBINED LAYOUT – Doughnut + Top Spending (LEFT/RIGHT)
-   ============================================================ */
-.combined-chart-box {
-    padding: 1.5rem;
-}
-
-.combined-chart-layout {
-    display: flex;
-    flex-direction: row;
-    gap: 2rem;
-    align-items: center;
-    width: 100%;
-}
-
-/* LEFT: Top Spending List */
-.top-spending-section {
-    flex: 1;
-    min-width: 0;
-    max-width: 50%;
-}
-
-.top-spending-section h3 {
-    font-weight: 600;
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    margin-bottom: 0.5rem;
-    letter-spacing: 0.3px;
-}
-
-#topSpendingList {
-    max-height: 240px;
-    overflow-y: auto;
-    padding-right: 6px;
-}
-
-.spending-item {
-    padding: 8px 0;
-    border-bottom: 1px solid var(--border-color);
-    transition: background 0.2s;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.spending-item:last-child {
-    border-bottom: none;
-}
-
-.spending-item .category-name {
-    font-weight: 500;
-    font-size: 0.85rem;
-    color: var(--text-primary);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.spending-item .category-amount {
-    font-weight: 600;
-    font-size: 0.85rem;
-    color: var(--text-primary);
-}
-
-.category-bar {
-    height: 4px;
-    border-radius: 99px;
-    margin-top: 4px;
-    transition: width 0.6s ease;
-    max-width: 100%;
-}
-
-/* RIGHT: Doughnut Chart */
-.doughnut-section {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    max-width: 50%;
-}
-
-.doughnut-section .chart-wrapper {
-    width: 100%;
-    max-height: 280px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 4px 0;
-}
-
-.doughnut-section .chart-wrapper canvas {
-    max-width: 260px !important;
-    max-height: 260px !important;
-    width: 100% !important;
-    height: auto !important;
-    margin: 0 auto;
 }
 
 /* ============================================================
@@ -195,7 +97,69 @@
 }
 
 /* ============================================================
-   MONTHLY CHART (Bar Chart) – Compact & Professional
+   SUMMARY CARDS – VERTICAL ON MOBILE
+   ============================================================ */
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.card {
+    background: var(--bg-card);
+    border-radius: var(--card-radius);
+    padding: 1.25rem;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.2s, border-color 0.2s;
+    min-width: 0;
+    overflow: hidden;
+}
+.card:hover {
+    border-color: var(--accent-purple);
+    box-shadow: var(--shadow-hover);
+}
+.card-header {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.3rem;
+}
+.card-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.3;
+}
+.card-footer {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 0.2rem;
+}
+.card-balance .card-value { color: var(--accent-purple); }
+.card-income .card-value { color: var(--accent-green); }
+.card-expense .card-value { color: var(--accent-red); }
+
+/* ============================================================
+   ROW LAYOUT
+   ============================================================ */
+.row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+.row .chart-box.full-width-chart {
+    grid-column: 1 / -1;
+}
+
+/* ============================================================
+   MONTHLY CHART (Bar Chart) – Compact, No Empty Space
    ============================================================ */
 .chart-box:has(#monthlyChart) {
     display: flex;
@@ -222,8 +186,110 @@
 }
 
 /* ============================================================
-   EMPTY STATE
+   COMBINED LAYOUT – Doughnut + Top Spending (LEFT/RIGHT)
    ============================================================ */
+.combined-chart-box {
+    padding: 1.5rem;
+}
+
+.combined-chart-layout {
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+    align-items: stretch;
+    width: 100%;
+}
+
+/* LEFT: Top Spending List */
+.top-spending-section {
+    flex: 1;
+    min-width: 0;
+    max-width: 50%;
+    display: flex;
+    flex-direction: column;
+}
+
+.top-spending-section h3 {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+    letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#topSpendingList {
+    flex: 1;
+    max-height: 240px;
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+.spending-item {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-color);
+    transition: background 0.2s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.spending-item:last-child {
+    border-bottom: none;
+}
+
+.spending-item .category-name {
+    font-weight: 500;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.spending-item .category-amount {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+}
+
+.category-bar {
+    height: 4px;
+    border-radius: 99px;
+    margin-top: 4px;
+    transition: width 0.6s ease;
+    max-width: 100%;
+}
+
+/* RIGHT: Doughnut Chart */
+.doughnut-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 50%;
+}
+
+.doughnut-section .chart-wrapper {
+    width: 100%;
+    max-height: 280px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4px 0;
+}
+
+.doughnut-section .chart-wrapper canvas {
+    max-width: 260px !important;
+    max-height: 260px !important;
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 auto;
+}
+
 .chart-empty-msg {
     text-align: center;
     color: var(--text-secondary);
@@ -237,7 +303,7 @@
    ============================================================ */
 
 @media (max-width: 768px) {
-    /* === SUMMARY CARDS – VERTICAL STACK === */
+    /* === SUMMARY CARDS – VERTICAL === */
     .summary-grid {
         grid-template-columns: 1fr !important;
         gap: 0.75rem;
@@ -247,7 +313,16 @@
         padding: 1rem;
     }
 
-    /* === COMBINED LAYOUT – Stack vertically on mobile === */
+    /* === MONTHLY CHART – Mobile compact === */
+    .chart-box:has(#monthlyChart) .chart-wrapper {
+        max-height: 220px;
+        min-height: 180px;
+    }
+    .chart-box:has(#monthlyChart) .chart-wrapper canvas {
+        max-height: 200px !important;
+    }
+
+    /* === COMBINED LAYOUT – Stack vertically === */
     .combined-chart-layout {
         flex-direction: column !important;
         gap: 1.5rem;
@@ -325,13 +400,8 @@
         padding: 0.2rem 0.6rem;
     }
 
-    /* === MONTHLY CHART – Mobile compact === */
-    .chart-box:has(#monthlyChart) .chart-wrapper {
-        max-height: 220px;
-        min-height: 180px;
-    }
-    .chart-box:has(#monthlyChart) .chart-wrapper canvas {
-        max-height: 200px !important;
+    .combined-chart-box {
+        padding: 1rem;
     }
 }
 
