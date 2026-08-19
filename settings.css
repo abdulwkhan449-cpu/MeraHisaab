@@ -40,17 +40,30 @@ body.dark {
     color: #7c3aed !important;
 }
 
-/* ===== MAIN CONTENT ===== */
+/* ============================================================
+   MAIN CONTENT – FIXED: proper margin on desktop
+   ============================================================ */
 .main-content {
     transition: margin-left 0.3s ease;
     margin-left: 0;
-    padding: 1.5rem 2rem;
-}
-.main-content.sidebar-open {
-    margin-left: 260px;
+    padding: 1.5rem 1rem;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 100vh;
 }
 
-/* ===== SIDEBAR (same as dashboard) ===== */
+/* Desktop: push content right of sidebar */
+@media (min-width: 901px) {
+    .main-content {
+        margin-left: 260px !important;
+        padding: 1.5rem 2rem;
+        width: calc(100% - 260px);
+    }
+}
+
+/* ============================================================
+   SIDEBAR (same as dashboard)
+   ============================================================ */
 .sidebar {
     position: fixed;
     top: 0;
@@ -70,6 +83,15 @@ body.dark {
 .sidebar.open {
     transform: translateX(0);
 }
+
+/* Desktop: sidebar always visible */
+@media (min-width: 901px) {
+    .sidebar {
+        transform: translateX(0) !important;
+    }
+}
+
+/* ===== OVERLAY (mobile only) ===== */
 .overlay {
     display: none;
     position: fixed;
@@ -82,20 +104,50 @@ body.dark {
 }
 
 @media (min-width: 901px) {
-    .sidebar {
-        transform: translateX(0);
-    }
-    .sidebar.open ~ .main-content {
-        margin-left: 260px;
+    .overlay {
+        display: none !important;
     }
 }
-@media (max-width: 900px) {
-    .main-content.sidebar-open {
-        margin-left: 0 !important;
+
+/* ============================================================
+   HEADER – same as dashboard
+   ============================================================ */
+.top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+.hamburger {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: block;
+}
+@media (min-width: 901px) {
+    .hamburger {
+        display: none;
     }
-    .main-content {
-        padding: 1rem;
-    }
+}
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+.dark-toggle {
+    background: none;
+    border: 1px solid var(--border-color);
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--text-primary);
+    font-size: 0.85rem;
 }
 
 /* ============================================================
@@ -293,7 +345,7 @@ body.dark {
 }
 
 /* ============================================================
-   DATA ACTION BUTTONS – consistent with dashboard list items
+   DATA ACTION BUTTONS – consistent with dashboard
    ============================================================ */
 .data-actions {
     display: flex;
@@ -460,6 +512,13 @@ body.dark {
    ============================================================ */
 
 @media (max-width: 768px) {
+    /* === MAIN CONTENT – mobile === */
+    .main-content {
+        padding: 1rem;
+        margin-left: 0 !important;
+        width: 100%;
+    }
+
     /* === SETTINGS CARDS – TALL & PROFESSIONAL === */
     .settings-card {
         padding: 2.5rem 2.5rem;
