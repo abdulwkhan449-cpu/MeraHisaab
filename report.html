@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
     <title>MeraHisaab · Reports</title>
 
     <!-- Google Font -->
@@ -13,9 +13,6 @@
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
@@ -24,7 +21,6 @@
 
     <!-- Reports-specific styles -->
     <link rel="stylesheet" href="reports.css" />
-    <link rel="icon" href="./image.png" type="image/x-icon">
 
 </head>
 <body>
@@ -45,9 +41,9 @@
             </div>
             <nav class="sidebar-nav">
                 <a href="index.html" class="nav-item"><i class="fas fa-home"></i> Dashboard</a>
-                <a href="report" class="nav-item active"><i class="fas fa-chart-line"></i> Reports</a>
+                <a href="report.html" class="nav-item active"><i class="fas fa-chart-line"></i> Reports</a>
                 <a href="budget.html" class="nav-item"><i class="fas fa-wallet"></i> Budgets</a>
-                <a href="setting.html" class="nav-item" id="settingsNavTrigger"><i class="fas fa-cog"></i> Settings</a>
+                <a href="#" class="nav-item" id="settingsNavTrigger"><i class="fas fa-cog"></i> Settings</a>
             </nav>
             <div class="sidebar-user">
                 <div class="avatar" id="userAvatar">JD</div>
@@ -71,7 +67,7 @@
                     </div>
                 </div>
                 <div class="header-actions">
-                    <span id="headerCurrencyDisplay" class="font-semibold text-gray-500 dark:text-gray-400">PKR</span>
+                    <span id="headerCurrencyDisplay" class="font-semibold text-gray-500">PKR</span>
                     <button class="dark-toggle" id="darkModeToggle"><i class="fas fa-moon"></i> Dark</button>
                 </div>
             </header>
@@ -79,26 +75,30 @@
             <!-- Filter Bar (Year + Month) -->
             <div class="filter-bar">
                 <div class="filter-left">
-                    <label for="yearFilter"><i class="fas fa-calendar-alt"></i> Year:</label>
-                    <select id="yearFilter" class="px-4 py-2 rounded-lg border dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white font-semibold">
-                        <!-- Options populated by JS -->
-                    </select>
-                    <label for="monthFilter">Month:</label>
-                    <select id="monthFilter" class="px-4 py-2 rounded-lg border dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white font-semibold">
-                        <option value="all">All</option>
-                        <option value="01">January</option>
-                        <option value="02">February</option>
-                        <option value="03">March</option>
-                        <option value="04">April</option>
-                        <option value="05">May</option>
-                        <option value="06">June</option>
-                        <option value="07">July</option>
-                        <option value="08">August</option>
-                        <option value="09">September</option>
-                        <option value="10">October</option>
-                        <option value="11">November</option>
-                        <option value="12">December</option>
-                    </select>
+                    <div class="filter-group">
+                        <label for="yearFilter"><i class="fas fa-calendar-alt"></i> Year:</label>
+                        <select id="yearFilter">
+                            <!-- Options populated by JS -->
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="monthFilter">Month:</label>
+                        <select id="monthFilter">
+                            <option value="all">All</option>
+                            <option value="01">January</option>
+                            <option value="02">February</option>
+                            <option value="03">March</option>
+                            <option value="04">April</option>
+                            <option value="05">May</option>
+                            <option value="06">June</option>
+                            <option value="07">July</option>
+                            <option value="08">August</option>
+                            <option value="09">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="filter-right">
                     <span class="stat-badge" id="txCountBadge"><i class="fas fa-list"></i> 0 Transactions</span>
@@ -126,28 +126,33 @@
 
             <!-- Monthly Chart (Full Width) -->
             <div class="row">
-                <div class="chart-box" style="grid-column: 1 / -1;">
+                <div class="chart-box full-width-chart">
                     <h2 class="text-xl font-semibold mb-2"><i class="fas fa-chart-bar text-purple-600"></i> Monthly Income vs Expenses</h2>
-                    <div class="chart-wrapper" style="min-height: 280px;">
+                    <div class="chart-wrapper">
                         <canvas id="monthlyChart"></canvas>
                     </div>
                 </div>
             </div>
 
-            <!-- Bottom Row: Category Chart + Top Spending -->
+            <!-- ===== COMBINED: Doughnut + Top Spending (LEFT/RIGHT) ===== -->
             <div class="row">
-                <div class="chart-box">
-                    <h2 class="text-xl font-semibold mb-2"><i class="fas fa-chart-pie text-purple-600"></i> Expense Breakdown</h2>
-                    <div class="chart-wrapper">
-                        <canvas id="categoryChart"></canvas>
-                    </div>
-                    <p id="chartEmptyMsg" class="chart-empty-msg">No expenses this period.</p>
-                </div>
-
-                <div class="chart-box">
-                    <h2 class="text-xl font-semibold mb-2"><i class="fas fa-list text-purple-600"></i> Top Spending Categories</h2>
-                    <div id="topSpendingList" class="space-y-2 max-h-60 overflow-y-auto">
-                        <!-- Rendered by JS -->
+                <div class="chart-box combined-chart-box">
+                    <h2 class="text-xl font-semibold mb-3"><i class="fas fa-chart-pie text-purple-600"></i> Expense Breakdown</h2>
+                    <div class="combined-chart-layout">
+                        <!-- LEFT: Top Spending List -->
+                        <div class="top-spending-section">
+                            <h3><i class="fas fa-list"></i> Top Spending Categories</h3>
+                            <div id="topSpendingList">
+                                <!-- Rendered by JS -->
+                            </div>
+                        </div>
+                        <!-- RIGHT: Doughnut Chart -->
+                        <div class="doughnut-section">
+                            <div class="chart-wrapper">
+                                <canvas id="categoryChart"></canvas>
+                            </div>
+                            <p id="chartEmptyMsg" class="chart-empty-msg">No expenses this period.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -156,7 +161,7 @@
     </div>
 
     <!-- ========================================================== -->
-    <!-- SETTINGS MODAL (reused from index)                         -->
+    <!-- SETTINGS MODAL                                             -->
     <!-- ========================================================== -->
     <div id="settingsModal" class="modal-overlay">
         <div class="modal-content">
@@ -178,7 +183,7 @@
             </div>
             <div class="flex flex-wrap gap-3 mt-4">
                 <button class="btn btn-primary flex-1" id="saveSettingsBtn"><i class="fas fa-save"></i> Save Changes</button>
-                <button class="btn flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300" id="closeSettingsBtn">Cancel</button>
+                <button class="btn btn-secondary flex-1" id="closeSettingsBtn">Cancel</button>
             </div>
         </div>
     </div>
