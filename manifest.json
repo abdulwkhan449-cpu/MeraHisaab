@@ -1,0 +1,22 @@
+{
+  "name": "MeraHisaab - Personal Finance",
+  "short_name": "MeraHisaab",
+  "description": "Track your income and expenses easily",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#7c3aed",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "image.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "image.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
