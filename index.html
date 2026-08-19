@@ -19,11 +19,6 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="index.css" />
 
-    
-    <!-- Favicon -->
-    <link rel="icon" href="./image.png" type="image/x-icon" />
-
-    
 </head>
 <body>
 
@@ -104,10 +99,10 @@
                 <span>MeraHisaab</span>
             </div>
             <nav class="sidebar-nav">
-                <a href="./index.html" class="nav-item active"><i class="fas fa-home"></i> Dashboard</a>
-                <a href="./report.html" class="nav-item"><i class="fas fa-chart-line"></i> Reports</a>
-                <a href="./budget.html" class="nav-item"><i class="fas fa-wallet"></i> Budgets</a>
-                <a href="./setting.html" class="nav-item" id="settingsNavTrigger"><i class="fas fa-cog"></i> Settings</a>
+                <a href="index.html" class="nav-item active"><i class="fas fa-home"></i> Dashboard</a>
+                <a href="report.html" class="nav-item"><i class="fas fa-chart-line"></i> Reports</a>
+                <a href="budget.html" class="nav-item"><i class="fas fa-wallet"></i> Budgets</a>
+                <a href="#" class="nav-item" id="settingsNavTrigger"><i class="fas fa-cog"></i> Settings</a>
             </nav>
             <div class="sidebar-user">
                 <div class="avatar" id="userAvatar">JD</div>
@@ -137,26 +132,34 @@
                 </div>
             </header>
 
-            <!-- Summary Cards -->
+            <!-- ===== SUMMARY CARDS (Updated structure for mobile) ===== -->
             <section class="summary-grid">
                 <div class="card card-balance">
-                    <div class="card-header"><i class="fas fa-wallet"></i> Total Balance</div>
-                    <div class="card-value" id="balanceDisplay">$0.00</div>
+                    <div class="card-left">
+                        <div class="card-header"><i class="fas fa-wallet"></i> Total Balance</div>
+                        <div class="card-value" id="balanceDisplay">$0.00</div>
+                    </div>
                     <div class="card-footer" id="balanceChange">+ $0.00 this month</div>
                 </div>
                 <div class="card card-income">
-                    <div class="card-header"><i class="fas fa-arrow-up"></i> Income</div>
-                    <div class="card-value" id="incomeDisplay">$0.00</div>
+                    <div class="card-left">
+                        <div class="card-header"><i class="fas fa-arrow-up"></i> Income</div>
+                        <div class="card-value" id="incomeDisplay">$0.00</div>
+                    </div>
                     <div class="card-footer">Total earned</div>
                 </div>
                 <div class="card card-expense">
-                    <div class="card-header"><i class="fas fa-arrow-down"></i> Expenses</div>
-                    <div class="card-value" id="expenseDisplay">$0.00</div>
+                    <div class="card-left">
+                        <div class="card-header"><i class="fas fa-arrow-down"></i> Expenses</div>
+                        <div class="card-value" id="expenseDisplay">$0.00</div>
+                    </div>
                     <div class="card-footer">Total spent</div>
                 </div>
                 <div class="card card-savings">
-                    <div class="card-header"><i class="fas fa-piggy-bank"></i> Savings Rate</div>
-                    <div class="card-value" id="savingsDisplay">0%</div>
+                    <div class="card-left">
+                        <div class="card-header"><i class="fas fa-piggy-bank"></i> Savings Rate</div>
+                        <div class="card-value" id="savingsDisplay">0%</div>
+                    </div>
                     <div class="card-footer">of total income</div>
                 </div>
             </section>
@@ -164,24 +167,28 @@
             <!-- Filter Bar -->
             <div class="filter-bar">
                 <div class="filter-left">
-                    <label for="yearFilter"><i class="fas fa-calendar-alt"></i> Year:</label>
-                    <select id="yearFilter"></select>
-                    <label for="monthFilter">Month:</label>
-                    <select id="monthFilter">
-                        <option value="all">All</option>
-                        <option value="01">January</option>
-                        <option value="02">February</option>
-                        <option value="03">March</option>
-                        <option value="04">April</option>
-                        <option value="05">May</option>
-                        <option value="06">June</option>
-                        <option value="07">July</option>
-                        <option value="08">August</option>
-                        <option value="09">September</option>
-                        <option value="10">October</option>
-                        <option value="11">November</option>
-                        <option value="12">December</option>
-                    </select>
+                    <div class="filter-group">
+                        <label for="yearFilter"><i class="fas fa-calendar-alt"></i> Year:</label>
+                        <select id="yearFilter"></select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="monthFilter">Month:</label>
+                        <select id="monthFilter">
+                            <option value="all">All</option>
+                            <option value="01">January</option>
+                            <option value="02">February</option>
+                            <option value="03">March</option>
+                            <option value="04">April</option>
+                            <option value="05">May</option>
+                            <option value="06">June</option>
+                            <option value="07">July</option>
+                            <option value="08">August</option>
+                            <option value="09">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="filter-right">
                     <span class="stat-badge" id="txCountBadge"><i class="fas fa-list"></i> 0 Transactions</span>
@@ -189,7 +196,7 @@
                 </div>
             </div>
 
-            <!-- ===== ROW: form + chart (FIXED MOBILE LAYOUT) ===== -->
+            <!-- ===== ROW: form + chart ===== -->
             <div class="row">
                 <div class="form-box">
                     <h2 id="formTitle" class="text-xl font-semibold mb-4"><i class="fas fa-plus-circle text-purple-600"></i> Add Transaction</h2>
@@ -249,7 +256,6 @@
         </main>
     </div>
 
-    <!-- Custom JS -->
     <script src="index.js"></script>
 </body>
 </html>
