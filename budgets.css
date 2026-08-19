@@ -1,9 +1,61 @@
 /* ============================================================
-   BUDGETS PAGE – Budgets-Specific Styles
-   Unified hover effects from settings.css
+   BUDGETS PAGE – Complete Styles
+   Mobile summary cards – same layout & styling as dashboard/reports
+   Mobile filter – stacked Year & Month
    ============================================================ */
 
-/* ----- Budget List Items ----- */
+/* ============================================================
+   SUMMARY CARDS – DESKTOP (3 columns)
+   ============================================================ */
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.card {
+    background: var(--bg-card);
+    border-radius: var(--card-radius);
+    padding: 1.25rem;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.2s, border-color 0.2s;
+    min-width: 0;
+    overflow: hidden;
+}
+.card:hover {
+    border-color: var(--accent-purple);
+    box-shadow: var(--shadow-hover);
+}
+.card-header {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.3rem;
+}
+.card-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.3;
+}
+.card-footer {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 0.2rem;
+}
+.card-balance .card-value { color: var(--accent-purple); }
+.card-income .card-value { color: var(--accent-green); }
+.card-savings .card-value { color: #f59e0b; }
+
+/* ============================================================
+   BUDGET LIST ITEMS
+   ============================================================ */
 .budget-item {
     display: flex;
     flex-direction: column;
@@ -33,18 +85,15 @@
     transition: opacity 0.3s ease;
 }
 
-/* ----- Hover effect (mirrors settings-card) ----- */
 .budget-item:hover {
     border-color: var(--accent-purple);
     box-shadow: var(--shadow-hover);
-    /* no transform – matches settings.css exactly */
 }
 
 .budget-item:hover::before {
     opacity: 1;
 }
 
-/* ----- Header & numbers (unchanged) ----- */
 .budget-item .budget-header {
     display: flex;
     justify-content: space-between;
@@ -159,7 +208,6 @@
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
-/* ----- Progress Bar ----- */
 .budget-progress {
     width: 100%;
     height: 8px;
@@ -178,16 +226,16 @@
 .budget-progress .progress-fill.safe {
     background: linear-gradient(90deg, #10b981, #34d399);
 }
-
 .budget-progress .progress-fill.warning {
     background: linear-gradient(90deg, #f59e0b, #fbbf24);
 }
-
 .budget-progress .progress-fill.danger {
     background: linear-gradient(90deg, #ef4444, #f87171);
 }
 
-/* ----- Empty State ----- */
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
 .empty-budgets {
     text-align: center;
     color: var(--text-secondary);
@@ -214,17 +262,144 @@
     margin: 0 auto;
 }
 
-/* ----- Modal fixes ----- */
+/* ============================================================
+   MODAL
+   ============================================================ */
 #budgetModal .modal-content {
     max-width: 420px;
 }
 
-/* ----- Responsive ----- */
-@media (max-width: 600px) {
+/* ============================================================
+   RESPONSIVE – MOBILE (same as dashboard/reports)
+   ============================================================ */
+
+@media (max-width: 768px) {
+    /* === SUMMARY CARDS – VERTICAL, LEFT-RIGHT LAYOUT === */
+    .summary-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .card {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 2.5rem 2.5rem;
+        min-height: 160px;
+        border-radius: 1.25rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow);
+        transition: box-shadow 0.2s, border-color 0.2s;
+        overflow: hidden;
+    }
+
+    .card .card-left {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+
+    .card .card-header {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin-bottom: 0;
+    }
+
+    .card .card-header i {
+        font-size: 1.2rem;
+    }
+
+    .card .card-value {
+        font-size: 1.9rem;
+        font-weight: 700;
+        line-height: 1.3;
+        color: var(--text-primary);
+    }
+
+    .card .card-footer {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-top: 0.1rem;
+        text-align: right;
+        font-weight: 500;
+    }
+
+    /* Color overrides for mobile cards */
+    .card-balance .card-value { color: var(--accent-purple); }
+    .card-income .card-value { color: var(--accent-green); }
+    .card-savings .card-value { color: #f59e0b; }
+
+    /* === FILTER BAR – Stack Year & Month vertically === */
+    .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+    }
+
+    .filter-left {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .filter-left .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .filter-left label {
+        min-width: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+    }
+
+    .filter-left select {
+        flex: 1;
+        min-width: 0;
+        padding: 0.4rem 0.6rem;
+        font-size: 0.85rem;
+        border: 1.5px solid var(--border-color);
+        border-radius: 0.5rem;
+        background: var(--bg-card);
+        color: var(--text-primary);
+    }
+
+    .filter-right {
+        justify-content: flex-start;
+        width: 100%;
+        margin-top: 0.25rem;
+    }
+
+    .stat-badge {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.8rem;
+        background: var(--bg-input);
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+    }
+
+    /* === BUDGET ITEMS – Mobile adjustments === */
     .budget-item {
         padding: 14px 16px;
     }
-    
+
     .budget-item .budget-header {
         flex-direction: column;
         align-items: stretch;
@@ -241,16 +416,59 @@
         justify-content: flex-end;
         margin-top: 4px;
     }
-    
+
     .budget-item::before {
         width: 3px;
     }
 }
 
-/* ----- Dark mode (unchanged) ----- */
+/* Extra small phones (< 480px) */
+@media (max-width: 480px) {
+    .summary-grid {
+        gap: 1rem;
+    }
+
+    .card {
+        padding: 2rem 2rem;
+        min-height: 130px;
+    }
+
+    .card .card-header {
+        font-size: 0.95rem;
+    }
+    .card .card-header i {
+        font-size: 1rem;
+    }
+    .card .card-value {
+        font-size: 1.6rem;
+    }
+    .card .card-footer {
+        font-size: 0.8rem;
+    }
+
+    .filter-left label {
+        min-width: 40px;
+        font-size: 0.8rem;
+    }
+    .filter-left select {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.5rem;
+    }
+    .stat-badge {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.6rem;
+    }
+}
+
+/* ============================================================
+   DARK MODE OVERRIDES
+   ============================================================ */
 body.dark .budget-item {
     background: var(--bg-card);
 }
 body.dark .budget-item:hover {
     border-color: var(--accent-purple);
+}
+body.dark .budget-item .budget-limit {
+    background: var(--bg-body);
 }
