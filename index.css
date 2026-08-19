@@ -1,6 +1,7 @@
 /* ============================================================
    COMPLETE CSS – MeraHisaab (Dashboard + Base)
    Desktop & Mobile styles properly separated
+   Mobile summary cards match report page style
    ============================================================ */
 
 /* ===== RESET & BASE ===== */
@@ -642,7 +643,7 @@ body {
    ============================================================ */
 
 @media (max-width: 768px) {
-    /* === SUMMARY CARDS – VERTICAL, REPORT PAGE STYLE === */
+    /* === SUMMARY CARDS – VERTICAL, LEFT-RIGHT LAYOUT === */
     .summary-grid {
         display: flex;
         flex-direction: column;
