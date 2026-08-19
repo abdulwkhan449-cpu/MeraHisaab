@@ -137,29 +137,25 @@
                 </div>
             </div>
 
-            <!-- ===== COMBINED: Doughnut + Top Spending (LEFT/RIGHT) ===== -->
-            <div class="row">
-                <div class="chart-box combined-chart-box">
-                    <h2 class="text-xl font-semibold mb-3"><i class="fas fa-chart-pie text-purple-600"></i> Expense Breakdown</h2>
-                    <div class="combined-chart-layout">
-                        <!-- LEFT: Top Spending List -->
-                        <div class="top-spending-section">
-                            <h3><i class="fas fa-list"></i> Top Spending Categories</h3>
-                            <div id="topSpendingList">
-                                <!-- Rendered by JS -->
-                            </div>
-                        </div>
-                        <!-- RIGHT: Doughnut Chart -->
-                        <div class="doughnut-section">
-                            <div class="chart-wrapper">
-                                <canvas id="categoryChart"></canvas>
-                            </div>
-                            <p id="chartEmptyMsg" class="chart-empty-msg">No expenses this period.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+           <!-- Bottom Row: Doughnut (Left) + Top Spending (Right) -->
+<div class="row">
+    <!-- LEFT: Doughnut Chart -->
+    <div class="chart-box doughnut-box">
+        <h2 class="text-xl font-semibold mb-2"><i class="fas fa-chart-pie text-purple-600"></i> Expense Breakdown</h2>
+        <div class="chart-wrapper">
+            <canvas id="categoryChart"></canvas>
+        </div>
+        <p id="chartEmptyMsg" class="chart-empty-msg">No expenses this period.</p>
+    </div>
 
+    <!-- RIGHT: Top Spending List -->
+    <div class="chart-box top-spending-box">
+        <h2 class="text-xl font-semibold mb-2"><i class="fas fa-list text-purple-600"></i> Top Spending Categories</h2>
+        <div id="topSpendingList" class="space-y-2 max-h-52 overflow-y-auto">
+            <!-- Rendered by JS -->
+        </div>
+    </div>
+</div>
         </main>
     </div>
 
