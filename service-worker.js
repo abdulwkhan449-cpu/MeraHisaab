@@ -1,4 +1,4 @@
-const CACHE_NAME = 'merahisaab-v1';
+const CACHE_NAME = 'merahisaab-v2';
 const urlsToCache = [
   'index.html',
   'index.css',
