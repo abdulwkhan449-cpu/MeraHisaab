@@ -1,7 +1,7 @@
 /* ============================================================
    COMPLETE CSS – MeraHisaab (Dashboard + Reports)
-   FIXED: Mobile summary cards stacked vertically,
-          Doughnut chart enlarged & professional
+   FIXED: Mobile filter stacked vertically,
+          Doughnut chart professional size on desktop
    ============================================================ */
 
 /* ===== RESET & BASE ===== */
@@ -336,7 +336,7 @@ body {
 }
 
 /* ============================================================
-   SUMMARY CARDS – MOBILE STACKED VERTICALLY
+   SUMMARY CARDS
    ============================================================ */
 .summary-grid {
     display: grid;
@@ -385,7 +385,9 @@ body {
 .card-expense .card-value { color: var(--accent-red); }
 .card-savings .card-value { color: #f59e0b; }
 
-/* ===== FILTER BAR ===== */
+/* ============================================================
+   FILTER BAR – Professional Layout (like reports)
+   ============================================================ */
 .filter-bar {
     display: flex;
     flex-wrap: wrap;
@@ -393,39 +395,68 @@ body {
     align-items: center;
     gap: 0.75rem;
     margin-bottom: 1.5rem;
-    padding: 0.75rem 1rem;
+    padding: 1rem 1.25rem;
     background: var(--bg-card);
     border-radius: 1rem;
     box-shadow: var(--shadow);
 }
+
 .filter-left {
     display: flex;
+    flex-direction: row;
     align-items: center;
-    gap: 0.3rem;
+    gap: 0.5rem 1rem;
     flex-wrap: wrap;
 }
-.filter-left label { font-weight: 500; font-size: 0.85rem; }
+
+.filter-left .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.filter-left label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
 .filter-left select {
-    padding: 0.25rem 0.5rem;
+    padding: 0.4rem 0.75rem;
     border-radius: 0.5rem;
-    border: 1px solid var(--border-color);
+    border: 1.5px solid var(--border-color);
     background: var(--bg-card);
     color: var(--text-primary);
     font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    min-width: 100px;
 }
+
+.filter-left select:focus {
+    border-color: var(--accent-purple);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+}
+
 .filter-right {
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
 }
+
 .stat-badge {
     font-size: 0.75rem;
-    padding: 0.2rem 0.6rem;
+    padding: 0.3rem 0.8rem;
     background: var(--bg-input);
     border-radius: 999px;
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
+    gap: 0.4rem;
+    font-weight: 500;
+    color: var(--text-secondary);
 }
 
 /* ===== ROW LAYOUT ===== */
@@ -495,18 +526,18 @@ body {
 }
 
 /* ============================================================
-   CHART WRAPPER – DOUGHNUT ENLARGED
+   CHART WRAPPER – DOUGHNUT PROFESSIONAL SIZE
    ============================================================ */
 .chart-wrapper {
     position: relative;
     width: 100%;
-    max-height: 360px;
+    max-height: 320px;
     margin: 0 auto;
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    padding: 8px 0;
+    padding: 4px 0;
 }
 
 .chart-wrapper canvas {
@@ -516,13 +547,13 @@ body {
     margin: 0 auto;
 }
 
-/* ----- DASHBOARD DOUGHNUT – ENLARGED ----- */
+/* ----- DASHBOARD DOUGHNUT – Professional size on desktop (280px) ----- */
 #expenseChart {
-    max-width: 420px !important;
-    max-height: 420px !important;
+    max-width: 280px !important;
+    max-height: 280px !important;
 }
 
-/* ----- Reports Doughnut (stays centered & compact) ----- */
+/* ----- Reports Doughnut – same professional size ----- */
 #categoryChart {
     max-width: 280px !important;
     max-height: 280px !important;
@@ -549,14 +580,14 @@ body {
     flex-direction: column;
     justify-content: flex-end;
     align-items: stretch;
-    max-height: 320px;
-    min-height: 260px;
+    max-height: 400px;
+    min-height: 320px;
     padding-bottom: 4px;
 }
 
 .chart-box:has(#monthlyChart) .chart-wrapper canvas {
     max-width: 100% !important;
-    max-height: 300px !important;
+    max-height: 380px !important;
     width: 100% !important;
     height: auto !important;
     margin: 0;
@@ -844,28 +875,73 @@ body {
         padding: 1rem;
     }
 
-    /* === DASHBOARD DOUGHNUT – Larger on Mobile === */
+    /* === FILTER SECTION – Stack labels & selects vertically === */
+    .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+    }
+
+    .filter-left {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .filter-left .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .filter-left label {
+        min-width: 50px;
+        font-size: 0.8rem;
+    }
+
+    .filter-left select {
+        flex: 1;
+        min-width: 0;
+        padding: 0.35rem 0.6rem;
+        font-size: 0.8rem;
+    }
+
+    .filter-right {
+        justify-content: center;
+        width: 100%;
+        gap: 0.4rem;
+    }
+
+    .stat-badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.6rem;
+    }
+
+    /* === DOUGHNUT CHART – Mobile size === */
     .chart-wrapper {
-        max-height: 320px;
+        max-height: 300px;
     }
     #expenseChart {
-        max-width: 320px !important;
-        max-height: 320px !important;
+        max-width: 260px !important;
+        max-height: 260px !important;
     }
 
     /* Reports doughnut */
     #categoryChart {
-        max-width: 200px !important;
-        max-height: 200px !important;
+        max-width: 260px !important;
+        max-height: 260px !important;
     }
 
     /* Monthly chart on mobile */
     .chart-box:has(#monthlyChart) .chart-wrapper {
-        max-height: 240px;
-        min-height: 180px;
+        max-height: 300px;
+        min-height: 220px;
     }
     .chart-box:has(#monthlyChart) .chart-wrapper canvas {
-        max-height: 220px !important;
+        max-height: 280px !important;
     }
 
     #topSpendingList {
@@ -938,26 +1014,25 @@ body {
         font-size: 0.65rem;
     }
 
-    /* === DASHBOARD DOUGHNUT – Even larger on very small screens === */
     .chart-wrapper {
-        max-height: 280px;
+        max-height: 260px;
     }
     #expenseChart {
-        max-width: 280px !important;
-        max-height: 280px !important;
+        max-width: 220px !important;
+        max-height: 220px !important;
     }
 
     #categoryChart {
-        max-width: 160px !important;
-        max-height: 160px !important;
+        max-width: 220px !important;
+        max-height: 220px !important;
     }
 
     .chart-box:has(#monthlyChart) .chart-wrapper {
-        max-height: 200px;
-        min-height: 150px;
+        max-height: 240px;
+        min-height: 170px;
     }
     .chart-box:has(#monthlyChart) .chart-wrapper canvas {
-        max-height: 180px !important;
+        max-height: 220px !important;
     }
 
     #topSpendingList {
@@ -970,21 +1045,16 @@ body {
         font-size: 0.75rem;
     }
 
-    .filter-bar {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.5rem;
-        padding: 0.75rem;
+    .filter-left .filter-group {
+        flex-wrap: wrap;
     }
-    .filter-left {
-        justify-content: center;
+    .filter-left label {
+        min-width: 40px;
+        font-size: 0.75rem;
     }
-    .filter-right {
-        justify-content: center;
-    }
-
-    .top-header h1 {
-        font-size: 1.5rem;
+    .filter-left select {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.5rem;
     }
 }
 
