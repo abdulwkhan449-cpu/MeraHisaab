@@ -541,23 +541,24 @@ function toggleDarkMode() {
     renderAll();
 }
 
+import { supabase } from './supabaseClient.js';
+
 async function saveUserData(userData) {
   try {
-    const response = await fetch('/api/user-data', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(userData),
-    });
+    const { data, error } = await supabase
+      .from('user_data')
+      .insert([
+        {
+          name: userData.name,
+          total_income: userData.total_income,
+          total_withdrawals: userData.total_withdrawals,
+          expenses: userData.expenses
+        }
+      ]);
 
-    if (!response.ok) {
-      throw new Error('Failed to save data');
-    }
-
-    const result = await response.json();
-    console.log('Success:', result);
+    if (error) throw error;
+    console.log('User data saved successfully:', data);
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error saving user data:', error.message);
   }
 }
