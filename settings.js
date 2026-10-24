@@ -629,3 +629,24 @@ document.addEventListener('DOMContentLoaded', () => {
     if (savedSidebarState !== null) defaultOpen = savedSidebarState === 'true';
     toggleSidebar(defaultOpen);
 });
+
+async function saveUserData(userData) {
+  try {
+    const response = await fetch('/api/user-data', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to save data');
+    }
+
+    const result = await response.json();
+    console.log('Success:', result);
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
